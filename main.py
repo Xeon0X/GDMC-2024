@@ -22,5 +22,25 @@ editor = Editor(buffering=True)
 #     print(point)
 #     editor.placeBlock(point, Block("stone"))
 
-print(segment.parrallel(((0, 0, 0), (0, 0, 10)), 10))
-print(segment.orthogonal((0, 0, 0), (1, 0, 0), 10))
+
+# print(segment.parallel(((0, 0, 0), (0, 0, 10)), 10))
+# print(segment.orthogonal((0, 0, 0), (1, 0, 0), 10))
+# print(curve.curvature(np.array(([0, 0, 0], [0, 1, 1], [1, 0, 1]))))
+
+
+curve_points = curve.curve(
+    [(390, 150, 788), (368, 155, 803), (377, 160, 836)], resolution=5)
+offset = curve.offset(curve_points, 10)
+
+for coordinate in offset:
+    editor.placeBlock(coordinate, Block("blue_concrete"))
+
+curve_points = curve.curve(
+    [(390, 150, 788), (368, 155, 803), (377, 160, 836)], resolution=5)
+offset = curve.offset(curve_points, -10)
+
+for coordinate in offset:
+    editor.placeBlock(coordinate, Block("red_concrete"))
+
+for coordinate in curve_points:
+    editor.placeBlock(coordinate, Block("white_concrete"))
