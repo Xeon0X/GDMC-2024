@@ -5,21 +5,17 @@ from scipy import interpolate
 class Curve:
     def __init__(self, target_points):
         # list of points to [(x1, y1, z1), (...), ...]
-        self.target_points = target_points
-        self.computed_points = []
+        self.computed_points = compute_curve(target_points)
 
-    def compute_curve(self, resolution=40):
+    @staticmethod
+    def compute_curve(self, target_points, resolution=40):
         """
         Fill self.computed_points with a list of points that approximate a smooth curve following self.target_points.
 
         https://stackoverflow.com/questions/18962175/spline-interpolation-coefficients-of-a-line-curve-in-3d-space
-
-        Args:
-            points (np.array): Points where the curve should pass in order.
-            resolution (int, optional): Total number of points to compute. Defaults to 40.
         """
         # Remove duplicates. Curve can't intersect itself
-        points = tuple(map(tuple, np.array(self.target_points)))
+        points = tuple(map(tuple, np.array(target_points)))
         points = sorted(set(points), key=points.index)
 
         # Change coordinates structure to (x1, x2, x3, ...), (y1, y2, y3, ...) (z1, z2, z3, ...)
@@ -38,5 +34,9 @@ class Curve:
         y_rounded = np.round(y_fine).astype(int)
         z_rounded = np.round(z_fine).astype(int)
 
-        self.computed_points = [(x, y, z) for x, y, z in zip(
+        return [(x, y, z) for x, y, z in zip(
             x_rounded, y_rounded, z_rounded)]
+
+    @staticmethod
+    def offset(self):
+        pass
