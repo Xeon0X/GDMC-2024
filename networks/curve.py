@@ -1,6 +1,5 @@
 import numpy as np
 from scipy import interpolate
-from scipy.interpolate import interp1d
 
 
 class Curve:
@@ -22,7 +21,6 @@ class Curve:
         # Remove duplicates. Curve can't intersect itself
         points = tuple(map(tuple, np.array(self.target_points)))
         points = sorted(set(points), key=points.index)
-        print(points)
 
         # Change coordinates structure to (x1, x2, x3, ...), (y1, y2, y3, ...) (z1, z2, z3, ...)
         coords = np.array(points, dtype=np.float32)
@@ -42,6 +40,3 @@ class Curve:
 
         self.computed_points = [(x, y, z) for x, y, z in zip(
             x_rounded, y_rounded, z_rounded)]
-
-        for i in range(len(self.computed_points)):
-            print(self.computed_points[i])
