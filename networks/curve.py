@@ -1,61 +1,47 @@
-class Curve:
-    def __init__(self, points):
-        self.points = points  # list of tuples (x1, y1, z1) in order
+import numpy as np
+from scipy import interpolate
+from scipy.interpolate import interp1d
 
-    def curve(points, resolution=40, debug=False):
+
+class Curve:
+    def __init__(self, target_points):
+        # list of points to [(x1, y1, z1), (...), ...]
+        self.target_points = target_points
+        self.computed_points = []
+
+    def compute_curve(self, resolution=40):
         """
-        Returns a 3d curve.
+        Fill self.computed_points with a list of points that approximate a smooth curve following self.target_points.
 
         https://stackoverflow.com/questions/18962175/spline-interpolation-coefficients-of-a-line-curve-in-3d-space
 
         Args:
             points (np.array): Points where the curve should pass in order.
-            resolution (int, optional): Number of points to compute. Defaults to 40.
-            debug (bool, optional): Visual. Defaults to False.
-
-        Returns:
-            tuple: Tuple of list of each coordinate.
+            resolution (int, optional): Total number of points to compute. Defaults to 40.
         """
-        # Remove duplicates.
-        points = tuple(map(tuple, points))
+        # Remove duplicates. Curve can't intersect itself
+        points = tuple(map(tuple, np.array(self.target_points)))
         points = sorted(set(points), key=points.index)
+        print(points)
 
-        x_sample = []
-        y_sample = []
-        z_sample = []
+        # Change coordinates structure to (x1, x2, x3, ...), (y1, y2, y3, ...) (z1, z2, z3, ...)
+        coords = np.array(points, dtype=np.float32)
+        x = coords[:, 0]
+        y = coords[:, 1]
+        z = coords[:, 2]
 
-        for i in range(len(points)):
-            x_sample.append(points[i][0])
-            z_sample.append(points[i][1])
-            y_sample.append(points[i][2])
-
-        x_sample = np.array(x_sample)
-        y_sample = np.array(y_sample)
-        z_sample = np.array(z_sample)
-
-        tck, u = interpolate.splprep([x_sample, y_sample, z_sample], s=2, k=2)
+        # Compute
+        tck, u = interpolate.splprep([x, y, z], s=2, k=2)
         x_knots, y_knots, z_knots = interpolate.splev(tck[0], tck)
-        u_fine = np.linspace(0, 1, number_true_pts)
+        u_fine = np.linspace(0, 1, resolution)
         x_fine, y_fine, z_fine = interpolate.splev(u_fine, tck)
 
-        if debug:
-            fig2 = plt.figure(2)
-            ax3d = fig2.add_subplot(111, projection="3d")
-            ax3d.plot(x_sample, y_sample, z_sample, "r*")
-            ax3d.plot(x_knots, y_knots, z_knots, "go")
-            ax3d.plot(x_fine, y_fine, z_fine, "r")
-            fig2.show()
-            plt.show()
+        x_rounded = np.round(x_fine).astype(int)
+        y_rounded = np.round(y_fine).astype(int)
+        z_rounded = np.round(z_fine).astype(int)
 
-        x = x_fine.tolist()
-        z = y_fine.tolist()
-        y = z_fine.tolist()
+        self.computed_points = [(x, y, z) for x, y, z in zip(
+            x_rounded, y_rounded, z_rounded)]
 
-        for i in x:
-            i = round(i)
-        for i in y:
-            i = round(i)
-        for i in z:
-            i = round(i)
-
-        return x, y, z
+        for i in range(len(self.computed_points)):
+            print(self.computed_points[i])

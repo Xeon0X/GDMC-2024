@@ -1,7 +1,7 @@
 # GDMC-2024
 A procedural city generator for Minecraft as part of the GDMC 2024 competition. 
 
-# Run
+## Run
 
 Install required packages using `pip`:
 ```bash
@@ -10,7 +10,7 @@ pip install -r requirements.txt
 
 Run `main.py`.
 
-# Dev 
+## Dev 
 
 First, setup your virtual environment using Python's built-in venv.
 
@@ -19,4 +19,4 @@ Install `pipreqs`:
 pip install pipreqs
 ```
 
-Run `pipreqs --ignore .venv` to generate an updated list of dependencies for the project in requirements file.
+Run `pipreqs --ignore .venv --force` to generate an updated list of dependencies for the project in requirements file.
