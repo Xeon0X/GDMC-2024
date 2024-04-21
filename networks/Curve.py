@@ -92,8 +92,3 @@ def offset(curve, distance):
     combined_curve.append(np.round(offset_segments[-1][1]).tolist())
 
     return combined_curve
-
-    # for i in range(1, len(offset_curve)-1):
-    #     pass
-
-# TODO : Curve Offset

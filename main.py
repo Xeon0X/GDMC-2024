@@ -27,18 +27,18 @@ editor = Editor(buffering=True)
 # print(segment.orthogonal((0, 0, 0), (1, 0, 0), 10))
 # print(curve.curvature(np.array(([0, 0, 0], [0, 1, 1], [1, 0, 1]))))
 
-for i in range(10):
-    curve_points = curve.curve(
-        [(317, 90, 686), (291, 95, 686), (271, 100, 705), (250, 95, 715), (234, 90, 692), (220, 146, 607), (185, 158, 598), (146, 90, 596), (142, 70, 674)], resolution=160)
-    offset = curve.offset(curve_points, i)
+i = 10
+curve_points = curve.curve(
+    [(317, 90, 686), (291, 95, 686), (271, 100, 705), (250, 95, 715), (234, 90, 692), (220, 146, 607), (185, 158, 598), (146, 90, 596), (142, 70, 674)], resolution=40)
+offset = curve.offset(curve_points, i)
 
-    for coordinate in offset:
-        editor.placeBlock(coordinate, Block("blue_concrete"))
+for coordinate in offset:
+    editor.placeBlock(coordinate, Block("blue_concrete"))
 
-    offset = curve.offset(curve_points, -i)
+offset = curve.offset(curve_points, -i)
 
-    for coordinate in offset:
-        editor.placeBlock(coordinate, Block("red_concrete"))
+for coordinate in offset:
+    editor.placeBlock(coordinate, Block("red_concrete"))
 
-    for coordinate in curve_points:
-        editor.placeBlock(coordinate, Block("white_concrete"))
+for coordinate in curve_points:
+    editor.placeBlock(coordinate, Block("white_concrete"))
