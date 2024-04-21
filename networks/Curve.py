@@ -80,10 +80,20 @@ def offset(curve, distance):
     curvature_values = curvature(curve)
 
     # Offsetting
-    offset_curve = [segment.parallel(
-        (curve[i], curve[i+1]), distance) for i in range(len(curve) - 1)]
+    offset_segments = [segment.parallel(
+        (curve[i], curve[i+1]), distance, curvature_values[i]) for i in range(len(curve) - 1)]
 
-    return offset_curve
+    # Combining segments
+    combined_curve = []
+    combined_curve.append(np.round(offset_segments[0][0]).tolist())
+    for i in range(0, len(offset_segments)-1):
+        combined_curve.append(segment.middle_point(
+            offset_segments[i][1], offset_segments[i+1][0]))
+    combined_curve.append(np.round(offset_segments[-1][1]).tolist())
+
+    return combined_curve
 
     # for i in range(1, len(offset_curve)-1):
     #     pass
+
+# TODO : Curve Offset

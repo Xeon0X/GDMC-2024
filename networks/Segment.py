@@ -49,26 +49,27 @@ def orthogonal(origin, point, distance, normal=np.array([0, 1, 0])):
     if np.array_equal(orthogonal, np.zeros((3,))):
         raise ValueError("The input vectors are not linearly independent.")
 
-    orthogonal = np.add(np.multiply(orthogonal, distance), origin)
+    orthogonal = np.round(
+        np.add(np.multiply(orthogonal, distance), origin)).astype(int)
     return orthogonal
 
 
-def discrete_segment(xyz1, xyz2, pixel_perfect=True):
+def discrete_segment(start_point, end_point, pixel_perfect=True):
     """
     Calculate a line between two points in 3D space.
 
     https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 
     Args:
-        xyz1 (tuple): First coordinates.
-        xyz2 (tuple): Second coordinates.
+        start_point (tuple): (x, y, z) First coordinates.
+        end_point (tuple): (x, y, z) Second coordinates.
         pixel_perfect (bool, optional): If true, remove unnecessary coordinates connecting to other coordinates side by side, leaving only a diagonal connection. Defaults to True.
 
     Returns:
         list: List of coordinates.
     """
-    (x1, y1, z1) = xyz1
-    (x2, y2, z2) = xyz2
+    (x1, y1, z1) = start_point
+    (x2, y2, z2) = end_point
     x1, y1, z1, x2, y2, z2 = (
         round(x1),
         round(y1),
@@ -162,3 +163,10 @@ def discrete_segment(xyz1, xyz2, pixel_perfect=True):
             p1 += 2 * dy
             p2 += 2 * dx
     return points
+
+
+def middle_point(start_point, end_point):
+    return (np.round((start_point[0] + end_point[0]) / 2.0).astype(int),
+            np.round((start_point[1] + end_point[1]) / 2.0).astype(int),
+            np.round((start_point[2] + end_point[2]) / 2.0).astype(int),
+            )
