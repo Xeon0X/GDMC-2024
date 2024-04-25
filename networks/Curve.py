@@ -1,6 +1,7 @@
 import numpy as np
 import networks.Segment as segment
 from scipy import interpolate
+from math import sqrt
 
 
 def curve(target_points, resolution=40):
@@ -92,3 +93,14 @@ def offset(curve, distance):
     combined_curve.append(np.round(offset_segments[-1][1]).tolist())
 
     return combined_curve
+
+
+def resolution_from_spacing(target_points, spacing_distance):
+    length = 0
+    for i in range(len(target_points) - 1):
+        length += sqrt(
+            ((target_points[i][0] - target_points[i + 1][0]) ** 2)
+            + ((target_points[i][1] - target_points[i + 1][1]) ** 2)
+            + ((target_points[i][2] - target_points[i + 1][2]) ** 2)
+        )
+    return round(length / spacing_distance)
