@@ -1,88 +1,103 @@
+
 from gdpc import Editor, Block, geometry
-import networks.curve as curve
+from list_block import *
 import numpy as np
 
-
-class House :
-    def __init__(self, editor,startX, startY, startZ, endX, endY, endZ):
+class House:
+    def __init__(self, editor, coordinates_min, coordinates_max):
         self.editor = editor
-        self.startX = startX
-        self.startY = startY
-        self.startZ = startZ
-        self.endX = endX
-        self.endY = endY
-        self.endZ = endZ
-       
-    
-    def placeGround(self):
-        for x in range(self.startX, self.endX):
-            for z in range(self.startZ, self.endZ):
-                self.editor.placeBlock((x, self.startY, z), Block("stone"))
-                
-    def placeWall(self):
-        for x in range(self.startX, self.endX+1):
-            for y in range(self.startY, self.endY):
-                self.editor.placeBlock((x, y, self.startZ), Block("oak_planks"))
-                self.editor.placeBlock((x, y, self.endZ), Block("oak_planks"))
-        for z in range(self.startZ, self.endZ+1):
-            for y in range(self.startY, self.endY):
-                self.editor.placeBlock((self.startX, y, z), Block("oak_planks"))
-                self.editor.placeBlock((self.endX, y, z), Block("oak_planks"))
-    
-    def placeRoof(self):
-        for x in range(self.startX, self.endX+1):
-            for z in range(self.startZ, self.endZ+1):
-                self.editor.placeBlock((x, self.endY, z), Block("stone"))
-                
-    def placeDoor(self,direction="north"):
-        if direction == "north":
-            x = (self.startX + self.endX) // 2
-            self.editor.placeBlock((x, self.startY, self.startZ), Block("air"))
-            self.editor.placeBlock((x, self.startY+1, self.startZ), Block("air"))
-            self.editor.placeBlock((x, self.startY+2, self.startZ), Block("air"))
-        elif direction == "south":
-            x = (self.startX + self.endX) // 2
-            self.editor.placeBlock((x, self.startY, self.endZ), Block("air"))
-            self.editor.placeBlock((x, self.startY+1, self.endZ), Block("air"))
-            self.editor.placeBlock((x, self.startY+2, self.endZ), Block("air"))
-        elif direction == "west":
-            z = (self.startZ + self.endZ) // 2
-            self.editor.placeBlock((self.startX, self.startY, z), Block("air"))
-            self.editor.placeBlock((self.startX, self.startY+1, z), Block("air"))
-            self.editor.placeBlock((self.startX, self.startY+2, z), Block("air"))
-        elif direction == "east":
-            z = (self.startZ + self.endZ) // 2
-            self.editor.placeBlock((self.endX, self.startY, z), Block("air"))
-            self.editor.placeBlock((self.endX, self.startY+1, z), Block("air"))
-            self.editor.placeBlock((self.endX, self.startY+2, z), Block("air"))
- 
-    def placeHouse(self):
-        self.clearInside()
-        self.placeGround()
-        self.placeWall()
-        self.placeRoof()
-        self.placeDoor()
-    
-    def clearInside(self):
-        for x in range(self.startX+1, self.endX):
-            for y in range(self.startY+1, self.endY):
-                for z in range(self.startZ+1, self.endZ):
-                    self.editor.placeBlock((x, y, z), Block("air"))
-
-    def clear(self):
-        for x in range(self.startX, self.endX+1):
-            for y in range(self.startY, self.endY+1):
-                for z in range(self.startZ, self.endZ+1):
-                    self.editor.placeBlock((x, y, z), Block("air"))
+        self.coordinates_min = coordinates_min
+        self.coordinates_max = coordinates_max
         
+        self.skeleton = []
+        
+    def createHouseSkeleton(self):
+        self.delete()
+        x_min, y_min, z_min = self.coordinates_min
+        x_max, y_max, z_max = self.coordinates_max
+        
+        for i in range (x_min, x_max):
+            for y in range(z_min, z_max):
+                if i == x_min or i == x_max - 1 or y == z_min or y == z_max - 1:
+                    self.editor.placeBlock((i, y_min, y), Block("oak_planks"))
+                
+        perimeter_width = x_max - x_min
+        perimeter_depth = z_max - z_min
+        
+
+        x = np.random.randint(x_min+1 , x_max-1)  
+        z = np.random.randint(z_min+1 , z_max-1 ) 
+        
+        width = perimeter_width // 2
+        depth = perimeter_depth // 2
+        
+        if x + width-1 > x_max-1:
+            x = x_max - width-1
+        if z + depth-1 > z_max-1:
+            z = z_max - depth-1
+        
+        for i in range(0, width-1):
+            for j in range(0, depth-1):
+                self.editor.placeBlock((x + i, y_min, z + j), Block("stone"))
+                
+        self.skeleton.append((x, z, width, depth))
+        
+        block = ["redstone_block", "gold_block", "diamond_block"]
+        
+        for _ in range(3):
+            print("Rectangle n°", _+1, "en cours de création")
+            while True:
+                new_width = np.random.randint(width//3, width-2)
+                new_depth = np.random.randint(depth//3, depth-2)
+                new_x = np.random.choice([x - new_width, x + width - 1]) 
+                if new_x >= x +width or new_x <= x:
+                    new_z = np.random.choice([z - new_depth + np.random.randint(2,depth), z + depth - 1 -+ np.random.randint(2,depth)])  
+                else:
+                    new_z = np.random.choice([z - new_depth, z + depth - 1])
+                    if new_z >= z + depth or new_z <= z:
+                        new_x = np.random.choice([x - new_width + np.random.randint(2,width), x + width - 1 - np.random.randint(2,width)]) 
+                
+                if new_x + new_width-1 > x_max-1:
+                    new_x = x_max - new_width-1
+                if new_z + new_depth-1 > z_max-1:
+                    new_z = z_max - new_depth-1
+                
+                if new_x >= x_min+1 and new_x + new_width <= x_max-1 and new_z >= z_min+1 and new_z + new_depth <= z_max-1 and not self.checkOverlap(new_x, new_z, new_width, new_depth):
+                    for i in range(0, new_width):
+                        for j in range(0, new_depth):
+                            self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
+                
+                    self.skeleton.append((new_x, new_z, new_width, new_depth))
+                    break  
+    
+    def checkOverlap(self, x, z, width, depth):
+        for skeleton in self.skeleton:
+            x_skeleton, z_skeleton, width_skeleton, depth_skeleton = skeleton
+            if x < x_skeleton + width_skeleton and x + width > x_skeleton and z < z_skeleton + depth_skeleton and z + depth > z_skeleton:
+                return True
+        
+        return False
+    
+    def delete(self):
+        for x in range(self.coordinates_min[0], self.coordinates_max[0]):
+            for y in range(self.coordinates_min[1], self.coordinates_max[1]):
+                for z in range(self.coordinates_min[2], self.coordinates_max[2]):
+                    self.editor.placeBlock((x, y, z), Block("air"))
+    
+
 if __name__ == "__main__":
     editor = Editor(buffering=True)
-    house = House(editor, 17, -58, 8, 30, -50, 20)
-    house.placeHouse()
-    #house.clear()
+    buildArea = editor.getBuildArea()    
+    coordinates_min = [min(buildArea.begin[i], buildArea.last[i]) for i in range(3)]
+    coordinates_max = [max(buildArea.begin[i], buildArea.last[i]) for i in range(3)] 
+    
+    house = House(editor, coordinates_min, coordinates_max)
+    house.createHouseSkeleton()
+    
+    
+
+   # delete(editor, coordinates_min, coordinates_max)
     editor.flushBuffer()
-    
-    
     
     
     
