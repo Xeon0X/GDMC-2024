@@ -8,7 +8,8 @@ class House:
         self.editor = editor
         self.coordinates_min = coordinates_min
         self.coordinates_max = coordinates_max
-        
+        self.grid = np.zeros((coordinates_max[0], coordinates_max[2]), dtype=bool)  # Create a grid of zeros (False)
+
         self.skeleton = []
         
     def createHouseSkeleton(self):
@@ -20,6 +21,7 @@ class House:
             for y in range(z_min, z_max):
                 if i == x_min or i == x_max - 1 or y == z_min or y == z_max - 1:
                     self.editor.placeBlock((i, y_min, y), Block("oak_planks"))
+                    
                 
         perimeter_width = x_max - x_min
         perimeter_depth = z_max - z_min
@@ -39,37 +41,31 @@ class House:
         for i in range(0, width-1):
             for j in range(0, depth-1):
                 self.editor.placeBlock((x + i, y_min, z + j), Block("stone"))
-                
+                self.grid[x+i,z+j] = True
         self.skeleton.append((x, z, width, depth))
         
         block = ["redstone_block", "gold_block", "diamond_block"]
         
         for _ in range(3):
             print("Rectangle n°", _+1, "en cours de création")
-            while True:
-                new_width = np.random.randint(width//3, width-2)
-                new_depth = np.random.randint(depth//3, depth-2)
-                new_x = np.random.choice([x - new_width, x + width - 1]) 
-                if new_x >= x +width or new_x <= x:
-                    new_z = np.random.choice([z - new_depth + np.random.randint(2,depth), z + depth - 1 -+ np.random.randint(2,depth)])  
-                else:
-                    new_z = np.random.choice([z - new_depth, z + depth - 1])
-                    if new_z >= z + depth or new_z <= z:
-                        new_x = np.random.choice([x - new_width + np.random.randint(2,width), x + width - 1 - np.random.randint(2,width)]) 
+            for a in range(1000):  
+                new_width = np.random.randint(width//2, width-2)
+                new_depth = np.random.randint(depth//2, depth-2)
                 
-                if new_x + new_width-1 > x_max-1:
-                    new_x = x_max - new_width-1
-                if new_z + new_depth-1 > z_max-1:
-                    new_z = z_max - new_depth-1
-                
-                if new_x >= x_min+1 and new_x + new_width <= x_max-1 and new_z >= z_min+1 and new_z + new_depth <= z_max-1 and not self.checkOverlap(new_x, new_z, new_width, new_depth):
+                new_x = np.random.randint(max(x_min+1, x - new_width), min(x_max-new_width, x + width))
+                new_z = np.random.randint(max(z_min+1, z - new_depth), min(z_max-new_depth, z + depth))
+
+                if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]):
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
                             self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
-                
+                            self.grid[new_x + i, new_z + j] = True
+
                     self.skeleton.append((new_x, new_z, new_width, new_depth))
-                    break  
-    
+                    break
+            else:
+                print("Failed to place rectangle after 1000 attempts.")
+
     def checkOverlap(self, x, z, width, depth):
         for skeleton in self.skeleton:
             x_skeleton, z_skeleton, width_skeleton, depth_skeleton = skeleton
