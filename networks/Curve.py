@@ -104,3 +104,36 @@ def resolution_from_spacing(target_points, spacing_distance):
             + ((target_points[i][2] - target_points[i + 1][2]) ** 2)
         )
     return round(length / spacing_distance)
+
+
+def simplify_segments(points, epsilon):
+    if len(points) < 3:
+        return points
+
+    # Find the point with the maximum distance
+    max_distance = 0
+    max_index = 0
+    end_index = len(points) - 1
+
+    for i in range(1, end_index):
+        distance = get_distance(points[i], points[0])
+        if distance > max_distance:
+            max_distance = distance
+            max_index = i
+
+    simplified_points = []
+
+    # If the maximum distance is greater than epsilon, recursively simplify
+    if max_distance > epsilon:
+        rec_results1 = simplify_segments(points[:max_index+1], epsilon)
+        rec_results2 = simplify_segments(points[max_index:], epsilon)
+
+        # Combine the simplified sub-results
+        simplified_points.extend(rec_results1[:-1])
+        simplified_points.extend(rec_results2)
+    else:
+        # The maximum distance is less than epsilon, retain the endpoints
+        simplified_points.append(points[0])
+        simplified_points.append(points[end_index])
+
+    return simplified_points
