@@ -77,12 +77,14 @@ def curvature(curve):
     return normal
 
 
-def offset(curve, distance):
-    curvature_values = curvature(curve)
+def offset(curve, distance, normals):
+    if len(normals) != len(curve):
+        raise ValueError(
+            'Number of normals and number of points in the curve do not match')
 
     # Offsetting
     offset_segments = [segment.parallel(
-        (curve[i], curve[i+1]), distance, curvature_values[i]) for i in range(len(curve) - 1)]
+        (curve[i], curve[i+1]), distance, normals[i]) for i in range(len(curve) - 1)]
 
     # Combining segments
     combined_curve = []
@@ -95,7 +97,7 @@ def offset(curve, distance):
     return combined_curve
 
 
-def resolution_from_spacing(target_points, spacing_distance):
+def resolution_distance(target_points, spacing_distance):
     length = 0
     for i in range(len(target_points) - 1):
         length += sqrt(
@@ -103,7 +105,7 @@ def resolution_from_spacing(target_points, spacing_distance):
             + ((target_points[i][1] - target_points[i + 1][1]) ** 2)
             + ((target_points[i][2] - target_points[i + 1][2]) ** 2)
         )
-    return round(length / spacing_distance)
+    return round(length / spacing_distance), length
 
 
 def simplify_segments(points, epsilon):
