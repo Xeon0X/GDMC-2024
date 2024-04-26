@@ -116,7 +116,23 @@ class House:
                                 print( i, y,  j, self.grid[x + i, z + j]['bool'],self.grid[x + i, z + j]['int'])
     
         
-        
+    def getAdjacentWalls(self):
+        main_rect = self.skeleton[0] 
+        x_main, z_main, width_main, depth_main = main_rect
+        adjacent_walls = []
+
+        for k in range(1, len(self.skeleton)):  
+            x, z, width, depth = self.skeleton[k]
+            
+            walls = [(x, z, x + width-1, z), (x, z, x, z + depth-1), (x, z + depth-1, x + width-1, z + depth-1), (x + width-1, z, x + width-1, z + depth-1)]
+            for wall in walls:
+                x1, z1, x2, z2 = wall
+                if (x_main <= x1 <= x_main + width_main or x_main <= x2 <= x_main + width_main) and (z_main - 1 == z1 or z_main + depth_main + 1 == z1):
+                    adjacent_walls.append(wall)
+                elif (z_main <= z1 <= z_main + depth_main or z_main <= z2 <= z_main + depth_main) and (x_main - 1 == x1 or x_main + width_main + 1 == x1):
+                    adjacent_walls.append(wall)
+
+        return adjacent_walls
                                    
 if __name__ == "__main__":
     editor = Editor(buffering=True)
@@ -131,6 +147,7 @@ if __name__ == "__main__":
         house.putWallOnSkeleton()
         print("House n°", i+1, "created")
         print('-----------------------------------')
+        print(house.getAdjacentWalls())
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
         coordinates_min = new_coordinates_min
