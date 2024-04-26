@@ -16,7 +16,7 @@ class CurveSurface:
     def compute_curvature(self):
         self.curvature = curve.curvature(self.curve)
 
-    def compute_surface(self, width, normals):
+    def compute_surface_perpendicular(self, width, normals):
         self.offset_left = curve.offset(self.curve, width, normals)
         self.offset_right = curve.offset(self.curve, -width, normals)
         self.perpendicular_segment = []
@@ -28,6 +28,7 @@ class CurveSurface:
         self.surface = []
 
         for i in range(len(self.perpendicular_segment)-1):
+            self.surface.append([])
             for j in range(len(self.perpendicular_segment[i])):
                 # Hypothesis
                 max_length_index = i
@@ -42,6 +43,16 @@ class CurveSurface:
                     proportion = len(
                         self.perpendicular_segment[min_length_index])/len(self.perpendicular_segment[max_length_index])
 
-                for k in range(len(self.perpendicular_segment[max_length_index])):
-                    self.surface.extend(segment.discrete_segment(
-                        self.perpendicular_segment[max_length_index][k], self.perpendicular_segment[min_length_index][round(k * proportion)-1], pixel_perfect=False))
+                self.surface[i].append([])
+                for k in range(len(self.perpendicular_segment[max_length_index])-1):
+                    self.surface[i][j].append(segment.discrete_segment(
+                        self.perpendicular_segment[max_length_index][k], self.perpendicular_segment[min_length_index][round(k * proportion)], pixel_perfect=False))
+
+    def compute_surface_parallel(self, inner_range, outer_range, resolution, normals):
+        self.left_side = []
+        self.right_side = []
+        for current_range in range(inner_range * resolution, outer_range * resolution):
+            self.left_side.append(curve.offset(
+                self.curve, current_range/resolution, normals))
+            self.right_side.append(curve.offset(
+                self.curve, -current_range/resolution, normals))

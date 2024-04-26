@@ -54,8 +54,7 @@ def orthogonal(origin, point, distance, normal=np.array([0, 1, 0])):
         print(origin, point, distance)
         raise ValueError("The input vectors are not linearly independent.")
 
-    orthogonal = np.round(
-        np.add(np.multiply(orthogonal, distance), origin)).astype(int)
+    orthogonal = np.add(np.multiply(orthogonal, distance), origin).astype(int)
     return orthogonal
 
 
