@@ -5,7 +5,7 @@ import numpy as np
 editor = Editor(buffering=True)
 
 # # Get a block
-# block = editor.getBlock((0,48,0))
+block = editor.getBlock((0,48,0))
 
 # # Place a block
 editor.placeBlock((-5, -58, 0), Block("stone"))

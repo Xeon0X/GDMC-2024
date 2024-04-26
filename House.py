@@ -21,7 +21,9 @@ class House:
                 if i == x_min or i == x_max - 1 or y == z_min or y == z_max - 1:
                     self.editor.placeBlock((i, y_min, y), Block("oak_planks"))
                     
-                
+        
+    
+        
         perimeter_width = x_max - x_min
         perimeter_depth = z_max - z_min
         
@@ -41,7 +43,7 @@ class House:
             for j in range(0, depth-1):
                 self.editor.placeBlock((x + i, y_min, z + j), Block("stone"))
                 self.grid[x+i,z+j] = True,1
-        self.skeleton.append((x, z, width, depth))
+        self.skeleton.append((x, z, width-1, depth-1))
         print("Coordinates of the corners: ", (x, z), (x, z+depth-1), (x+width-1, z), (x+width-1, z+depth-1))
         
         block = ["redstone_block", "gold_block", "diamond_block"]
@@ -53,10 +55,10 @@ class House:
             around_around_corners = [(x-1, z+1), (x+1, z-1), (x-1, z+depth-3), (x+1, z+depth-1), (x+width-3, z-1), (x+width-1, z+1), (x+width-1, z+depth-3), (x+width-3, z+depth-1)]
             
             corners = corners + around_corners + around_around_corners
-            print(corners)
+        
             for a in range(100000):  
-                new_width = np.random.randint(width//2, width-2)
-                new_depth = np.random.randint(depth//2, depth-2)
+                new_width = np.random.randint(5, width-2)
+                new_depth = np.random.randint(5, depth-2)
                 
                 new_x = np.random.randint(max(x_min+1, x - new_width ), min(x_max-new_width - 1, x + width ))
                 new_z = np.random.randint(max(z_min+1, z - new_depth), min(z_max-new_depth - 1, z + depth ))
@@ -76,12 +78,14 @@ class House:
                     continue
 
                 if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]['bool']):
-                    print(new_x, new_z, x,z)
-                    print(new_x+ new_width-1, new_z+new_depth-1, x+width-1, z+depth-1)
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
-                            self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
                             self.grid[new_x + i, new_z + j] = True,2
+
+                            if i == 0 or i == new_width-1 or j == 0 or j == new_depth-1:
+                                continue
+                            else:
+                                self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
 
                     self.skeleton.append((new_x, new_z, new_width, new_depth))
                     break
@@ -96,19 +100,24 @@ class House:
                     self.editor.placeBlock((x, y, z), Block("air"))
     
     def putWallOnSkeleton(self):
-        for skeleton in self.skeleton:
-            x, z, width, depth = skeleton
-            for i in range(0, width):
-                for j in range(0, depth):
-                    for y in range(self.coordinates_min[1], self.coordinates_max[1]):
-                        if i == 0 or i == width-1 or j == 0 or j == depth-1:
-                            if not (self.grid[x + i - 1, z + j]['bool'] ) or \
-                               not (self.grid[x + i + 1, z + j]['bool'] ) or \
-                               not (self.grid[x + i, z + j - 1]['bool'] ) or \
-                               not (self.grid[x + i, z + j + 1]['bool'] ):
+        for k in range(len(self.skeleton)):
+            x, z, width, depth = self.skeleton[k]
+            if k!= 0:
+                x+=1
+                z+=1
+                width-=2
+                depth-=2
+            for i in range(-1, width+1):
+                for j in range(-1, depth+1):
+                    for y in range(self.coordinates_min[1]+1, self.coordinates_max[1]):
+                        if i == -1 or i == width or j == -1 or j == depth:
+                            if not (self.grid[x + i, z + j]['bool']) and not (self.grid[x + i, z + j]['int'] == 1) or (self.grid[x + i, z + j]['bool'] and self.grid[x + i, z + j]['int'] == 2):
                                 self.editor.placeBlock((x + i, y, z + j), Block("stone"))
-                  
-                  
+                                print( i, y,  j, self.grid[x + i, z + j]['bool'],self.grid[x + i, z + j]['int'])
+    
+        
+        
+                                   
 if __name__ == "__main__":
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()    
