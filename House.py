@@ -13,7 +13,7 @@ class House:
         self.skeleton = []
         
     def createHouseSkeleton(self):
-        self.delete()
+        #self.delete()
         x_min, y_min, z_min = self.coordinates_min
         x_max, y_max, z_max = self.coordinates_max
         
@@ -43,19 +43,42 @@ class House:
                 self.editor.placeBlock((x + i, y_min, z + j), Block("stone"))
                 self.grid[x+i,z+j] = True
         self.skeleton.append((x, z, width, depth))
+        print("Coordinates of the corners: ", (x, z), (x, z+depth-1), (x+width-1, z), (x+width-1, z+depth-1))
         
         block = ["redstone_block", "gold_block", "diamond_block"]
         
         for _ in range(3):
             print("Rectangle n°", _+1, "en cours de création")
-            for a in range(1000):  
+            corners = [(x-1, z-1), (x-1, z+depth-1), (x+width-1, z-1), (x+width-1, z+depth-1)]
+            around_corners = [(x-1, z),(x, z-1), (x-1, z+depth-2),(x, z+depth-1), (x+width-2, z-1),(x+width-1, z), (x+width-1, z+depth-2),(x+width-2, z+depth-1)]
+            around_around_corners = [(x-1, z+1), (x+1, z-1), (x-1, z+depth-3), (x+1, z+depth-1), (x+width-3, z-1), (x+width-1, z+1), (x+width-1, z+depth-3), (x+width-3, z+depth-1)]
+            
+            corners = corners + around_corners + around_around_corners
+            print(corners)
+            for a in range(100000):  
                 new_width = np.random.randint(width//2, width-2)
                 new_depth = np.random.randint(depth//2, depth-2)
                 
-                new_x = np.random.randint(max(x_min+1, x - new_width), min(x_max-new_width, x + width))
-                new_z = np.random.randint(max(z_min+1, z - new_depth), min(z_max-new_depth, z + depth))
+                new_x = np.random.randint(max(x_min+1, x - new_width ), min(x_max-new_width - 1, x + width ))
+                new_z = np.random.randint(max(z_min+1, z - new_depth), min(z_max-new_depth - 1, z + depth ))
+
+                
+                #if  (new_x, new_z) in corners or(new_x+new_width-1, new_z) in corners or (new_x, new_z+new_depth-1) in corners or (new_x+new_width-1, new_z+new_depth-1) in corners:
+                 #   continue
+
+                # Check if the majority of the small rectangle is adjacent to the first rectangle
+                adjacent_blocks = 0
+                for i in range(new_x, new_x + new_width):
+                    for j in range(new_z, new_z + new_depth):
+                        if self.grid[i-1,j] or self.grid[i+1,j] or self.grid[i,j-1] or self.grid[i,j+1]:
+                            adjacent_blocks += 1
+
+                if adjacent_blocks < 3:
+                    continue
 
                 if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]):
+                    print(new_x, new_z, x,z)
+                    print(new_x+ new_width-1, new_z+new_depth-1, x+width-1, z+depth-1)
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
                             self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
@@ -66,14 +89,7 @@ class House:
             else:
                 print("Failed to place rectangle after 1000 attempts.")
 
-    def checkOverlap(self, x, z, width, depth):
-        for skeleton in self.skeleton:
-            x_skeleton, z_skeleton, width_skeleton, depth_skeleton = skeleton
-            if x < x_skeleton + width_skeleton and x + width > x_skeleton and z < z_skeleton + depth_skeleton and z + depth > z_skeleton:
-                return True
-        
-        return False
-    
+   
     def delete(self):
         for x in range(self.coordinates_min[0], self.coordinates_max[0]):
             for y in range(self.coordinates_min[1], self.coordinates_max[1]):
@@ -86,11 +102,17 @@ if __name__ == "__main__":
     buildArea = editor.getBuildArea()    
     coordinates_min = [min(buildArea.begin[i], buildArea.last[i]) for i in range(3)]
     coordinates_max = [max(buildArea.begin[i], buildArea.last[i]) for i in range(3)] 
+
     
-    house = House(editor, coordinates_min, coordinates_max)
-    house.createHouseSkeleton()
-    
-    
+    for i in range(10):
+        house = House(editor, coordinates_min, coordinates_max)
+        house.createHouseSkeleton()
+        print("House n°", i+1, "created")
+        print('-----------------------------------')
+        new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
+        new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
+        coordinates_min = new_coordinates_min
+        coordinates_max = new_coordinates_max
 
    # delete(editor, coordinates_min, coordinates_max)
     editor.flushBuffer()
