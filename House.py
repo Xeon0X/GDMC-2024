@@ -8,12 +8,11 @@ class House:
         self.editor = editor
         self.coordinates_min = coordinates_min
         self.coordinates_max = coordinates_max
-        self.grid = np.zeros((coordinates_max[0], coordinates_max[2]), dtype=bool)  # Create a grid of zeros (False)
-
+        self.grid = np.zeros((coordinates_max[0], coordinates_max[2]), dtype=[('bool', bool), ('int', int)])
         self.skeleton = []
         
     def createHouseSkeleton(self):
-        #self.delete()
+        self.delete()
         x_min, y_min, z_min = self.coordinates_min
         x_max, y_max, z_max = self.coordinates_max
         
@@ -41,7 +40,7 @@ class House:
         for i in range(0, width-1):
             for j in range(0, depth-1):
                 self.editor.placeBlock((x + i, y_min, z + j), Block("stone"))
-                self.grid[x+i,z+j] = True
+                self.grid[x+i,z+j] = True,1
         self.skeleton.append((x, z, width, depth))
         print("Coordinates of the corners: ", (x, z), (x, z+depth-1), (x+width-1, z), (x+width-1, z+depth-1))
         
@@ -70,19 +69,19 @@ class House:
                 adjacent_blocks = 0
                 for i in range(new_x, new_x + new_width):
                     for j in range(new_z, new_z + new_depth):
-                        if self.grid[i-1,j] or self.grid[i+1,j] or self.grid[i,j-1] or self.grid[i,j+1]:
+                        if self.grid[i-1,j]['bool'] and self.grid[i-1,j]['int']==1  or self.grid[i+1,j]['bool'] and self.grid[i+1,j]['int']==1 or self.grid[i,j-1]['bool'] and self.grid[i,j-1]['int']==1 or self.grid[i,j+1]['bool'] and self.grid[i,j+1]['int']==1:   
                             adjacent_blocks += 1
 
                 if adjacent_blocks < 3:
                     continue
 
-                if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]):
+                if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]['bool']):
                     print(new_x, new_z, x,z)
                     print(new_x+ new_width-1, new_z+new_depth-1, x+width-1, z+depth-1)
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
                             self.editor.placeBlock((new_x + i, y_min, new_z + j), Block(block[_]))
-                            self.grid[new_x + i, new_z + j] = True
+                            self.grid[new_x + i, new_z + j] = True,2
 
                     self.skeleton.append((new_x, new_z, new_width, new_depth))
                     break
@@ -96,7 +95,20 @@ class House:
                 for z in range(self.coordinates_min[2], self.coordinates_max[2]):
                     self.editor.placeBlock((x, y, z), Block("air"))
     
-
+    def putWallOnSkeleton(self):
+        for skeleton in self.skeleton:
+            x, z, width, depth = skeleton
+            for i in range(0, width):
+                for j in range(0, depth):
+                    for y in range(self.coordinates_min[1], self.coordinates_max[1]):
+                        if i == 0 or i == width-1 or j == 0 or j == depth-1:
+                            if not (self.grid[x + i - 1, z + j]['bool'] ) or \
+                               not (self.grid[x + i + 1, z + j]['bool'] ) or \
+                               not (self.grid[x + i, z + j - 1]['bool'] ) or \
+                               not (self.grid[x + i, z + j + 1]['bool'] ):
+                                self.editor.placeBlock((x + i, y, z + j), Block("stone"))
+                  
+                  
 if __name__ == "__main__":
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()    
@@ -104,9 +116,10 @@ if __name__ == "__main__":
     coordinates_max = [max(buildArea.begin[i], buildArea.last[i]) for i in range(3)] 
 
     
-    for i in range(10):
+    for i in range(1):
         house = House(editor, coordinates_min, coordinates_max)
         house.createHouseSkeleton()
+        house.putWallOnSkeleton()
         print("House n°", i+1, "created")
         print('-----------------------------------')
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
