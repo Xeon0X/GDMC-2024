@@ -19,8 +19,11 @@ def parallel(segment, distance, normal=np.array([0, 1, 0])):
 
 def normalized(vector):
     magnitude = np.linalg.norm(vector)
-    normalized_vector = vector / magnitude
-    return normalized_vector
+    if magnitude != 0:
+        normalized_vector = vector / magnitude
+        return normalized_vector
+    else:
+        return [0, 0, 0]
 
 
 def orthogonal(origin, point, distance, normal=np.array([0, 1, 0])):
@@ -47,6 +50,8 @@ def orthogonal(origin, point, distance, normal=np.array([0, 1, 0])):
     orthogonal = np.cross(normalized_vector, normalized_normal)
 
     if np.array_equal(orthogonal, np.zeros((3,))):
+        print(normalized_vector, normalized_normal, orthogonal, normal)
+        print(origin, point, distance)
         raise ValueError("The input vectors are not linearly independent.")
 
     orthogonal = np.round(

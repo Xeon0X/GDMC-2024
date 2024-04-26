@@ -21,7 +21,7 @@ def curve(target_points, resolution=40):
     z = coords[:, 2]
 
     # Compute
-    tck, u = interpolate.splprep([x, y, z], s=2, k=2)
+    tck, u = interpolate.splprep([x, y, z], s=3, k=2)
     x_knots, y_knots, z_knots = interpolate.splev(tck[0], tck)
     u_fine = np.linspace(0, 1, resolution)
     x_fine, y_fine, z_fine = interpolate.splev(u_fine, tck)
@@ -71,7 +71,7 @@ def curvature(curve):
     dT_dt = np.array([[deriv_tangent_x[i], deriv_tangent_y[i], deriv_tangent_z[i]]
                      for i in range(deriv_tangent_x.size)])
     length_dT_dt = np.sqrt(
-        deriv_tangent_x * deriv_tangent_x + deriv_tangent_y * deriv_tangent_y + deriv_tangent_z * deriv_tangent_z)
+        deriv_tangent_x * deriv_tangent_x + deriv_tangent_y * deriv_tangent_y + deriv_tangent_z * deriv_tangent_z + 0.0001)
 
     normal = np.array([1/length_dT_dt]).transpose() * dT_dt
     return normal
