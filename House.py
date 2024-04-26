@@ -109,17 +109,19 @@ class House:
                 depth-=2
             for i in range(-1, width+1):
                 for j in range(-1, depth+1):
-                    for y in range(self.coordinates_min[1]+1, self.coordinates_max[1]):
+                    for y in range(self.coordinates_min[1], self.coordinates_max[1]):
                         if i == -1 or i == width or j == -1 or j == depth:
                             if not (self.grid[x + i, z + j]['bool']) and not (self.grid[x + i, z + j]['int'] == 1) or (self.grid[x + i, z + j]['bool'] and self.grid[x + i, z + j]['int'] == 2):
                                 self.editor.placeBlock((x + i, y, z + j), Block("stone"))
-                                print( i, y,  j, self.grid[x + i, z + j]['bool'],self.grid[x + i, z + j]['int'])
+                                #print( i, y,  j, self.grid[x + i, z + j]['bool'],self.grid[x + i, z + j]['int'])
     
         
     def getAdjacentWalls(self):
         main_rect = self.skeleton[0] 
         x_main, z_main, width_main, depth_main = main_rect
         adjacent_walls = []
+        width_main-=1
+        depth_main-=1
 
         for k in range(1, len(self.skeleton)):  
             x, z, width, depth = self.skeleton[k]
@@ -128,11 +130,49 @@ class House:
             for wall in walls:
                 x1, z1, x2, z2 = wall
                 if (x_main <= x1 <= x_main + width_main or x_main <= x2 <= x_main + width_main) and (z_main - 1 == z1 or z_main + depth_main + 1 == z1):
-                    adjacent_walls.append(wall)
+                    # Adjust the wall segment to only include the part that is overlapped by the main rectangle
+                    x1 = max(x1, x_main-1)
+                    x2 = min(x2, x_main + width_main+1)
+                    # If there is more than one adjacent block, add it to the list
+                    if  abs(x2 - x1) > 1:
+                        adjacent_walls.append((x1, z1, x2, z2))
                 elif (z_main <= z1 <= z_main + depth_main or z_main <= z2 <= z_main + depth_main) and (x_main - 1 == x1 or x_main + width_main + 1 == x1):
-                    adjacent_walls.append(wall)
+                    # Adjust the wall segment to only include the part that is overlapped by the main rectangle
+                    z1 = max(z1, z_main-1)
+                    z2 = min(z2, z_main + depth_main+1)
+                    # If there is more than one adjacent block, add it to the list
+                    if  abs(z2 - z1) > 1:
+                        adjacent_walls.append((x1, z1, x2, z2))
 
         return adjacent_walls
+
+    def placeDoor(self):
+        walls = self.getAdjacentWalls()
+        for wall in walls:
+            x_min, z_min, x_max, z_max = wall
+            if x_min == x_max:
+                width = z_max - z_min
+                if width % 2 != 0:
+                    door_pos = width // 2
+                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
+                        self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
+                        self.editor.placeBlock((x_min, y, z_min + door_pos+1), Block("air"))
+                else:
+                    door_pos = width // 2 
+                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
+                        self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
+            else:
+                width = x_max - x_min
+                if width % 2 != 0:
+                    door_pos = width // 2
+                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
+                        self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
+                        self.editor.placeBlock((x_min + door_pos+1, y, z_min), Block("air"))
+
+                else:
+                    door_pos = width // 2 
+                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
+                        self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
                                    
 if __name__ == "__main__":
     editor = Editor(buffering=True)
@@ -148,6 +188,7 @@ if __name__ == "__main__":
         print("House n°", i+1, "created")
         print('-----------------------------------')
         print(house.getAdjacentWalls())
+        house.placeDoor()
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
         coordinates_min = new_coordinates_min
