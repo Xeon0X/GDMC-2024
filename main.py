@@ -31,31 +31,8 @@ for i in range(len(curve_surface.curvature)):
 
 curve_surface.compute_surface(10, curvature)
 
-# for coordinate in curve_surface.offset_points:
-#     editor.placeBlock(coordinate, Block("white_concrete"))
-
 for coordinate in curve_surface.surface:
     editor.placeBlock(coordinate, Block("black_concrete"))
 
 for coordinate in curve_surface.curve:
     editor.placeBlock(coordinate, Block("red_concrete"))
-
-
-# for line_range in range(len(curve_surface.offset_points[0])):
-#     for coordinate in curve_surface.offset_points[line_range]:
-#         editor.placeBlock(coordinate, Block("red_concrete"))
-
-# offset = curve.offset(curve_points, i)
-
-# for coordinate in offset:
-#     editor.placeBlock(coordinate, Block("blue_concrete"))
-
-# offset = curve.offset(curve_points, -i)
-
-# for coordinate in offset:
-#     editor.placeBlock(coordinate, Block("red_concrete"))
-
-# for coordinate in curve_points:
-#     editor.placeBlock(coordinate, Block("white_concrete"))
-
-###
