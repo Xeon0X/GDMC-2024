@@ -210,18 +210,7 @@ class House:
                             self.editor.placeBlock((x + i, self.coordinates_max[1]+n, z + j), Block("blackstone_slab",{"type":"bottom"}))
             
             if width<depth:
-                if width%2==0:
-                    h = 0
-                    for i in range(-1, width//2):
-                        for j in range(-1, depth+1):
-                            self.editor.placeBlock((x + i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
-                            self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
-                            if i != -1:
-                                self.editor.placeBlock((x + i, self.coordinates_max[1]+h-1, z + j), Block("blackstone_slab",{"type":"top"}))
-                                self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h-1, z + j), Block("blackstone_slab",{"type":"top"}))
-                            
-                        h+=1
-                else:
+                
                     h = 0
                     for i in range(-1, width//2):
                         for j in range(-1, depth+1):
@@ -241,15 +230,7 @@ class House:
                         if i != -1:
                             h += 0.5
             else:
-                if depth%2==0:
-                    h = 0
-                    for i in range(-1, depth//2):
-                        for j in range(-1, width+1):
-                        
-                            self.editor.placeBlock((x + j, self.coordinates_max[1]+h-1, z + i), Block("blackstone_slab",{"type":"top"}))
-                            self.editor.placeBlock((x + j, self.coordinates_max[1]+h-1, z + depth-1-i), Block("blackstone_slab",{"type":"top"}))
-                        h+=1
-                else:
+            
                     h = 0
                     for i in range(-1, depth//2):
                         for j in range(-1, width+1):
