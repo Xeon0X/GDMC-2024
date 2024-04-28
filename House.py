@@ -1,7 +1,10 @@
 
+from time import sleep
 from gdpc import Editor, Block, geometry
 from list_block import *
 import numpy as np
+from skimage.morphology import skeletonize
+import matplotlib.pyplot as plt
 
 class House:
     def __init__(self, editor, coordinates_min, coordinates_max):
@@ -10,6 +13,8 @@ class House:
         self.coordinates_max = coordinates_max
         self.grid = np.zeros((coordinates_max[0], coordinates_max[2]), dtype=[('bool', bool), ('int', int)])
         self.skeleton = []
+        
+        self.nbEtage = (coordinates_max[1] - coordinates_min[1]) // 5
         
     def createHouseSkeleton(self):
         self.delete()
@@ -21,13 +26,16 @@ class House:
                 if i == x_min or i == x_max - 1 or y == z_min or y == z_max - 1:
                     self.editor.placeBlock((i, y_min, y), Block("oak_planks"))
                     
-        
+       
     
         
         perimeter_width = x_max - x_min
         perimeter_depth = z_max - z_min
         
-
+        x_min += 1
+        z_min += 1
+        x_max -= 1
+        z_max -= 1
         x = np.random.randint(x_min+1 , x_max-1)  
         z = np.random.randint(z_min+1 , z_max-1 ) 
         
@@ -47,6 +55,11 @@ class House:
         print("Coordinates of the corners: ", (x, z), (x, z+depth-1), (x+width-1, z), (x+width-1, z+depth-1))
         
         block = ["redstone_block", "gold_block", "diamond_block"]
+        
+        x_min -= 1
+        x_max -= 1
+        z_min += 1
+        z_max += 1
         
         for _ in range(3):
             print("Rectangle n°", _+1, "en cours de création")
@@ -95,7 +108,7 @@ class House:
    
     def delete(self):
         for x in range(self.coordinates_min[0], self.coordinates_max[0]):
-            for y in range(self.coordinates_min[1], self.coordinates_max[1]):
+            for y in range(self.coordinates_min[1], self.coordinates_max[1]+4):
                 for z in range(self.coordinates_min[2], self.coordinates_max[2]):
                     self.editor.placeBlock((x, y, z), Block("air"))
     
@@ -130,50 +143,134 @@ class House:
             for wall in walls:
                 x1, z1, x2, z2 = wall
                 if (x_main <= x1 <= x_main + width_main or x_main <= x2 <= x_main + width_main) and (z_main - 1 == z1 or z_main + depth_main + 1 == z1):
-                    # Adjust the wall segment to only include the part that is overlapped by the main rectangle
                     x1 = max(x1, x_main-1)
                     x2 = min(x2, x_main + width_main+1)
-                    # If there is more than one adjacent block, add it to the list
                     if  abs(x2 - x1) > 1:
                         adjacent_walls.append((x1, z1, x2, z2))
                 elif (z_main <= z1 <= z_main + depth_main or z_main <= z2 <= z_main + depth_main) and (x_main - 1 == x1 or x_main + width_main + 1 == x1):
-                    # Adjust the wall segment to only include the part that is overlapped by the main rectangle
                     z1 = max(z1, z_main-1)
                     z2 = min(z2, z_main + depth_main+1)
-                    # If there is more than one adjacent block, add it to the list
                     if  abs(z2 - z1) > 1:
                         adjacent_walls.append((x1, z1, x2, z2))
 
         return adjacent_walls
 
+      
+    
+        
     def placeDoor(self):
         walls = self.getAdjacentWalls()
         for wall in walls:
-            x_min, z_min, x_max, z_max = wall
-            if x_min == x_max:
-                width = z_max - z_min
-                if width % 2 != 0:
-                    door_pos = width // 2
-                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
-                        self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
-                        self.editor.placeBlock((x_min, y, z_min + door_pos+1), Block("air"))
+            for i in range(self.nbEtage):
+                x_min, z_min, x_max, z_max = wall
+                if x_min == x_max:
+                    width = z_max - z_min
+                    if width % 2 != 0:
+                        door_pos = width // 2
+                        for y in range(self.coordinates_min[1]+1+i*4, self.coordinates_min[1]+3+i*4):
+                            self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
+                            self.editor.placeBlock((x_min, y, z_min + door_pos+1), Block("air"))
+                    else:
+                        door_pos = width // 2 
+                        for y in range(self.coordinates_min[1]+1+i*4 , self.coordinates_min[1]+3+i*4):
+                            self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
                 else:
-                    door_pos = width // 2 
-                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
-                        self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
-            else:
-                width = x_max - x_min
-                if width % 2 != 0:
-                    door_pos = width // 2
-                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
-                        self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
-                        self.editor.placeBlock((x_min + door_pos+1, y, z_min), Block("air"))
+                    width = x_max - x_min
+                    if width % 2 != 0:
+                        door_pos = width // 2
+                        for y in range(self.coordinates_min[1]+1+i*4, self.coordinates_min[1]+3+i*4):
+                            self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
+                            self.editor.placeBlock((x_min + door_pos+1, y, z_min), Block("air"))
 
+                    else:
+                        door_pos = width // 2 
+                        for y in range(self.coordinates_min[1]+1+i*4, self.coordinates_min[1]+3+i*4):
+                            self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
+           
+    def placeRoof(self):
+        for k in range(len(self.skeleton)-1, -1, -1):
+            x, z, width, depth = self.skeleton[k]
+            
+            if k!= 0:
+                x+=1
+                z+=1
+                width-=2
+                depth-=2
+                n=1
+            else:
+                n=2
+            for i in range(-1, width+1):
+                for j in range(-1, depth+1):
+                    if width<depth:
+                        if (i == width//2  and width ==3):
+                            self.editor.placeBlock((x + i, self.coordinates_max[1]+n, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                            
+                    else:
+                        if (j == depth//2  ):
+                            self.editor.placeBlock((x + i, self.coordinates_max[1]+n, z + j), Block("blackstone_slab",{"type":"bottom"}))
+            
+            if width<depth:
+                if width%2==0:
+                    h = 0
+                    for i in range(-1, width//2):
+                        for j in range(-1, depth+1):
+                            self.editor.placeBlock((x + i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                            self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                            if i != -1:
+                                self.editor.placeBlock((x + i, self.coordinates_max[1]+h-1, z + j), Block("blackstone_slab",{"type":"top"}))
+                                self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h-1, z + j), Block("blackstone_slab",{"type":"top"}))
+                            
+                        h+=1
                 else:
-                    door_pos = width // 2 
-                    for y in range(self.coordinates_min[1]+1, self.coordinates_min[1]+3):
-                        self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
-                                   
+                    h = 0
+                    for i in range(-1, width//2):
+                        for j in range(-1, depth+1):
+                            if i != -1:
+                                if h % 1 == 0:
+                                    self.editor.placeBlock((x + i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"top"}))
+                                    self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"top"}))
+                                else:
+                                    self.editor.placeBlock((x + i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                                    self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                                    self.editor.placeBlock((x + i, self.coordinates_max[1]+h-0.5, z + j), Block("blackstone"))
+                                    self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h-0.5, z + j), Block("blackstone"))
+                            else:  
+                                self.editor.placeBlock((x + i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"}))
+                                self.editor.placeBlock((x + width-1-i, self.coordinates_max[1]+h, z + j), Block("blackstone_slab",{"type":"bottom"})) 
+                                
+                        if i != -1:
+                            h += 0.5
+            else:
+                if depth%2==0:
+                    h = 0
+                    for i in range(-1, depth//2):
+                        for j in range(-1, width+1):
+                        
+                            self.editor.placeBlock((x + j, self.coordinates_max[1]+h-1, z + i), Block("blackstone_slab",{"type":"top"}))
+                            self.editor.placeBlock((x + j, self.coordinates_max[1]+h-1, z + depth-1-i), Block("blackstone_slab",{"type":"top"}))
+                        h+=1
+                else:
+                    h = 0
+                    for i in range(-1, depth//2):
+                        for j in range(-1, width+1):
+                            if i != -1:
+                                if h % 1 == 0:  
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + i), Block("blackstone_slab",{"type":"top"}))
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + depth-1-i), Block("blackstone_slab",{"type":"top"}))
+                                else:  
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + i), Block("blackstone_slab",{"type":"bottom"}))
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + depth-1-i), Block("blackstone_slab",{"type":"bottom"}))
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h-0.5, z + i), Block("blackstone"))
+                                    self.editor.placeBlock((x + j, self.coordinates_max[1]+h-0.5, z + depth-1-i), Block("blackstone"))
+                            else:   
+                                self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + i), Block("blackstone_slab",{"type":"bottom"}))
+                                self.editor.placeBlock((x + j, self.coordinates_max[1]+h, z + depth-1-i), Block("blackstone_slab",{"type":"bottom"}))
+                        if i != -1:
+                            h += 0.5
+                                            
+    
+    
+                    
 if __name__ == "__main__":
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()    
@@ -189,6 +286,8 @@ if __name__ == "__main__":
         print('-----------------------------------')
         print(house.getAdjacentWalls())
         house.placeDoor()
+        house.placeRoof()
+      
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
         coordinates_min = new_coordinates_min
