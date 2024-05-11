@@ -1,14 +1,30 @@
 import random as rd
 import numpy as np
 import math
+from Enums import COLLUMN_STYLE
 from buildings.geometry.Tile import Tile
 from buildings.geometry.Polygon import Polygon
 from buildings.geometry.Point import Point
 from buildings.geometry.Rectangle import Rectangle
+from buildings.elements.Collumn import Collumn
 
 class Foundations:
-    def __init__(self, position : tuple[int,int], size : tuple[int, int], matrice : list[list[int]]):
+    # TODO : gérer les collones sur les tiles trop petites et les colones 1tile/2 + fulltile
+    
+    def __init__(self, 
+                 position : tuple[int,int], 
+                 size : tuple[int, int], 
+                 matrice : list[list[int]], 
+                 tile_size : int, 
+                 is_collumn_full_tile : bool, 
+                 is_inner_or_outer : COLLUMN_STYLE):
         # Foundations are the base of the building, they are made of tiles and based on a matrice
+        
+        # Random components
+        self.tile_size = tile_size
+        self.is_collumn_full_tile = is_collumn_full_tile
+        self.is_inner_or_outer = is_inner_or_outer
+        
         x,z = position
         self.position = Point(x = x, z = z)
         self.size = size
@@ -16,22 +32,13 @@ class Foundations:
         self.width = size[1]
         self.matrice = matrice
         self.tiles = []
-        self.tile_size = self.define_tile_size()
+        self.vertices = []
         self.length_in_tiles = self.length // self.tile_size
         self.width_in_tiles = self.width // self.tile_size
         self.x_distribution = []
         self.z_distribution = []
         self.polygon = self.get_polygon()
         self.collumns = self.get_columns()
-        
-    def define_tile_size(self) -> int:
-        # Tiles are constant square units different for each buildings
-        smaller_side = min(self.length, self.width)
-        
-        # area is too small, will work but not very well
-        if smaller_side <= 15 : return smaller_side // 5
-        
-        return rd.randint(3, smaller_side // len(self.matrice))
     
     def add_tile(self, tile : Tile):
         self.tiles.append(tile)
@@ -58,8 +65,8 @@ class Foundations:
                 z_padding += zsize * self.tile_size
             x_padding += xsize * self.tile_size               
         
-        polygon.set_vertices_and_neighbors(self.tiles)   
-        polygon.compress(self.tiles)                 
+        polygon.set_vertices_and_neighbors(self.tiles, self.vertices)   
+        polygon.compress(self.tiles, self.vertices)                 
         return polygon
         
         
@@ -68,6 +75,9 @@ class Foundations:
         # foundations are based on a matrice, 
         # this function gives the number of tiles for each row/collumn of the matrice, giving a more random shape
         # The real shit start here
+        if length == avaliable_tiles:
+            return [1 for i in range(avaliable_tiles)]
+        
         if length == 1:
             return [avaliable_tiles]
         
@@ -76,83 +86,59 @@ class Foundations:
             return [l,avaliable_tiles-l]
         
         if length >= 3:
-            is_len_even = length % 2 == 0
-            is_availiable_even = avaliable_tiles % 2 == 0
             sizes = []
+            intersections_count = math.ceil(length/2)-1
+            tiles_per_side = avaliable_tiles//2
+            correction = 0
             
-            # This is to keep symetry in case of an even matrice
-            if not is_len_even:
-                center = rd.randint(1,avaliable_tiles-length+1)
-                avaliable_tiles -= center
-                is_availiable_even = avaliable_tiles % 2 == 0
-
-                if not is_availiable_even: center += 1
-
-                sizes.append(center)
-                is_availiable_even = True
+            intersect_values = np.random.choice(np.arange(1,tiles_per_side), size=intersections_count, replace=False)
             
-            intersection_number = length // 2 - 1
-            tiles_per_side = avaliable_tiles // 2
-            # we keep symetry we randomize only one side
-            intersect_values = np.random.choice(np.arange(1,tiles_per_side), size=intersection_number, replace=False)
-            
-            # we duplicate the side for the symetry
+            #we generate only half of the distribution      
             last_pos = 0
             intersect_values = np.append(intersect_values,tiles_per_side)
             for intersect in intersect_values:
-                size = [intersect - last_pos]
-                sizes = size + sizes + size
+                sizes.append(intersect - last_pos)
                 last_pos = intersect
-            
-            # if there is a tile left, add it randomly
-            if not is_availiable_even: sizes[rd.randint(0,len(sizes)-1)] += 1
+             
+            # we duplicate the side for the symetry
+            symetry = sizes.copy()
+            symetry.reverse()  
+            if avaliable_tiles%2 == 1: correction = 1  # if there is a tile left, add it randomly
+            if length%2 == 1 : sizes[-1], symetry = sizes[-1]*2 + correction,  symetry[1:]
+            sizes += symetry
+                
             return sizes
     
-    def get_columns(self) -> list[Rectangle]:
+    def get_columns(self) -> list[Collumn]:
         collumns = []
-        is_full_tile = bool(rd.getrandbits(1))
-        x_padding = self.position.x
         
-        for x,row in enumerate(self.matrice):
-            z_padding = self.position.z
-            lenx = self.x_distribution[x]
+        for tile in self.tiles:
+            north_west_collumn = Collumn(Point(x = tile.north_west.x-1, z = tile.north_west.z-1), tile.north_west)
+            north_east_collumn = Collumn(Point(x = tile.north_east.x, z = tile.north_east.z-1), Point(x = tile.north_east.x+1, z = tile.north_east.z))
+            south_west_collumn = Collumn(Point(x = tile.south_west.x-1, z = tile.south_west.z), Point(x = tile.south_west.x, z = tile.south_west.z+1))
+            south_east_collumn = Collumn(tile.south_east, Point(x = tile.south_east.x+1, z = tile.south_east.z+1))
             
-            for z,value in enumerate(row):
-                lenz = self.z_distribution[z]
-                
-                # conditions to not make a collumn on the facade of the building (no outter collumns)
-                
-                skip_first_x,skip_first_z = False,False
-                # if it's the first or last row/collumn 
-                if x == 0 : skip_first_x = True
-                if z == 0 : skip_first_z = True
-                    
-                last_value_x,last_value_z = self.matrice[x-1][z],self.matrice[x][z-1]
-                # if the previous row/collumn is empty
-                if last_value_x == 0 : skip_first_x = True
-                if last_value_z == 0 : skip_first_z = True
-                
-                next_value_x,next_value_z = 0,0
-                try : next_value_x = self.matrice[x+1][z]
-                except : pass
-                try : next_value_z = self.matrice[x][z+1]
-                except : pass
-                # if this part of the building is too tiny
-                if last_value_x == 0 and next_value_x == 0 and self.x_distribution[x] == 1: continue
-                if last_value_z == 0 and next_value_z == 0 and self.z_distribution[z] == 1: continue
-                
-                if value == 1:
-                    self.create_collumns(x_padding, z_padding, lenx, lenz, skip_first_x, skip_first_z, collumns)
-                    
-                z_padding += lenz * self.tile_size
-            x_padding += lenx * self.tile_size
-    
-        return collumns
+            if tile.north_vertice != None or tile.west_vertice != None: north_west_collumn.set_is_outer(True)
+            
+            if tile.north_vertice != None or tile.east_vertice != None: north_east_collumn.set_is_outer(True)
+            
+            if tile.south_vertice != None or tile.west_vertice != None: south_west_collumn.set_is_outer(True)
+            
+            if tile.south_vertice != None or tile.east_vertice != None: south_east_collumn.set_is_outer(True)
+
+            collumns.extend([north_west_collumn, north_east_collumn, south_west_collumn, south_east_collumn])
         
-    def create_collumns(self, basex : int, basez : int, lenx : int, lenz : int, skip_first_x : bool, skip_first_z : bool, collumns : list[Rectangle]):
-        for x in range(lenx):
-            if x==0 and skip_first_x: continue
-            for z in range(lenz):
-                if z==0 and skip_first_z: continue
-                collumns.append(Rectangle(Point(x = basex+x*self.tile_size, z = basez+z*self.tile_size), Point(x = basex+x*self.tile_size-1, z = basez+z*self.tile_size-1)))
+        return self._suppr_doubblons_collumns(collumns)
+                   
+    def _suppr_doubblons_collumns(self, collumns : list[Collumn]): 
+        for index,collumn in enumerate(collumns):
+            if index == len(collumns)-1: break
+            for compare in  collumns[index+1:]:
+                if collumn.point1.position == compare.point1.position :
+                    if compare.is_outer : collumn.set_is_outer(True)
+                    collumns.remove(compare)
+        
+        print(len(collumns))            
+        return collumns
+    
         

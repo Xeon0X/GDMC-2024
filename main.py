@@ -2,7 +2,7 @@ from gdpc import Editor, Block, geometry
 import networks.curve as curve
 import numpy as np
 import json
-from buildings.Foundations import Foundations
+from buildings.Building import Building
 
 editor = Editor(buffering=True)
 
@@ -12,11 +12,12 @@ shapes = json.load(f)
 # F = Foundations((0,0), (20,20), shapes[0]['matrice'])
 # F.polygon.fill_polygon(editor, "stone", -60)
 geometry.placeCuboid(editor, (-10,-60,-10), (85,-55,85), Block("air"))
-F = Foundations((0,0), (75,75), shapes[8]['matrice'])
-F.polygon.fill_polygon(editor, "stone", -60)
-F.polygon.fill_vertice(editor, "pink_wool", -60)
-for collumn in F.collumns:
-    collumn.fill(editor, "stone", -60, -55)
+B = Building((0,0), (75,75), shapes[7]['matrice'])
+B.foundations.polygon.fill_vertice(editor, "pink_wool", -60)
+for collumn in B.foundations.collumns:
+    collumn.fill(editor, "white_concrete", -60, -55)
+B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
+
 # # Get a block
 # block = editor.getBlock((0,48,0))
 
