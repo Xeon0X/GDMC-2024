@@ -1,0 +1,59 @@
+[
+    {
+        "id": 0,
+        "name": "basic_shape",
+        "matrice":[[1]]
+    },
+    {
+        "id": 1,
+        "name": "long_shape",
+        "matrice":[[0,1]]
+    },
+    {
+        "id": 2,
+        "name": "double_long_shape",
+        "matrice":[[1,0,1]]
+    },
+    {
+        "id": 3,
+        "name": "L_shape",
+        "matrice":[[1,0],
+                   [1,1]]
+    },
+    {
+        "id": 4,
+        "name": "U_shape",
+        "matrice":[[1,0,1],
+                   [1,1,1]]
+    },
+    {
+        "id": 5,
+        "name": "H_shape",
+        "matrice":[[1,0,1],
+                   [1,1,1],
+                   [1,0,1]]
+    },
+    {
+        "id": 6,
+        "name": "X_shape",
+        "matrice":[[0,1,0],
+                   [1,1,1],
+                   [0,1,0]]
+    },
+    {
+        "id": 7,
+        "name": "O_shape",
+        "matrice":[[1,1,1],
+                   [1,0,1],
+                   [1,1,1]]
+    },
+    {
+        "id": 8,
+        "name": "E_shape",
+        "matrice":[[1,1,1],
+                   [1,0,0],
+                   [1,1,1],
+                   [1,0,0],
+                   [1,1,1]]
+    }
+]
