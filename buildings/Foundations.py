@@ -1,7 +1,7 @@
 import random as rd
 import numpy as np
 import math
-from Enums import COLLUMN_STYLE
+from utils.Enums import COLLUMN_STYLE
 from buildings.geometry.Tile import Tile
 from buildings.geometry.Polygon import Polygon
 from buildings.geometry.Point import Point
@@ -54,9 +54,9 @@ class Foundations:
         
         # this bullshit is to create tiles from the matrice and the distribution
         x_padding = self.position.x
-        for x,xsize in enumerate(self.x_distribution):
+        for x,xsize in utils.Enumerate(self.x_distribution):
             z_padding = self.position.z
-            for z,zsize in enumerate(self.z_distribution):
+            for z,zsize in utils.Enumerate(self.z_distribution):
                 if self.matrice[x][z] == 1:
                     for xi in range(xsize):
                         for zi in range(zsize):
@@ -131,14 +131,13 @@ class Foundations:
         return self._suppr_doubblons_collumns(collumns)
                    
     def _suppr_doubblons_collumns(self, collumns : list[Collumn]): 
-        for index,collumn in enumerate(collumns):
+        for index,collumn in utils.Enumerate(collumns):
             if index == len(collumns)-1: break
             for compare in  collumns[index+1:]:
                 if collumn.point1.position == compare.point1.position :
                     if compare.is_outer : collumn.set_is_outer(True)
                     collumns.remove(compare)
-        
-        print(len(collumns))            
+                   
         return collumns
     
         

@@ -1,22 +1,45 @@
 from gdpc import Editor, Block, geometry
 import networks.curve as curve
 import numpy as np
-import json
+from utils.JsonReader import JsonReader
+from utils.YamlReader import YamlReader
 from buildings.Building import Building
+
+from buildings.geometry.Vertice import Vertice
+from buildings.geometry.Point import Point
+from utils.Enums import DIRECTION,COLLUMN_STYLE
+from buildings.Facade import Facade
 
 editor = Editor(buffering=True)
 
-f = open('buildings\shapes.json')
-shapes = json.load(f)
+f = JsonReader('buildings\shapes.json')
+shapes = f.data
+
+y = YamlReader('params.yml')
+random_data = y.data
+
+geometry.placeCuboid(editor, (0,-60,-5), (100,-45,-5), Block("air"))
+
+x = 0
+facade = []
+for i in range(3,13):
+    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,-5), Point(x+i,0,-5), DIRECTION.NORTH)],i,i,COLLUMN_STYLE.NONE))
+    x += i+2
+
+for f in facade:
+    f.build(editor, ["stone_bricks", "glass_pane"], -60)
  
 # F = Foundations((0,0), (20,20), shapes[0]['matrice'])
 # F.polygon.fill_polygon(editor, "stone", -60)
-geometry.placeCuboid(editor, (-10,-60,-10), (85,-55,85), Block("air"))
-B = Building((0,0), (75,75), shapes[7]['matrice'])
-B.foundations.polygon.fill_vertice(editor, "pink_wool", -60)
-for collumn in B.foundations.collumns:
-    collumn.fill(editor, "white_concrete", -60, -55)
-B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
+
+# geometry.placeCuboid(editor, (-10,-60,-10), (85,-55,85), Block("air"))
+# B = Building((0,0), (75,75), shapes[7]['matrice'])
+# B.foundations.polygon.fill_vertice(editor, "pink_wool", -60)
+# for collumn in B.foundations.collumns:
+#     collumn.fill(editor, "white_concrete", -60, -55)
+# B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
+
+
 
 # # Get a block
 # block = editor.getBlock((0,48,0))

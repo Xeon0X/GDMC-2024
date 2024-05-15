@@ -1,1 +1,36 @@
-// contains all random variables
+#  contains all random variables
+buildings:
+  tile_size:
+    min_tile_size: 3
+    max_tile_size: 12
+
+  foudations:
+    collumn_style :
+    # proportion of each style
+      - none: 1
+      - inner: 1
+      - outer: 1
+      - both: 1
+    floor:
+      min_height: 4
+      max_height: 7
+
+  facade:
+    windows:
+      size:
+        min_height: 2
+        max_height: 6
+        min_width: 1
+        max_width: 12
+      crossbars:
+        min_height_for_vertical_crossbar: 3
+        vertical_crossbar: 0.25
+        min_width_for_horizontal_crossbar: 3
+        horizontal_crossbar: 0.25
+      grounded: 0.5
+      multiple:
+        # min size and probability of multiple windows on the same vertice
+        min_width: 5
+        proba: 0.5
+    inter_floor: 0.5
+    balcony: 0.25

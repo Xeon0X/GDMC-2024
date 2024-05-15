@@ -1,5 +1,5 @@
 import random as rd
-from Enums import COLLUMN_STYLE
+from utils.Enums import COLLUMN_STYLE
 from buildings.Foundations import Foundations
 from buildings.Facade import Facade
 

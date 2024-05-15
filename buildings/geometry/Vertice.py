@@ -1,9 +1,9 @@
-from Enums import DIRECTION
+from utils.Enums import DIRECTION
 from buildings.geometry.Point import Point
 from buildings.geometry.Rectangle import Rectangle
 
 class Vertice(Rectangle):
-    def __init__(self, point1 : Point, point2 : Point, facing : str):
+    def __init__(self, point1 : Point, point2 : Point, facing : DIRECTION):
         Rectangle.__init__(self, point1, point2)
         self.facing = facing
         

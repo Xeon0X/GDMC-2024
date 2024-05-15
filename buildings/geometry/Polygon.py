@@ -1,4 +1,4 @@
-from Enums import DIRECTION
+from utils.Enums import DIRECTION
 from gdpc import Editor, Block, geometry
 from buildings.geometry.Tile import Tile
 from buildings.geometry.Point import Point
@@ -70,7 +70,7 @@ class Polygon:
     def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice]):
         for tile in tiles:
             targets = tile.get_neighbors_coords()
-            for vertice_num,target in enumerate(targets):
+            for vertice_num,target in utils.Enumerate(targets):
                 has_neighbor = self._has_neighbor(target, tiles)
                 if not has_neighbor:
                     vertice = tile.get_vertice(vertice_num)

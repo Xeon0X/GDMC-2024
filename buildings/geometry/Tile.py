@@ -1,5 +1,5 @@
 from gdpc import Editor, Block, geometry
-from Enums import DIRECTION
+from utils.Enums import DIRECTION
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
 

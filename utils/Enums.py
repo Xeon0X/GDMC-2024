@@ -7,6 +7,7 @@ class DIRECTION(Enum):
     SOUTH = 3
     
 class COLLUMN_STYLE(Enum):
+    NONE = 0
     INNER = 1
     OUTER = 2
     BOTH = 3
