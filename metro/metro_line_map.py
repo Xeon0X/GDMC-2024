@@ -111,6 +111,38 @@ def osculating_circle(points: list[Position], derivative: list[Position], second
     return circle
 
 
+def merge_similar_circles(circles: list[tuple[float, Position]], radius_threshold: float, center_threshold: float) \
+        -> list[tuple[float, Position]]:
+    """
+    Merge similar osculating circles
+
+    :param circles: The osculating circles to merge
+    :param radius_threshold: The maximum difference in radius for two circles to be considered similar
+    :param center_threshold: The maximum distance between the centers of two circles to be considered similar
+    :return: The merged osculating circles
+    """
+    merged_circles = []
+    i = 0
+    while i < len(circles) - 1:
+        radius1, center1 = circles[i]
+        radius2, center2 = circles[i + 1]
+        if abs(radius1 - radius2) <= radius_threshold and center1.distance_to(center2) <= center_threshold:
+            merged_radius = (radius1 + radius2) / 2
+            merged_center = Position((center1.x + center2.x) // 2, (center1.y + center2.y) // 2)
+            merged_circles.append((merged_radius, merged_center))
+            i += 2
+        else:
+            merged_circles.append(circles[i])
+            i += 1
+    if i < len(circles):
+        merged_circles.append(circles[i])
+
+    if len(merged_circles) == len(circles):
+        return merged_circles
+    else:
+        return merge_similar_circles(merged_circles, radius_threshold, center_threshold)
+
+
 def calculate_control_points(station, next_station, curve_factor) -> tuple[Position, Position]:
     """
     Calculate the control points for a Bézier curve between two stations
@@ -133,7 +165,7 @@ def calculate_control_points(station, next_station, curve_factor) -> tuple[Posit
 
 
 def metro_line_osculating_circles(metro: Metro_Line, curve_factor: float = 0.5, num_points_factor: float = 1/20) -> (
-        tuple)[list[list[tuple[float, Position]]], list[list[Position]]]:
+        tuple)[list[tuple[float, Position]], list[list[Position]]]:
     """
     Calculate the osculating circles of a metro line
 
@@ -158,7 +190,10 @@ def metro_line_osculating_circles(metro: Metro_Line, curve_factor: float = 0.5, 
             [station.pos, control_point_pos, control_point_next_pos, station.next_station.pos],
             int(distance * num_points_factor))
 
-        circles.append(osculating_circle(points, derivatives, second_derivatives))
+        osculating_circles = osculating_circle(points, derivatives, second_derivatives)
+        merged_circles = merge_similar_circles(osculating_circles, 100, 100)
+        print(f"[METRO LINE] {len(osculating_circles) - len(merged_circles)} out of {len(osculating_circles)} circles deleted !")
+        circles.extend(merged_circles)
         points_list.append(points)
     print(f"[METRO LINE] Osculating circles done")
     return circles, points_list
@@ -205,8 +240,7 @@ def draw_metro_line(metro: Metro_Line, surface: Surface, show_points: bool = Tru
         draw_station(station.next_station, surface)
 
     circles, points = metro_line_osculating_circles(metro)
-    for circle in circles:
-        draw_osculating_circle(circle, surface)
+    draw_osculating_circle(circles, surface)
     if show_points:
         for points in points:
             draw_points(points, surface)
