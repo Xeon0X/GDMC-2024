@@ -1,4 +1,4 @@
-from gdpc import Editor, Block, geometry
+from gdpc import Editor, Block, geometry, Transform
 import networks.curve as curve
 import numpy as np
 from utils.JsonReader import JsonReader
@@ -18,7 +18,11 @@ shapes = f.data
 y = YamlReader('params.yml')
 random_data = y.data
 
+transform = Transform((-2,0,-5),rotation = 3)
+editor.transform.push(transform)
+
 geometry.placeCuboid(editor, (0,-60,-5), (100,-45,-5), Block("air"))
+
 
 x = 0
 facade = []
@@ -27,7 +31,8 @@ for i in range(3,13):
     x += i+2
 
 for f in facade:
-    f.build(editor, ["stone_bricks", "glass_pane"], -60)
+    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall"], -60)
+
  
 # F = Foundations((0,0), (20,20), shapes[0]['matrice'])
 # F.polygon.fill_polygon(editor, "stone", -60)

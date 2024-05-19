@@ -42,11 +42,12 @@ class Facade:
                 rd.randint(self.rdata["windows"]["size"]["min_height"],max_height)
         )
         
+    def get_window(self) -> Window:
+        return Window(self.rdata["windows"] ,self.window_size)
+    
     def has_balcony(self) -> bool:
         pass
     
     def has_inter_floor(self) -> bool:
         pass
     
-    def get_window(self) -> Window:
-        return Window(self.rdata["windows"] ,self.window_size)

@@ -28,7 +28,9 @@ buildings:
         min_width_for_horizontal_crossbar: 3
         horizontal_crossbar: 0.25
       grounded: 0.5
-      multiple:
+      # alternate between block and pane
+      alternate: 0.5
+      multiple: 
         # min size and probability of multiple windows on the same vertice
         min_width: 5
         proba: 0.5

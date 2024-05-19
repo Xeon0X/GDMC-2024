@@ -17,5 +17,5 @@ class Vertice(Rectangle):
                         Point(x = self.point2.x, z = self.point2.z + 1)]
                 
     def get_size(self):
-        return self.point2.x - self.point1.x + self.point2.z - self.point1.z
+        return self.point2.x - self.point1.x + self.point2.z - self.point1.z + 1
         
