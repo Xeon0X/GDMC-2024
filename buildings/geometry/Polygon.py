@@ -6,8 +6,7 @@ from buildings.geometry.Rectangle import Rectangle
 from buildings.geometry.Vertice import Vertice
 
 class Polygon:
-    def __init__(self, position : Point, size: tuple[int,int]):
-        self.position = position
+    def __init__(self, size: tuple[int,int]):
         self.size = size
         self.shape = []
         self.vertices = []
@@ -70,7 +69,7 @@ class Polygon:
     def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice]):
         for tile in tiles:
             targets = tile.get_neighbors_coords()
-            for vertice_num,target in utils.Enumerate(targets):
+            for vertice_num,target in enumerate(targets):
                 has_neighbor = self._has_neighbor(target, tiles)
                 if not has_neighbor:
                     vertice = tile.get_vertice(vertice_num)

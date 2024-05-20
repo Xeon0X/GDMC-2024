@@ -1,14 +1,14 @@
 import random as rd
 import math
-from gdpc import Editor, Block, geometry
-from utils.Enums import DIRECTION
+from gdpc import Editor, Block, geometry, Transform
+from utils.Enums import COLLUMN_STYLE
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
 
 class Window:
-    def __init__(self, rdata, size : tuple[int,int]):
+    def __init__(self, rdata, max_width : int, max_height : int):
         self.rdata = rdata
-        self.width, self.height = size
+        self.width, self.height = self.get_size(max_width, max_height)
         self.is_grounded = self.is_grounded()
         self.has_multiple_windows = self.has_multiple_windows()
         self.is_alternate = self.is_alternate()
@@ -16,26 +16,22 @@ class Window:
         self.padding = 0
         self.editor, self.materials = None,None
         
-    def build(self, editor : Editor, vertice : Vertice, height : int, y : int, materials : list[str]):
+    def build(self, editor : Editor, facade_len : int, facade_height : int, materials : list[str]):
         self.editor = editor
         self.materials = materials
         
-        len = vertice.get_size()
-        self.padding = (len - self.width)//2
-        self.width = len - self.padding*2
+        # correction to avoid asymetry
+        self.padding = (facade_len - self.width)//2
+        self.width = facade_len - self.padding*2
+        
         self.is_alternate = True
-        if not self.is_grounded: y += (height - self.height)//2
+        if not self.is_grounded: editor.transform @= Transform((0,(facade_height-self.height)//2,0))
         
-        if self.has_multiple_windows: self.build_multiple_windows(vertice,  y)
-        else : 
-            xpadding, zpadding = self.padding, self.padding
-            if vertice.facing == DIRECTION.NORTH or vertice.facing == DIRECTION.SOUTH: zpadding = 0
-            else: xpadding = 0
-            
-            self.place_glasses(Point(vertice.point1.x+xpadding, y, vertice.point1.z+zpadding), 
-                               Point(vertice.point2.x-xpadding, y+self.height, vertice.point2.z-zpadding))
+        if self.has_multiple_windows: self.build_multiple_windows()
+        else :
+            self.place_glasses(self.padding, self.width+self.padding)
         
-    def build_multiple_windows(self, vertice : Vertice, y : int):
+    def build_multiple_windows(self):
         slices = rd.randint(3, self.width//self.rdata["size"]["min_width"])
         mid = math.ceil(slices/2)
         windows_count = mid
@@ -53,46 +49,41 @@ class Window:
             
             # kepp a spacing between windows, "is revert" is used to keep symetry
             if is_window:
-                #set the values to orient windows in x or z axis
-                xpadding,xlen,zpadding,zlen = 0,0,0,0
-                if vertice.facing == DIRECTION.NORTH or vertice.facing == DIRECTION.SOUTH:
-                    xpadding,xlen = self.padding + gap, wsize-1
-                else: zpadding,zlen = self.padding + gap, wsize-1
-                
-                self.place_glasses(Point(vertice.point1.x+xpadding, y, vertice.point1.z+zpadding), 
-                                   Point(vertice.point1.x+xpadding+xlen, y+self.height, vertice.point1.z+zpadding+zlen))
+                x=  self.padding + gap               
+                self.place_glasses(x, x+wsize)
                 gap += wsize
             else : 
                 gap += isize
                 
             is_window = not is_window
     
-    def place_glasses(self, pos1 : Point, pos2 : Point):
-        
-        xlen, zlen = pos2.x - pos1.x, pos2.z - pos1.z
-        len = xlen + zlen
+    def place_glasses(self, x1 : int, x2 : int):
+        len = x2 - x1
         if self.is_alternate:
-            mid = len//2 + 1
+            mid = x1 + len//2
             
-            is_block, is_even = False, len % 2 == 1 # yeah the result isn't actually even but it's because either xlen or zlen is 1, we want to know of the other result is even
-            for x in range(xlen+1):
-                for z in range(zlen+1):
-                    if is_even and (x+z) == mid: is_block = not is_block # to keep symetry
-                    id = 1 if not is_block else 2
-                    geometry.placeCuboid(self.editor,(pos1.x+x,pos1.y,pos1.z+z),(pos1.x+x,pos2.y,pos1.z+z),Block(self.materials[id]))
-                    is_block = not is_block
+            is_block, is_even = False, len % 2 == 0
+            for x in range(x1,x2):
+                if is_even and x == mid: is_block = not is_block # to keep symetry
+                id = 1 if not is_block else 2
+                geometry.placeCuboid(self.editor,(x,0,0),(x,self.height,0),Block(self.materials[id]))
+                is_block = not is_block
             
         else:
-            geometry.placeCuboid(self.editor,pos1.position,pos2.position,Block(self.materials[1]))
+            geometry.placeCuboid(self.editor,(x1,0,0),(x2,self.height,0),Block(self.materials[1]))
             
-        self.build_crossbars(pos1, pos2, len)
-            
-            
-    def build_crossbars(self, pos1 : Point, pos2 : Point, len : int):
+        self.build_crossbars(x1, x2-1, len)
+        
+    def get_size(self, max_width : int ,max_height : int) -> tuple[int,int]:
+        return (
+                rd.randint(self.rdata["size"]["min_width"],max_width),
+                rd.randint(self.rdata["size"]["min_height"],max_height)
+            )
+                 
+    def build_crossbars(self, x1 : int, x2 : int, len : int):
         if self.has_vertical_crossbar and self.height >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
-            print(pos1.x,pos2.x)
             y = self.height//2
-            geometry.placeCuboid(self.editor,(pos1.x,pos1.y+y,pos1.z),(pos2.x,pos2.y-y,pos2.z),Block(self.materials[3]))
+            geometry.placeCuboid(self.editor,(x1,y,0),(x2,self.height-y,0),Block(self.materials[3]))
         if self.has_horizontal_crossbar and len >= self.rdata["crossbars"]["min_width_for_horizontal_crossbar"]:
             pass 
                           

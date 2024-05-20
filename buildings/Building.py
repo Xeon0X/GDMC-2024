@@ -17,7 +17,7 @@ class Building:
         
         is_inner_or_outer = COLLUMN_STYLE.BOTH
         
-        self.foundations = Foundations(position, size, matrice, tile_size, is_collumn_full_tile, is_inner_or_outer)
+        self.foundations = Foundations(size, matrice, tile_size, is_collumn_full_tile, is_inner_or_outer)
         self.facade = Facade(self.foundations.vertices, floor_height, is_inner_or_outer)
         
     def gen_tile_size(self) -> int:

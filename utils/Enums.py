@@ -1,10 +1,10 @@
 from enum import Enum
 
 class DIRECTION(Enum):
-    WEST = 0
-    EAST = 1
-    NORTH = 2
-    SOUTH = 3
+    NORTH = 0
+    WEST = 1
+    SOUTH = 2
+    EAST = 3
     
 class COLLUMN_STYLE(Enum):
     NONE = 0

@@ -11,8 +11,7 @@ from buildings.elements.Collumn import Collumn
 class Foundations:
     # TODO : gérer les collones sur les tiles trop petites et les colones 1tile/2 + fulltile
     
-    def __init__(self, 
-                 position : tuple[int,int], 
+    def __init__(self,
                  size : tuple[int, int], 
                  matrice : list[list[int]], 
                  tile_size : int, 
@@ -25,11 +24,8 @@ class Foundations:
         self.is_collumn_full_tile = is_collumn_full_tile
         self.is_inner_or_outer = is_inner_or_outer
         
-        x,z = position
-        self.position = Point(x = x, z = z)
         self.size = size
-        self.length = size[0]
-        self.width = size[1]
+        self.length, self.width = size
         self.matrice = matrice
         self.tiles = []
         self.vertices = []
@@ -45,7 +41,7 @@ class Foundations:
     
     def get_polygon(self) -> Polygon:
         ## The polygon is a shape of tiles representing the foundation shape
-        polygon = Polygon(self.position, self.size)
+        polygon = Polygon(self.size)
         avaliable_space = (self.length_in_tiles, self.width_in_tiles)
         
         # we save the distribution, usefull for the next steps 
@@ -53,10 +49,10 @@ class Foundations:
         self.z_distribution = self.get_distribution(len(self.matrice[0]), avaliable_space[1])
         
         # this bullshit is to create tiles from the matrice and the distribution
-        x_padding = self.position.x
-        for x,xsize in utils.Enumerate(self.x_distribution):
-            z_padding = self.position.z
-            for z,zsize in utils.Enumerate(self.z_distribution):
+        x_padding = 0
+        for x,xsize in enumerate(self.x_distribution):
+            z_padding = 0
+            for z,zsize in enumerate(self.z_distribution):
                 if self.matrice[x][z] == 1:
                     for xi in range(xsize):
                         for zi in range(zsize):
@@ -131,7 +127,7 @@ class Foundations:
         return self._suppr_doubblons_collumns(collumns)
                    
     def _suppr_doubblons_collumns(self, collumns : list[Collumn]): 
-        for index,collumn in utils.Enumerate(collumns):
+        for index,collumn in enumerate(collumns):
             if index == len(collumns)-1: break
             for compare in  collumns[index+1:]:
                 if collumn.point1.position == compare.point1.position :

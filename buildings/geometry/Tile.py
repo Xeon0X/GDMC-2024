@@ -27,15 +27,14 @@ class Tile:
         self.north_vertice = None
         self.south_vertice = None
         
-    def fill(self, editor : Editor, material : str, y : int, y2 : int = None) -> list[Point]:
-        if y2 == None: y2 = y
-        geometry.placeCuboid(editor, (self.pos.x, y, self.pos.z), (self.pos.x+self.size-1, y2, self.pos.z+self.size-1), Block(material))
+    def fill(self, editor : Editor, material : str, y : int = 0) -> list[Point]:
+        geometry.placeCuboid(editor, (self.pos.x, 0, self.pos.z), (self.pos.x+self.size-1, y, self.pos.z+self.size-1), Block(material))
         
     def get_neighbors_coords(self):
-        return [Point(x = self.pos.x - self.size, z = self.pos.z), # west
-                Point(x = self.pos.x + self.size, z = self.pos.z), # east
-                Point(x = self.pos.x, z = self.pos.z - self.size), # north
-                Point(x = self.pos.x, z = self.pos.z + self.size)] # south
+        return [Point(x = self.pos.x, z = self.pos.z - self.size), # north
+                Point(x = self.pos.x - self.size, z = self.pos.z), # west
+                Point(x = self.pos.x, z = self.pos.z + self.size), # south
+                Point(x = self.pos.x + self.size, z = self.pos.z)] # east
         
             
     def get_neighbor(self, direction) -> Point:
@@ -62,16 +61,16 @@ class Tile:
     
     def get_vertice(self,vertice : int|DIRECTION) -> Vertice:
         # gives the corresponding vertice : 
-        # 0 = west, 1 = east, 2 = north, 3 = south
+        # 0 = north, 1 = west, 2 = south, 3 = east
         match(vertice):
             case 0 :
-                return Vertice(self.north_west, self.south_west, DIRECTION.WEST)
-            case 1 :
-                return Vertice(self.north_east, self.south_east, DIRECTION.EAST)
-            case 2 :
                 return Vertice(self.north_west, self.north_east, DIRECTION.NORTH)
-            case 3 :
+            case 1 :
+                return Vertice(self.north_west, self.south_west, DIRECTION.WEST)
+            case 2 :
                 return Vertice(self.south_west, self.south_east, DIRECTION.SOUTH)
+            case 3 :
+                return Vertice(self.north_east, self.south_east, DIRECTION.EAST)
             case DIRECTION.WEST :
                 return self.west_vertice
             case DIRECTION.EAST :

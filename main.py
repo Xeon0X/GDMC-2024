@@ -18,7 +18,7 @@ shapes = f.data
 y = YamlReader('params.yml')
 random_data = y.data
 
-transform = Transform((-2,0,-5),rotation = 3)
+transform = Transform((0,-60,0),rotation = 0)
 editor.transform.push(transform)
 
 geometry.placeCuboid(editor, (0,-60,-5), (100,-45,-5), Block("air"))
@@ -31,7 +31,7 @@ for i in range(3,13):
     x += i+2
 
 for f in facade:
-    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall"], -60)
+    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall"])
 
  
 # F = Foundations((0,0), (20,20), shapes[0]['matrice'])
