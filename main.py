@@ -7,8 +7,10 @@ from buildings.Building import Building
 
 from buildings.geometry.Vertice import Vertice
 from buildings.geometry.Point import Point
-from utils.Enums import DIRECTION,COLLUMN_STYLE
+from utils.Enums import DIRECTION,COLLUMN_STYLE,BORDER_RADIUS
 from buildings.Facade import Facade
+
+from utils.functions import *
 
 editor = Editor(buffering=True)
 
@@ -18,20 +20,21 @@ shapes = f.data
 y = YamlReader('params.yml')
 random_data = y.data
 
-transform = Transform((0,-60,0),rotation = 0)
+
+transform = Transform((0,-60,-5),rotation = 0)
 editor.transform.push(transform)
 
-geometry.placeCuboid(editor, (0,-60,-5), (100,-45,-5), Block("air"))
+geometry.placeCuboid(editor, (0,0,-1), (100,15,1), Block("air"))
 
 
 x = 0
 facade = []
 for i in range(3,13):
-    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,-5), Point(x+i,0,-5), DIRECTION.NORTH)],i,i,COLLUMN_STYLE.NONE))
+    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,0), Point(x+i,0,0), DIRECTION.NORTH)],i,i,COLLUMN_STYLE.NONE))
     x += i+2
 
 for f in facade:
-    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall"])
+    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs"])
 
  
 # F = Foundations((0,0), (20,20), shapes[0]['matrice'])

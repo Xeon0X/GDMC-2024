@@ -11,3 +11,8 @@ class COLLUMN_STYLE(Enum):
     INNER = 1
     OUTER = 2
     BOTH = 3
+    
+class BORDER_RADIUS(Enum):
+    NONE = 0
+    TOP = 1
+    TOP_AND_BOTTOM = 2

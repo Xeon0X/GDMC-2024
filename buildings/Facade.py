@@ -1,6 +1,6 @@
 import random as rd
 from utils.Enums import COLLUMN_STYLE
-from gdpc import Editor, Transform
+from gdpc import Editor, Block, geometry, Transform
 from buildings.geometry.Vertice import Vertice
 from buildings.elements.Window import Window
 
@@ -15,11 +15,16 @@ class Facade:
         self.window =  self.get_window()
         self.has_balcony = self.has_balcony()
         self.has_inter_floor = self.has_inter_floor()
+        self.editor, self.materials = None,None
         
-    def build(self, editor : Editor, materials : list[str]):            
+    def build(self, editor : Editor, materials : list[str]):  
+        self.editor = editor
+        self.materials = materials
+                  
         for vertice in self.vertices:
             vertice.fill(editor, materials[0], self.height, xpadding = self.padding, zpadding = self.padding)
             with editor.pushTransform(Transform(vertice.point1.position,rotation = vertice.facing.value)):
+                self.build_inter_floor(vertice)
                 self.window.build(editor, vertice.get_len(), self.height, materials)
         
     def get_window(self) -> Window:
@@ -31,9 +36,13 @@ class Facade:
             
         return Window(self.rdata["windows"] ,max_width, max_height)
     
+    def build_inter_floor(self, vertice : Vertice):
+        if self.has_inter_floor:
+            geometry.placeCuboid(self.editor,(0,self.height,-1),(self.length,self.height,-1),Block(self.materials[4], {"facing": "south", "half": "top"})) 
+    
     def has_balcony(self) -> bool:
-        pass
+        return self.rdata["balcony"] >= rd.random()
     
     def has_inter_floor(self) -> bool:
-        pass
+        return self.rdata["inter_floor"] >= rd.random()
     

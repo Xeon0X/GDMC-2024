@@ -7,10 +7,10 @@ buildings:
   foudations:
     collumn_style :
     # proportion of each style
-      - none: 1
-      - inner: 1
-      - outer: 1
-      - both: 1
+      none: 1
+      inner: 1
+      outer: 1
+      both: 1
     floor:
       min_height: 4
       max_height: 7
@@ -34,5 +34,10 @@ buildings:
         # min size and probability of multiple windows on the same vertice
         min_width: 5
         proba: 0.5
+      border_radius:
+        # proportion of each style
+        none: 2
+        top: 1
+        top_and_bottom: 1
     inter_floor: 0.5
     balcony: 0.25
