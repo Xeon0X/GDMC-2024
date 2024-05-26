@@ -1,5 +1,5 @@
-import networks.Curve as curve
-import networks.Segment as segment
+import networks.geometry.curve as curve
+import networks.geometry.segment as segment
 import numpy as np
 
 

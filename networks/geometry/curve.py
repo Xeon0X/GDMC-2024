@@ -1,5 +1,5 @@
 import numpy as np
-import networks.Segment as segment
+import networks.geometry.segment as segment
 from scipy import interpolate
 from math import sqrt
 
