@@ -1,4 +1,5 @@
 import networks.lines.Line as Line
+import networks.lanes.Lane as Lane
 from gdpc import Editor, Block, geometry
 import networks.geometry.curve as curve
 import networks.geometry.CurveSurface as CurveSurface
@@ -91,9 +92,14 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # #         editor.placeBlock(coordinate, Block("yellow_concrete"))
 
 
-coordinates = [(0, 0, 0), (0, 10, 0), (0, 20, 0)]
+coordinates = [(0, 0, 0), (0, 0, 10), (0, 0, 20)]
 
-with open('networks/lines/line.json') as f:
-    lines_type = json.load(f)
-    l = Line.Line(coordinates, lines_type.get('solid_white'))
-    print(l.get_surface())
+# with open('networks/lines/lines.json') as f:
+#     lines_type = json.load(f)
+#     l = Line.Line(coordinates, lines_type.get('solid_white'))
+#     print(l.get_surface())
+
+# with open('networks/lanes/lanes.json') as f:
+#     lanes_type = json.load(f)
+#     l = Lane.Lane(coordinates, lanes_type.get('classic_lane'), 5)
+#     print(l.get_surface())

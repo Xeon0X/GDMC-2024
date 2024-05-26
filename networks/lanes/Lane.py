@@ -5,18 +5,17 @@ import random
 
 
 class Lane:
-    def __init__(self, coordinates, width, lane_type):
+    def __init__(self, coordinates, lane_materials,  width):
         self.coordinates = coordinates
         self.width = width
-        self.lane_type = lane_type
         self.lane_materials = lane_materials
         self.surface = []
 
-    def create_surface(self, coordinates):
-        resolution, distance = curve.resolution_distance(coordinates, 6)
+    def get_surface(self):
+        resolution, distance = curve.resolution_distance(self.coordinates, 6)
 
-        curve_points = curve.curve(coordinates, resolution)
-        curve_surface = CurveSurface.CurveSurface(coordinates)
+        curve_points = curve.curve(self.coordinates, resolution)
+        curve_surface = CurveSurface.CurveSurface(self.coordinates)
         curve_surface.compute_curvature()
 
         # Set the road to be flat
@@ -25,12 +24,14 @@ class Lane:
             normals.append((0, 1, 0))
 
         # Compute each line
-        for distance in range(width):
+        for distance in range(self.width):
             offset = curve.offset(curve_surface.curve, distance, normals)
             for i in range(len(offset)-1):
                 line = segment.discrete_segment(offset[i], offset[i+1])
                 for coordinate in line:
                     self.surface.append((coordinate, random.choices(
-                        list(lane_materials.keys()),
-                        weights=lane_materials.values(),
+                        list(self.lane_materials.keys()),
+                        weights=self.lane_materials.values(),
                         k=1,)))
+
+        return self.surface

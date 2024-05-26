@@ -4,9 +4,9 @@ import random
 
 
 class Line:
-    def __init__(self, coordinates, line_type):
+    def __init__(self, coordinates, line_materials):
         self.coordinates = coordinates
-        self.line_type = line_type
+        self.line_materials = line_materials
         self.surface = []
 
     def get_surface(self):
@@ -18,7 +18,7 @@ class Line:
 
         pattern_length = 0
         pattern_materials = []
-        for key, value in self.line_type.items():
+        for key, value in self.line_materials.items():
             pattern_length += int(key)
             for _ in range(int(key)):
                 pattern_materials.append(value)
