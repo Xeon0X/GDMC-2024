@@ -3,9 +3,23 @@ import networks.Curve as curve
 import networks.CurveSurface as CurveSurface
 import networks.Segment as segment
 import numpy as np
+import json
+from buildings.Building import Building
 import random
 
 editor = Editor(buffering=True)
+
+f = open('buildings\shapes.json')
+shapes = json.load(f)
+
+# F = Foundations((0,0), (20,20), shapes[0]['matrice'])
+# F.polygon.fill_polygon(editor, "stone", -60)
+geometry.placeCuboid(editor, (-10, -60, -10), (85, -55, 85), Block("air"))
+B = Building((0, 0), (75, 75), shapes[7]['matrice'])
+B.foundations.polygon.fill_vertice(editor, "pink_wool", -60)
+for collumn in B.foundations.collumns:
+    collumn.fill(editor, "white_concrete", -60, -55)
+B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
 
 y = 25
 block_list = ["blue_concrete", "red_concrete", "green_concrete",
