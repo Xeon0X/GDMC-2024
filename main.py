@@ -94,10 +94,10 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 coordinates = [(0, 0, 0), (0, 0, 10), (0, 0, 20)]
 
-# with open('networks/lines/lines.json') as f:
-#     lines_type = json.load(f)
-#     l = Line.Line(coordinates, lines_type.get('solid_white'))
-#     print(l.get_surface())
+with open('networks/lines/lines.json') as f:
+    lines_type = json.load(f)
+    l = Line.Line(coordinates, lines_type.get('solid_white'))
+    print(l.get_surface())
 
 # with open('networks/lanes/lanes.json') as f:
 #     lanes_type = json.load(f)

@@ -18,10 +18,11 @@ class Line:
 
         pattern_length = 0
         pattern_materials = []
-        for key, value in self.line_materials.items():
-            pattern_length += int(key)
-            for _ in range(int(key)):
-                pattern_materials.append(value)
+
+        for pattern in self.line_materials:
+            pattern_length += pattern[1]
+            for _ in range(pattern[1]):
+                pattern_materials.append(pattern[0])
 
         pattern_iteration = 0
         for i in range(len(curve_points)-1):

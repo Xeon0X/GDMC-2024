@@ -1,9 +1,10 @@
 {
-    "solid_white": {
-        "1": {"white_concrete": 3, "white_concrete_powder": 1}
-    },
-    "broken_white": {
-        "3": {"white_concrete": 3, "white_concrete_powder": 1},
-        "1": {"None": 1}
-    }
+    "solid_white": [
+        [{"white_concrete": 3, "white_concrete_powder": 1}, 1]
+    ],
+    
+    "broken_white": [
+        [{"white_concrete": 3, "white_concrete_powder": 1}, 3],
+        [{"None": 1}, 1]
+    ]
 }
