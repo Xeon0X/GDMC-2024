@@ -3,6 +3,7 @@ from utils.Enums import COLLUMN_STYLE
 from gdpc import Editor, Block, geometry, Transform
 from buildings.geometry.Vertice import Vertice
 from buildings.elements.Window import Window
+from buildings.elements.Balcony import Balcony
 
 class Facade:
     def __init__(self, rdata, vertices : list[Vertice], height : int, length : int, is_inner_or_outer : COLLUMN_STYLE):
@@ -36,7 +37,12 @@ class Facade:
             
         return Window(self.rdata["windows"] ,max_width, max_height)
     
-    def build_inter_floor(self, vertice : Vertice):
+    def get_balcony(self) -> Balcony:
+        len = rd.randint(self.rdata["balcony"]["size"]["min_len"], self.rdata["balcony"]["size"]["max_len"])
+        max_width = self.length-2*self.padding
+        return Balcony(len, max_width, self.window)
+    
+    def build_inter_floor(self):
         if self.has_inter_floor:
             geometry.placeCuboid(self.editor,(0,self.height,-1),(self.length,self.height,-1),Block(self.materials[4], {"facing": "south", "half": "top"})) 
     

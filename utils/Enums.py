@@ -15,4 +15,4 @@ class COLLUMN_STYLE(Enum):
 class BORDER_RADIUS(Enum):
     NONE = 0
     TOP = 1
-    TOP_AND_BOTTOM = 2
+    TOP_AND_BOTTOM = 2  

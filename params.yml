@@ -40,4 +40,12 @@ buildings:
         top: 1
         top_and_bottom: 1
     inter_floor: 0.5
-    balcony: 0.25
+    balcony: 
+      proba : 0.25
+      size:
+        min_len : 1
+        max_len : 3
+        min_width : 3
+      multiple:
+        min_width: 5
+        proba: 0.5
