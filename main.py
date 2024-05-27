@@ -30,7 +30,7 @@ geometry.placeCuboid(editor, (0,0,-1), (100,15,1), Block("air"))
 x = 0
 facade = []
 for i in range(3,13):
-    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,0), Point(x+i,0,0), DIRECTION.NORTH)],i,i,COLLUMN_STYLE.NONE))
+    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,0), Point(x+i,i,0), DIRECTION.NORTH)],COLLUMN_STYLE.NONE))
     x += i+2
 
 for f in facade:
