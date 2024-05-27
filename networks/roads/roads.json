@@ -1,10 +1,11 @@
 {
-    "high_way": {
-        "3": {"classic_lane": 3}
-        
-    },
-    "broken_white": {
-        "3": {"white_concrete": 3, "white_concrete_powder": 1},
-        "1": {"None": 1}
-    }
+    "high_way": [
+        {"lane": "classic_lane", "width": 5, "number": 3},
+        {"lane": "classic_divider", "width": 5, "number": 1},
+        {"lane": "classic_lane", "width": 5, "number": 3}
+    ],
+    
+    "modern_road": [
+        {"lane": "classic_lane", "width": 5, "number": 2}
+    ]
 }

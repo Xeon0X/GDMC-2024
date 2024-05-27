@@ -9,7 +9,9 @@ import json
 from buildings.Building import Building
 import random
 
-# editor = Editor(buffering=True)
+from networks.geometry.point import curveCornerIntersectionLine, curveCornerIntersectionPoints
+
+editor = Editor(buffering=True)
 
 # f = open('buildings\shapes.json')
 # shapes = json.load(f)
@@ -92,14 +94,24 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # #         editor.placeBlock(coordinate, Block("yellow_concrete"))
 
 
-coordinates = [(0, 0, 0), (0, 0, 10), (0, 0, 20)]
+# coordinates = [(0, 0, 0), (0, 0, 10), (0, 0, 20)]
 
-with open('networks/lines/lines.json') as f:
-    lines_type = json.load(f)
-    l = Line.Line(coordinates, lines_type.get('solid_white'))
-    print(l.get_surface())
+# with open('networks/lines/lines.json') as f:
+#     lines_type = json.load(f)
+#     l = Line.Line(coordinates, lines_type.get('solid_white'))
+#     print(l.get_surface())
 
 # with open('networks/lanes/lanes.json') as f:
 #     lanes_type = json.load(f)
 #     l = Lane.Lane(coordinates, lanes_type.get('classic_lane'), 5)
 #     print(l.get_surface())
+
+
+circle = curveCornerIntersectionLine(
+    ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angleAdaptation=True)
+
+print(circle[0])
+
+for coordinate in circle[0]:
+    editor.placeBlock(
+        (round(coordinate[0]), 100, round(coordinate[1])), Block("green_concrete"))
