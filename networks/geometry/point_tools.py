@@ -1,5 +1,6 @@
 from math import sqrt, cos, pi, sin
 import numpy as np
+from networks.geometry.segment_tools import discrete_segment, middle_point
 
 
 def circle(center, radius):
@@ -51,7 +52,7 @@ def is_in_triangle(point, xy0, xy1, xy2):
 
 
 def distance(xy1, xy2):  # TODO : Can be better.
-    return sqrt((xy2[0] - xy1[0]) ** 2 + (xy2[1] - xy1[1]) ** 2)
+    return sqrt((xy2[0] - xy1[0]) ** 2 + (xy2[-1] - xy1[-1]) ** 2)
 
 
 def get_angle(xy0, xy1, xy2):
@@ -210,11 +211,17 @@ def segments_intersection(line0, line1, full_line=True):
             <= y
             <= max(line1[0][-1], line1[1][-1])
         ):
-            return x, y
+            if len(line0[0]) > 2:
+                return middle_point(nearest(discrete_segment(line1[0], line1[1], pixel_perfect=True), (x, y)), nearest(discrete_segment(line0[0], line0[1], pixel_perfect=True), (x, y)))
+            else:
+                return x, y
         else:
             return None
     else:
-        return x, y
+        if len(line0[0]) > 2:
+            return middle_point(nearest(discrete_segment(line1[0], line1[1], pixel_perfect=True), (x, y)), nearest(discrete_segment(line0[0], line0[1], pixel_perfect=True), (x, y)))
+        else:
+            return x, y
 
 
 def circle_segment_intersection(

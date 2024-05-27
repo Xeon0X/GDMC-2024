@@ -9,6 +9,9 @@ import json
 from buildings.Building import Building
 import random
 
+from networks.roads import Road as Road
+from networks.roads.intersections import Intersection as Intersection
+
 from networks.geometry.point_tools import curved_corner_intersection
 
 editor = Editor(buffering=True)
@@ -93,25 +96,84 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # #     for coordinate in curve_surface.left_side[current_range]:
 # #         editor.placeBlock(coordinate, Block("yellow_concrete"))
 
+# ---
 
 # coordinates = [(0, 0, 0), (0, 0, 10), (0, 0, 20)]
 
-# with open('networks/lines/lines.json') as f:
+# with open('networks/roads/lines/lines.json') as f:
 #     lines_type = json.load(f)
 #     l = Line.Line(coordinates, lines_type.get('solid_white'))
 #     print(l.get_surface())
 
-# with open('networks/lanes/lanes.json') as f:
+# with open('networks/roads/lanes/lanes.json') as f:
 #     lanes_type = json.load(f)
 #     l = Lane.Lane(coordinates, lanes_type.get('classic_lane'), 5)
 #     print(l.get_surface())
 
 
-circle = curved_corner_intersection(
-    ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angle_adaptation=True, output_only_points=False)
+# circle = curved_corner_intersection(
+#     ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angle_adaptation=True, output_only_points=False)
 
-print(circle)
+# print(circle)
 
 # for coordinate in circle[0]:
 #     editor.placeBlock(
 #         (round(coordinate[0]), 100, round(coordinate[1])), Block("green_concrete"))
+
+# ---
+
+# r1 = Road.Road((-1341, 100, 439), "None")
+# r2 = Road.Road((-1378, 100, 415), "None")
+
+# i = Intersection.Intersection(
+#     (-1352, 100, 405), [(-1345, 100, 426), (-1369, 100, 412)], [r1, r2])
+
+
+# ---
+
+r1 = Road.Road((-1337, 71, 472), "None")
+r2 = Road.Road((-1269, 80, 574), "None")
+r3 = Road.Road((-1392, 79, 527), "None")
+
+i = Intersection.Intersection(
+    (-1327, 71, 533), [(-1335, 71, 494), (-1298, 75, 553), (-1366, 78, 530)], [r1, r2, r3])
+
+# ---
+
+# y = 100
+
+# r1 = Road.Road((-1337, y, 472), "None")
+# r2 = Road.Road((-1269, y, 574), "None")
+# r3 = Road.Road((-1392, y, 527), "None")
+
+# i = Intersection.Intersection(
+#     (-1327, y, 533), [(-1335, y, 494), (-1298, y, 553), (-1366, y, 530)], [r1, r2, r3])
+
+
+i.compute_curved_corner()
+
+for j in range(len(i.orthogonal_delimitations)):
+
+    coordinates = segment_tools.discrete_segment(
+        i.orthogonal_delimitations[j][0][0], i.orthogonal_delimitations[j][0][1])
+    for coordinate in coordinates:
+        editor.placeBlock(coordinate, Block("purple_concrete"))
+
+    coordinates = segment_tools.discrete_segment(
+        i.orthogonal_delimitations[j][1][0], i.orthogonal_delimitations[j][1][1])
+    for coordinate in coordinates:
+        editor.placeBlock(coordinate, Block("pink_concrete"))
+
+    coordinates = segment_tools.discrete_segment(
+        i.parallel_delimitations[j][0][0], i.parallel_delimitations[j][0][1])
+    for coordinate in coordinates:
+        editor.placeBlock(coordinate, Block("orange_concrete"))
+
+    coordinates = segment_tools.discrete_segment(
+        i.parallel_delimitations[j][1][0], i.parallel_delimitations[j][1][1])
+    for coordinate in coordinates:
+        editor.placeBlock(coordinate, Block("yellow_concrete"))
+
+for coordinate in i.intersections:
+    if coordinate != None:
+        editor.placeBlock(coordinate, Block("black_concrete"))
