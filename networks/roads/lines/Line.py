@@ -1,5 +1,5 @@
-import networks.geometry.curve as curve
-import networks.geometry.segment as segment
+import networks.geometry.curve_tools as curve_tools
+import networks.geometry.segment_tools as segment_tools
 import random
 
 
@@ -10,9 +10,10 @@ class Line:
         self.surface = []
 
     def get_surface(self):
-        resolution, distance = curve.resolution_distance(self.coordinates, 6)
+        resolution, distance = curve_tools.resolution_distance(
+            self.coordinates, 6)
 
-        curve_points = curve.curve(self.coordinates, resolution)
+        curve_points = curve_tools.curve(self.coordinates, resolution)
 
         # Compute the line
 
@@ -26,7 +27,8 @@ class Line:
 
         pattern_iteration = 0
         for i in range(len(curve_points)-1):
-            line = segment.discrete_segment(curve_points[i], curve_points[i+1])
+            line = segment_tools.discrete_segment(
+                curve_points[i], curve_points[i+1])
             for coordinate in line:
                 block = random.choices(
                     list(pattern_materials[pattern_iteration].keys()),

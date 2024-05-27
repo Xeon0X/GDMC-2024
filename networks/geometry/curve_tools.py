@@ -1,5 +1,5 @@
 import numpy as np
-import networks.geometry.segment as segment
+import networks.geometry.segment_tools as segment_tools
 from scipy import interpolate
 from math import sqrt
 
@@ -83,14 +83,14 @@ def offset(curve, distance, normals):
             'Number of normals and number of points in the curve do not match')
 
     # Offsetting
-    offset_segments = [segment.parallel(
+    offset_segments = [segment_tools.parallel(
         (curve[i], curve[i+1]), distance, normals[i]) for i in range(len(curve) - 1)]
 
     # Combining segments
     combined_curve = []
     combined_curve.append(np.round(offset_segments[0][0]).tolist())
     for i in range(0, len(offset_segments)-1):
-        combined_curve.append(segment.middle_point(
+        combined_curve.append(segment_tools.middle_point(
             offset_segments[i][1], offset_segments[i+1][0]))
     combined_curve.append(np.round(offset_segments[-1][1]).tolist())
 

@@ -1,6 +1,6 @@
-import networks.geometry.curve as curve
-import networks.geometry.CurveSurface as CurveSurface
-import networks.geometry.segment as segment
+import networks.geometry.curve_tools as curve_tools
+import networks.geometry.Strip as Strip
+import networks.geometry.segment_tools as segment_tools
 import random
 
 
@@ -12,10 +12,11 @@ class Lane:
         self.surface = []
 
     def get_surface(self):
-        resolution, distance = curve.resolution_distance(self.coordinates, 6)
+        resolution, distance = curve_tools.resolution_distance(
+            self.coordinates, 6)
 
-        curve_points = curve.curve(self.coordinates, resolution)
-        curve_surface = CurveSurface.CurveSurface(self.coordinates)
+        curve_points = curve_tools.curve(self.coordinates, resolution)
+        curve_surface = Strip.Strip(self.coordinates)
         curve_surface.compute_curvature()
 
         # Set the road to be flat
@@ -25,9 +26,9 @@ class Lane:
 
         # Compute each line
         for distance in range(self.width):
-            offset = curve.offset(curve_surface.curve, distance, normals)
+            offset = curve_tools.offset(curve_surface.curve, distance, normals)
             for i in range(len(offset)-1):
-                line = segment.discrete_segment(offset[i], offset[i+1])
+                line = segment_tools.discrete_segment(offset[i], offset[i+1])
                 for coordinate in line:
                     self.surface.append((coordinate, random.choices(
                         list(self.lane_materials.keys()),

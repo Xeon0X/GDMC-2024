@@ -1,15 +1,15 @@
 import networks.roads.lines.Line as Line
 import networks.roads.lanes.Lane as Lane
 from gdpc import Editor, Block, geometry
-import networks.geometry.curve as curve
-import networks.geometry.CurveSurface as CurveSurface
-import networks.geometry.segment as segment
+import networks.geometry.curve_tools as curve_tools
+import networks.geometry.Strip as Strip
+import networks.geometry.segment_tools as segment_tools
 import numpy as np
 import json
 from buildings.Building import Building
 import random
 
-from networks.geometry.point import curved_corner_intersection
+from networks.geometry.point_tools import curved_corner_intersection
 
 editor = Editor(buffering=True)
 
