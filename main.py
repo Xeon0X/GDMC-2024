@@ -1,5 +1,5 @@
-import networks.lines.Line as Line
-import networks.lanes.Lane as Lane
+import networks.roads.lines.Line as Line
+import networks.roads.lanes.Lane as Lane
 from gdpc import Editor, Block, geometry
 import networks.geometry.curve as curve
 import networks.geometry.CurveSurface as CurveSurface
@@ -9,7 +9,7 @@ import json
 from buildings.Building import Building
 import random
 
-from networks.geometry.point import curveCornerIntersectionLine, curveCornerIntersectionPoints
+from networks.geometry.point import curved_corner_intersection
 
 editor = Editor(buffering=True)
 
@@ -107,11 +107,11 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 #     print(l.get_surface())
 
 
-circle = curveCornerIntersectionLine(
-    ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angleAdaptation=True)
+circle = curved_corner_intersection(
+    ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angle_adaptation=True, output_only_points=False)
 
-print(circle[0])
+print(circle)
 
-for coordinate in circle[0]:
-    editor.placeBlock(
-        (round(coordinate[0]), 100, round(coordinate[1])), Block("green_concrete"))
+# for coordinate in circle[0]:
+#     editor.placeBlock(
+#         (round(coordinate[0]), 100, round(coordinate[1])), Block("green_concrete"))
