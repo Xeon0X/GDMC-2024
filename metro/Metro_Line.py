@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, atan2
 
 
 class Position:
@@ -21,11 +21,18 @@ class Position:
     def __str__(self):
         return f"({self.x}, {self.y})"
 
+    def __eq__(self, other: "Position"):
+        return self.x == other.x and self.y == other.y
+
     def distance_to(self, other: "Position") -> float:
         return sqrt((self.x - other.x) ** 2 + (self.y - other.y) ** 2)
 
     def norm(self) -> float:
         return sqrt(self.x ** 2 + self.y ** 2)
+
+    def angle_to(self, other: "Position") -> float:
+        return atan2(self.y - other.y, other.x - self.x)
+
 
 class Station:
     """

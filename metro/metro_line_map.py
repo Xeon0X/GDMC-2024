@@ -1,5 +1,5 @@
 from Metro_Line import *
-from math import pi, cos, sin
+from math import pi, cos, sin, sqrt, atan2, inf
 from pygame import Surface
 import pygame
 
@@ -83,7 +83,7 @@ def bezier_curve(control_points, num_points) -> tuple[list[Position], list[Posit
 
 
 def osculating_circle(points: list[Position], derivative: list[Position], second_derivative: list[Position]) \
-        -> list[tuple[float, Position]]:
+        -> list[tuple[int, Position]]:
     """
     Calculate the osculating circle at each point of a curve
     An osculating circle is the circle that best approximates the curve at a given point
@@ -107,12 +107,12 @@ def osculating_circle(points: list[Position], derivative: list[Position], second
                 center = points[i] + Position(-derivative[i].y * radius / normal, derivative[i].x * radius / normal)
             else:
                 center = points[i] + Position(derivative[i].y * radius / normal, -derivative[i].x * radius / normal)
-            circle.append((radius, center))
+            circle.append((int(radius), center))
     return circle
 
 
-def merge_similar_circles(circles: list[tuple[float, Position]], radius_threshold: float, center_threshold: float) \
-        -> list[tuple[float, Position]]:
+def merge_similar_circles(circles: list[tuple[int, Position]], radius_threshold: float, center_threshold: float) \
+        -> list[tuple[int, Position]]:
     """
     Merge similar osculating circles
 
@@ -127,7 +127,7 @@ def merge_similar_circles(circles: list[tuple[float, Position]], radius_threshol
         radius1, center1 = circles[i]
         radius2, center2 = circles[i + 1]
         if abs(radius1 - radius2) <= radius_threshold and center1.distance_to(center2) <= center_threshold:
-            merged_radius = (radius1 + radius2) / 2
+            merged_radius = (radius1 + radius2) // 2
             merged_center = Position((center1.x + center2.x) // 2, (center1.y + center2.y) // 2)
             merged_circles.append((merged_radius, merged_center))
             i += 2
@@ -141,6 +141,81 @@ def merge_similar_circles(circles: list[tuple[float, Position]], radius_threshol
         return merged_circles
     else:
         return merge_similar_circles(merged_circles, radius_threshold, center_threshold)
+
+
+def circle_intersection(circle1: tuple[int, Position], circle2: tuple[int, Position]) -> list[Position]:
+    distance = circle1[1].distance_to(circle2[1])
+
+    if (distance > circle1[0] + circle2[0] or distance < abs(circle1[0] - circle2[0])
+            or (distance == 0 and circle1[0] == circle2[0])):
+        return []
+
+    distance_line_circle = (circle1[0] ** 2 - circle2[0] ** 2 + distance ** 2) / (2 * distance)
+    distance_line_intersec_point = sqrt(circle1[0] ** 2 - distance_line_circle ** 2)
+    p = circle1[1] + (circle2[1] - circle1[1]) * distance_line_circle / distance
+
+    return [Position(int(p.x + distance_line_intersec_point * (circle2[1].y - circle1[1].y) / distance),
+                     int(p.y - distance_line_intersec_point * (circle2[1].x - circle1[1].x) / distance)),
+            Position(int(p.x - distance_line_intersec_point * (circle2[1].y - circle1[1].y) / distance),
+                     int(p.y + distance_line_intersec_point * (circle2[1].x - circle1[1].x) / distance))]
+
+
+def closest_to_curve(points: list[Position], curve_points: list[Position]) -> Position:
+    closest_point = Position()
+    distance = inf
+    for point in points:
+        for curve_point in curve_points:
+            distance_point_curve = point.distance_to(curve_point)
+            if distance_point_curve < distance:
+                distance = distance_point_curve
+                closest_point = point
+    return closest_point
+
+
+def midpoint_circle_segment(circle: tuple[int, Position], start_point: Position, end_point: Position, curve_points: list[Position]) -> list[
+    Position]:
+    points = []
+
+    start_angle = circle[1].angle_to(start_point)
+    end_angle = circle[1].angle_to(end_point)
+
+    if start_angle < 0:
+        start_angle += 2 * pi
+    if end_angle < 0:
+        end_angle += 2 * pi
+    if start_angle > end_angle:
+        start_angle, end_angle = end_angle, start_angle
+
+    middle_angle = (start_angle+end_angle)/2
+    middle_point = circle[1] + Position(int(circle[0]*cos(middle_angle)), -int(circle[0]*sin(middle_angle)))
+    is_outside_point = closest_to_curve([middle_point, circle[1]], curve_points) == middle_point
+
+    x0, y0 = circle[1].x, circle[1].y
+    x = circle[0]
+    y = 0
+    err = 0
+
+    while x >= y:
+        for (x1, y1) in [(x0 + x, y0 + y), (x0 + y, y0 + x), (x0 - y, y0 + x), (x0 - x, y0 + y),
+                         (x0 - x, y0 - y), (x0 - y, y0 - x), (x0 + y, y0 - x), (x0 + x, y0 - y)]:
+            angle = atan2(y0 - y1, x1 - x0)
+            if angle < 0:
+                angle += 2*pi
+            if is_outside_point:
+                if start_angle <= angle <= end_angle:
+                    points.append(Position(int(x1), int(y1)))
+            else:
+                if angle <= start_angle or end_angle <= angle:
+                    points.append(Position(int(x1), int(y1)))
+
+        if err <= 0:
+            y += 1
+            err += 2 * y + 1
+        if err > 0:
+            x -= 1
+            err -= 2 * x + 1
+
+    return points
 
 
 def calculate_control_points(station, next_station, curve_factor) -> tuple[Position, Position]:
@@ -164,8 +239,8 @@ def calculate_control_points(station, next_station, curve_factor) -> tuple[Posit
     return control_point_pos, control_point_next_pos
 
 
-def metro_line_osculating_circles(metro: Metro_Line, curve_factor: float = 0.5, num_points_factor: float = 1/20) -> (
-        tuple)[list[tuple[float, Position]], list[list[Position]]]:
+def metro_line_osculating_circles(metro: Metro_Line, curve_factor: float = 0.5, num_points_factor: float = 1 / 20) -> (
+        tuple)[list[tuple[int, Position]], list[Position]]:
     """
     Calculate the osculating circles of a metro line
 
@@ -191,17 +266,18 @@ def metro_line_osculating_circles(metro: Metro_Line, curve_factor: float = 0.5, 
             int(distance * num_points_factor))
 
         osculating_circles = osculating_circle(points, derivatives, second_derivatives)
-        merged_circles = merge_similar_circles(osculating_circles, 100, 100)
-        print(f"[METRO LINE] {len(osculating_circles) - len(merged_circles)} out of {len(osculating_circles)} circles deleted !")
+        merged_circles = merge_similar_circles(osculating_circles, 50, 50)
+        print(
+            f"[METRO LINE] {len(osculating_circles) - len(merged_circles)} out of {len(osculating_circles)} circles deleted !")
         circles.extend(merged_circles)
-        points_list.append(points)
+        points_list.extend(points)
     print(f"[METRO LINE] Osculating circles done")
     return circles, points_list
 
 
 # --- DRAW PART ---
 
-def draw_osculating_circle(circle: list[tuple[float, Position]], surface: Surface):
+def draw_osculating_circle(circle: list[tuple[int, Position]], surface: Surface):
     """
     :param circle: The osculating circles to draw
     :param surface: The surface on which to draw the circles
@@ -228,6 +304,15 @@ def draw_points(points: list[Position], surface):
         pygame.draw.circle(surface, (40, 255, 40), (point.x, point.y), 5)
 
 
+def draw_point(point: Position, surface):
+    pygame.draw.circle(surface, (40, 255, 40), (point.x, point.y), 5)
+
+
+def draw_pixels(points: list[Position], surface):
+    for point in points:
+        surface.set_at((point.x, point.y), (0, 255, 255))
+
+
 def draw_metro_line(metro: Metro_Line, surface: Surface, show_points: bool = True):
     """
     :param metro: The metro line to draw
@@ -241,9 +326,37 @@ def draw_metro_line(metro: Metro_Line, surface: Surface, show_points: bool = Tru
 
     circles, points = metro_line_osculating_circles(metro)
     draw_osculating_circle(circles, surface)
-    if show_points:
-        for points in points:
-            draw_points(points, surface)
+    for i in range(1, len(circles) - 1):
+        intersect_point_circle_before = closest_to_curve(circle_intersection(circles[i - 1], circles[i]), points)
+        intersect_point_circle_after = closest_to_curve(circle_intersection(circles[i], circles[i + 1]), points)
+        if intersect_point_circle_before == Position():
+            continue
+            intersect_point_circle_before = circles[i - 1][1]
+        else:
+            draw_point(intersect_point_circle_before, surface)
+
+        if intersect_point_circle_after == Position():
+            continue
+            intersect_point_circle_after = circles[i + 1][1]
+        else:
+            draw_point(intersect_point_circle_after, surface)
+
+        points_midpoint = midpoint_circle_segment(circles[i], intersect_point_circle_before,
+                                                  intersect_point_circle_after, points)
+        draw_pixels(points_midpoint, surface)
+
+    if len(points) != 0:
+        intersect_point_circle_before = points[0]
+        intersect_point_circle_after = closest_to_curve(circle_intersection(circles[0], circles[1]), points)
+        points_midpoint = midpoint_circle_segment(circles[0], intersect_point_circle_before,
+                                                  intersect_point_circle_after, points)
+        draw_pixels(points_midpoint, surface)
+
+        intersect_point_circle_before = points[-1]
+        intersect_point_circle_after = closest_to_curve(circle_intersection(circles[-1], circles[-2]), points)
+        points_midpoint = midpoint_circle_segment(circles[-1], intersect_point_circle_before,
+                                                  intersect_point_circle_after, points)
+        draw_pixels(points_midpoint, surface)
 
 
 def interface():
