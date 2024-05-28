@@ -256,7 +256,7 @@ def circle_segment_intersection(
     (p1x, p1y), (p2x, p2y), (cx, cy) = (
         (xy0[0], xy0[-1]),
         (xy1[0], xy1[-1]),
-        (circle_center[0], circle_center[1]),
+        (circle_center[0], circle_center[-1]),
     )
     (x1, y1), (x2, y2) = (p1x - cx, p1y - cy), (p2x - cx, p2y - cy)
     dx, dy = (x2 - x1), (y2 - y1)
@@ -314,8 +314,8 @@ def perpendicular(distance, xy1, xy2):
         tuple: Coordinates of the line length distance, perpendicular
         to [xy1; xy2] at xy1.
     """
-    (x1, y1) = xy1
-    (x2, y2) = xy2
+    (x1, y1) = xy1[0], xy1[-1]
+    (x2, y2) = xy2[0], xy2[-1]
     dx = x1 - x2
     dy = y1 - y2
     dist = sqrt(dx * dx + dy * dy)
@@ -329,7 +329,7 @@ def perpendicular(distance, xy1, xy2):
 
 
 def curved_corner_intersection(
-    line0, line1, start_distance, angle_adaptation=False, full_line=False, center=(), output_only_points=True
+    line0, line1, start_distance, angle_adaptation=False, full_line=True, center=(), output_only_points=True
 ):
     """
     Create points between the two lines to smooth the intersection.
@@ -350,6 +350,8 @@ def curved_corner_intersection(
 
     >>> curved_corner_intersection(((0, 0), (50, 20)), ((-5, 50), (25, -5)), 10)
     """
+    print("\nInput:")
+    print(line0, line1)
     intersection = segments_intersection(line0, line1, full_line)
 
     if intersection == None:
@@ -370,20 +372,20 @@ def curved_corner_intersection(
         intersection, start_distance, line0[0], intersection, full_line
     )[0]
     start_curve_point = (
-        round(start_curve_point[0]), round(start_curve_point[1]))
+        round(start_curve_point[0]), round(start_curve_point[-1]))
     end_curve_point = circle_segment_intersection(
         intersection, start_distance, line1[0], intersection, full_line
     )[0]
-    end_curve_point = (round(end_curve_point[0]), round(end_curve_point[1]))
+    end_curve_point = (round(end_curve_point[0]), round(end_curve_point[-1]))
     # Higher value for better precision
     perpendicular0 = perpendicular(10e3, start_curve_point, intersection)[0]
-    perpendicular1 = perpendicular(10e3, end_curve_point, intersection)[1]
+    perpendicular1 = perpendicular(10e3, end_curve_point, intersection)[-1]
 
     if center == ():
         center = segments_intersection(
             (perpendicular0, start_curve_point), (perpendicular1, end_curve_point)
         )
-        center = round(center[0]), round(center[1])
+        center = round(center[0]), round(center[-1])
 
     # Distance with startCurvePoint and endCurvePoint from the center are the
     # same.
@@ -408,4 +410,7 @@ def curved_corner_intersection(
     # Be sure that all the points are in correct order.
     curve_corner_points = optimized_path(
         curved_corner_points_temporary, start_curve_point)
+    print("Output:")
+    print(curve_corner_points)
+    print("\n")
     return curve_corner_points, center, radius

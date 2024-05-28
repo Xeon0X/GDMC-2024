@@ -111,14 +111,12 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 #     print(l.get_surface())
 
 
-# circle = curved_corner_intersection(
-#     ((-1313, 392), (-1378, 415)), ((-1371, 348), (-1341, 439)), 30, angle_adaptation=True, output_only_points=False)
+circle = curved_corner_intersection(
+    ((-1365, 520), (-1326, 523)), ((-1344, 496), (-1336, 535)), 10, angle_adaptation=False, output_only_points=False)
 
-# print(circle)
-
-# for coordinate in circle[0]:
-#     editor.placeBlock(
-#         (round(coordinate[0]), 100, round(coordinate[1])), Block("green_concrete"))
+for coordinate in circle[0]:
+    editor.placeBlock(
+        (round(coordinate[0]), 125, round(coordinate[1])), Block("green_concrete"))
 
 # ---
 
@@ -131,23 +129,23 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # ---
 
-r1 = Road.Road((-1337, 71, 472), "None")
-r2 = Road.Road((-1269, 80, 574), "None")
-r3 = Road.Road((-1392, 79, 527), "None")
+# r1 = Road.Road((-1337, 71, 472), "None")
+# r2 = Road.Road((-1269, 80, 574), "None")
+# r3 = Road.Road((-1392, 79, 527), "None")
 
-i = Intersection.Intersection(
-    (-1327, 71, 533), [(-1335, 71, 494), (-1298, 75, 553), (-1366, 78, 530)], [r1, r2, r3])
+# i = Intersection.Intersection(
+#     (-1327, 71, 533), [(-1335, 71, 494), (-1298, 75, 553), (-1366, 78, 530)], [r1, r2, r3])
 
 # ---
 
-# y = 100
+y = 150
 
-# r1 = Road.Road((-1337, y, 472), "None")
-# r2 = Road.Road((-1269, y, 574), "None")
-# r3 = Road.Road((-1392, y, 527), "None")
+r1 = Road.Road((-1337, y, 472), "None")
+r2 = Road.Road((-1269, y, 574), "None")
+r3 = Road.Road((-1392, y, 527), "None")
 
-# i = Intersection.Intersection(
-#     (-1327, y, 533), [(-1335, y, 494), (-1298, y, 553), (-1366, y, 530)], [r1, r2, r3])
+i = Intersection.Intersection(
+    (-1327, y, 533), [(-1335, y, 494), (-1298, y, 553), (-1366, y, 530)], [r1, r2, r3])
 
 
 i.compute_curved_corner()
@@ -177,3 +175,10 @@ for j in range(len(i.orthogonal_delimitations)):
 for coordinate in i.intersections:
     if coordinate != None:
         editor.placeBlock(coordinate, Block("black_concrete"))
+
+for k in range(len(i.intersections_curved)):
+    for coordinate in i.intersections_curved[k][0]:
+        if coordinate != None:
+            if k >= 0:
+                editor.placeBlock(
+                    (coordinate[0], y, coordinate[1]), Block("cyan_concrete"))
