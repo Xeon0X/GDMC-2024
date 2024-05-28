@@ -16,7 +16,7 @@ class Glass:
             
     def reset_groups(self):
         self.group1, self.group2 = [], []
-        
-    def get_len(self):
+    
+    def __len__(self):
         return self.x2 - self.x1 + 1
         

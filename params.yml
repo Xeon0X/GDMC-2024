@@ -42,10 +42,13 @@ buildings:
     inter_floor: 0.5
     balcony: 
       proba : 0.25
+      growth: 0.8 # [growth]% chance to have min_width + 1 balcony length, [growth**2]% chance to have min_width + 2 balcony length, etc
       size:
         min_len : 1
         max_len : 3
         min_width : 3
       multiple:
-        min_width: 5
+      # probability to have multiple balcony IF POSSIBLE
         proba: 0.5
+        min_width: 5
+        min_gap: 0

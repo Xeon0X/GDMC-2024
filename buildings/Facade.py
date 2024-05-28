@@ -52,5 +52,5 @@ class Facade:
         return self.rdata["inter_floor"] >= rd.random()
     
     def get_dimentions(self) -> tuple[int]:
-        return ( self.vertices[0].get_height(), self.vertices[0].get_len())
+        return ( self.vertices[0].get_height(), len(self.vertices[0]))
     

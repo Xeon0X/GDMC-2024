@@ -25,10 +25,10 @@ class Window:
         self.materials = materials
         with editor.pushTransform(Transform((self.padding,self.ypadding,0))):
             for g in self.windows:
-                len = g.get_len()
+                leng = len(g)
                 g.build(editor, materials[1], materials[2])
-                self.build_crossbars(g.x1, g.x2, len)
-                if len > 1: self.build_border_radius(g.x1, g.x2)
+                self.build_crossbars(g.x1, g.x2, leng)
+                if leng > 1: self.build_border_radius(g.x1, g.x2)
                          
     def build_crossbars(self, x1 : int, x2 : int, len : int):
         if self.has_vertical_crossbar and self.height >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
@@ -67,11 +67,12 @@ class Window:
         is_even= slices % 2 == 0
         is_window, gap = True, 0
         remainder = self.width - (window_size*windows_count + inter_size*inter_count)
+        
         if windows_count % 2 == 1 and inter_count % 2 == 1: 
             inter_count -= 1
             remainder += inter_size
             is_even = not is_even
-        print(window_size,windows_count,inter_size,inter_count,remainder,self.width,"\n\n")
+            
         for i in range(1,slices+1):
             wsize,isize = window_size, inter_size
             if is_even and i == mid: wsize, isize = wsize*2, isize*2
@@ -90,10 +91,10 @@ class Window:
     def alternate(self, windows : list[Glass]):
         for g in windows:
             g.reset_groups()
-            len = g.get_len()
-            mid = g.x1 + len//2
+            leng = len(g)
+            mid = g.x1 + leng//2
             
-            is_block, is_even = False, len % 2 == 0
+            is_block, is_even = False, leng % 2 == 0
             for x in range(g.x1,g.x2+1):
                 if is_even and x == mid: is_block = not is_block # to keep symetry
                 if is_block: g.group2.append(self.create_window(x))
