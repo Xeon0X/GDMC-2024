@@ -14,6 +14,7 @@ class Facade:
         self.padding = 0
         self.window =  self.get_window()
         self.has_balcony = self.has_balcony()
+        self.balcony = self.get_balcony()
         self.has_inter_floor = self.has_inter_floor()
         self.editor, self.materials = None,None
         
@@ -26,6 +27,7 @@ class Facade:
             with editor.pushTransform(Transform(vertice.point1.position,rotation = vertice.facing.value)):
                 self.window.build(editor, materials)
                 self.build_inter_floor()
+                if self.has_balcony: self.balcony.build(editor, materials)
         
     def get_window(self) -> Window:
         if self.is_inner_or_outer == COLLUMN_STYLE.OUTER or self.is_inner_or_outer == COLLUMN_STYLE.BOTH:
@@ -36,7 +38,8 @@ class Facade:
             
         return Window(self.rdata["windows"] ,max_width, max_height, self.length, self.height)
     
-    def get_balcony(self) -> Balcony:
+    def get_balcony(self) -> Balcony|None:
+        if not self.has_balcony: return None
         max_width = self.length-2*self.padding
         return Balcony(self.rdata["balcony"], max_width, self.window)
     
@@ -44,8 +47,9 @@ class Facade:
         if self.has_inter_floor:
             geometry.placeCuboid(self.editor,(0,self.height,0),(self.length-1,self.height,0),Block(self.materials[0])) 
             geometry.placeCuboid(self.editor,(0,self.height,-1),(self.length-1,self.height,-1),Block(self.materials[4], {"facing": "south", "half": "top"})) 
-    
+
     def has_balcony(self) -> bool:
+        return True
         return self.rdata["balcony"]["proba"] >= rd.random()
     
     def has_inter_floor(self) -> bool:
