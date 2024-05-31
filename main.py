@@ -138,15 +138,28 @@ for coordinate in circle[0]:
 
 # ---
 
-y = 150
+# y = 150
 
-r1 = Road.Road((-1337, y, 472), "None")
-r2 = Road.Road((-1269, y, 574), "None")
-r3 = Road.Road((-1392, y, 527), "None")
+# r1 = Road.Road((-1337, y, 472), "None")
+# r2 = Road.Road((-1269, y, 574), "None")
+# r3 = Road.Road((-1392, y, 527), "None")
+
+# i = Intersection.Intersection(
+#     (-1327, y, 533), [(-1335, y, 494), (-1298, y, 553), (-1366, y, 530)], [r1, r2, r3])
+
+
+# ---
+
+y = 100
+
+r1 = Road.Road((-1380, 75, 406), "None")
+r2 = Road.Road((-1365, 75, 468), "None")
+r3 = Road.Road((-1411, 75, 501), "None")
+r4 = Road.Road((-1451, 75, 449), "None")
+r5 = Road.Road((-1432, 75, 423), "None")
 
 i = Intersection.Intersection(
-    (-1327, y, 533), [(-1335, y, 494), (-1298, y, 553), (-1366, y, 530)], [r1, r2, r3])
-
+    (-1411, 75, 461), [(-1392, 75, 427), (-1385, 75, 465), (-1411, 75, 487), (-1435, 75, 454), (-1426, 75, 435)], [r1, r2, r3, r4, r5])
 
 i.compute_curved_corner()
 
@@ -181,4 +194,4 @@ for k in range(len(i.intersections_curved)):
         if coordinate != None:
             if k >= 0:
                 editor.placeBlock(
-                    (coordinate[0], y, coordinate[1]), Block("cyan_concrete"))
+                    (coordinate[0], 75, coordinate[1]), Block("cyan_concrete"))

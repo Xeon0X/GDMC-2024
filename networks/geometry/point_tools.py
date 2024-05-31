@@ -410,7 +410,4 @@ def curved_corner_intersection(
     # Be sure that all the points are in correct order.
     curve_corner_points = optimized_path(
         curved_corner_points_temporary, start_curve_point)
-    print("Output:")
-    print(curve_corner_points)
-    print("\n")
     return curve_corner_points, center, radius

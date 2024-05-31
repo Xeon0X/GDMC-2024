@@ -28,18 +28,10 @@ class Intersection:
             self.intersections.append(segments_intersection(
                 self.parallel_delimitations[j][1], self.parallel_delimitations[(j+1) % len(self.Roads)][0], full_line=False))
 
-            test = tuple(self.parallel_delimitations[(
+            next_parallel = tuple(self.parallel_delimitations[(
                 j+1) % len(self.Roads)][0][0]), tuple(self.parallel_delimitations[(j+1) % len(self.Roads)][0][1])
-            test0 = tuple(self.parallel_delimitations[j][1][0]), tuple(
+            current_parallel = tuple(self.parallel_delimitations[j][1][0]), tuple(
                 self.parallel_delimitations[j][1][1])
 
-            print("\n\n\n --- \n\n\n")
-            print(self.parallel_delimitations)
-            print(self.parallel_delimitations[(
-                j+1) % len(self.Roads)][0])
-            print(self.parallel_delimitations[j][1])
-
             self.intersections_curved.append(curved_corner_intersection(
-                ((test0[0][0], test0[0][-1]), (test0[1][0], test0[1][-1])), ((test[0][0], test[0][-1]), (test[1][0], test[1][-1])), 10, angle_adaptation=False, output_only_points=False))
-
-            print("\n", test0, test)
+                ((current_parallel[0][0], current_parallel[0][-1]), (current_parallel[1][0], current_parallel[1][-1])), ((next_parallel[0][0], next_parallel[0][-1]), (next_parallel[1][0], next_parallel[1][-1])), 10, angle_adaptation=True, output_only_points=False))
