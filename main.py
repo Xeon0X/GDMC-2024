@@ -24,7 +24,7 @@ random_data = y.data
 transform = Transform((0,-60,-5),rotation = 0)
 editor.transform.push(transform)
 
-geometry.placeCuboid(editor, (0,0,-1), (100,15,1), Block("air"))
+geometry.placeCuboid(editor, (0,0,-3), (100,15,1), Block("air"))
 
 
 x = 0

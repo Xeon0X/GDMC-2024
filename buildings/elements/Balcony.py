@@ -20,8 +20,8 @@ class Balcony:
         
     def get_structures(self) -> list[Vertice]:
         attach_points = self.get_attach_points()
-        len_attach_points = len(attach_points)
-        min_wid = self.rdata["size"]["min_width"] -1
+        len_attach_points = len(attach_points)-1
+        min_wid = self.rdata["size"]["min_width"]
         min_gap = self.rdata["multiple"]["min_gap"]
         growth_chance = self.rdata["growth"]
         midpoint = len_attach_points//2
@@ -32,6 +32,7 @@ class Balcony:
         while True:
             x1 -= 1
             x2 += 1 if centered else 0
+            print(x1,x2, attach_points)
             leng = attach_points[x2] - attach_points[x1] - 1
             
             if x1 == 0: 
@@ -46,6 +47,7 @@ class Balcony:
                     
                 if not self.has_multiple: break
                 else:
+                    print(x1,min_wid, min_gap)
                     if x1-min_wid < min_gap: break
                     gap  = rd.randint(min_gap, x1-min_wid)
                     x2 = x1-gap
@@ -64,7 +66,7 @@ class Balcony:
         return points
     
     def create_structure(self, x1 : int, x2 : int) -> Vertice:
-        return Vertice(Point(x1,0,0), Point(x2,0,self.length-1))
+        return Vertice(Point(x1,0,0), Point(x2,0,-self.length+1))
     
     def follow_window(self) -> bool:
         return self.windows.ypadding > 3
