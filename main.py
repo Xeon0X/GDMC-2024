@@ -12,7 +12,7 @@ import random
 from networks.roads import Road as Road
 from networks.roads.intersections import Intersection as Intersection
 
-from networks.geometry.point_tools import curved_corner
+from networks.geometry.point_tools import curved_corner_by_curvature, curved_corner_by_distance
 
 editor = Editor(buffering=True)
 
@@ -150,48 +150,85 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # ---
 
-y = 100
+# y = 100
+# x = -200
 
-r1 = Road.Road((-1380, 75, 406), "None")
-r2 = Road.Road((-1365, 75, 468), "None")
-r3 = Road.Road((-1411, 75, 501), "None")
-r4 = Road.Road((-1451, 75, 449), "None")
-r5 = Road.Road((-1432, 75, 423), "None")
+# r1 = Road.Road((-1380+x, 75, 406), "None")
+# r2 = Road.Road((-1365+x, 75, 468), "None")
+# r3 = Road.Road((-1411+x, 75, 501), "None")
+# r4 = Road.Road((-1451+x, 75, 449), "None")
+# r5 = Road.Road((-1432+x, 75, 423), "None")
 
-i = Intersection.Intersection(
-    (-1411, 75, 461), [(-1392, 75, 427), (-1385, 75, 465), (-1411, 75, 487), (-1435, 75, 454), (-1426, 75, 435)], [r1, r2, r3, r4, r5])
+# i = Intersection.Intersection(
+#     (-1411+x, 75, 461), [(-1392+x, 75, 427), (-1385+x, 75, 465), (-1411+x, 75, 487), (-1435+x, 75, 454), (-1426+x, 75, 435)], [r1, r2, r3, r4, r5])
 
-i.compute_curved_corner()
+# i.compute_curved_corner()
 
-for j in range(len(i.orthogonal_delimitations)):
+# for j in range(len(i.orthogonal_delimitations)):
 
-    coordinates = segment_tools.discrete_segment(
-        i.orthogonal_delimitations[j][0][0], i.orthogonal_delimitations[j][0][1])
-    for coordinate in coordinates:
-        editor.placeBlock(coordinate, Block("purple_concrete"))
+#     coordinates = segment_tools.discrete_segment(
+#         i.orthogonal_delimitations[j][0][0], i.orthogonal_delimitations[j][0][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("purple_concrete"))
 
-    coordinates = segment_tools.discrete_segment(
-        i.orthogonal_delimitations[j][1][0], i.orthogonal_delimitations[j][1][1])
-    for coordinate in coordinates:
-        editor.placeBlock(coordinate, Block("pink_concrete"))
+#     coordinates = segment_tools.discrete_segment(
+#         i.orthogonal_delimitations[j][1][0], i.orthogonal_delimitations[j][1][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("pink_concrete"))
 
-    coordinates = segment_tools.discrete_segment(
-        i.parallel_delimitations[j][0][0], i.parallel_delimitations[j][0][1])
-    for coordinate in coordinates:
-        editor.placeBlock(coordinate, Block("orange_concrete"))
+#     coordinates = segment_tools.discrete_segment(
+#         i.parallel_delimitations[j][0][0], i.parallel_delimitations[j][0][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("orange_concrete"))
 
-    coordinates = segment_tools.discrete_segment(
-        i.parallel_delimitations[j][1][0], i.parallel_delimitations[j][1][1])
-    for coordinate in coordinates:
-        editor.placeBlock(coordinate, Block("yellow_concrete"))
+#     coordinates = segment_tools.discrete_segment(
+#         i.parallel_delimitations[j][1][0], i.parallel_delimitations[j][1][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("yellow_concrete"))
 
-for coordinate in i.intersections:
-    if coordinate != None:
-        editor.placeBlock(coordinate, Block("black_concrete"))
+# for coordinate in i.intersections:
+#     if coordinate != None:
+#         editor.placeBlock(coordinate, Block("black_concrete"))
 
-for k in range(len(i.intersections_curved)):
-    for coordinate in i.intersections_curved[k][0]:
-        if coordinate != None:
-            if k >= 0:
-                editor.placeBlock(
-                    (coordinate[0], 75, coordinate[1]), Block("brown_concrete"))
+# for k in range(len(i.intersections_curved)):
+#     for coordinate in i.intersections_curved[k][0]:
+#         if coordinate != None:
+#             if k >= 0:
+#                 editor.placeBlock(
+#                     (coordinate[0], 75, coordinate[1]), Block("gray_concrete"))
+
+#     editor.placeBlock(
+#         (i.intersections_curved[k][1][0], 76, i.intersections_curved[k][1][1]), Block("black_concrete"))
+
+#     coordinates = segment_tools.discrete_segment(
+#         i.intersections_curved[k][-1][0], i.intersections_curved[k][-1][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("lime_concrete"))
+
+#     coordinates = segment_tools.discrete_segment(
+#         i.intersections_curved[k][-2][0], i.intersections_curved[k][-2][1])
+#     for coordinate in coordinates:
+#         editor.placeBlock(coordinate, Block("green_concrete"))
+
+# ---
+
+intersection = (-1510, 94, 455)
+xyz0 = (-1545, 90, 537)
+xyz1 = (-1443, 160, 452)
+circle = curved_corner_by_distance(
+    intersection, xyz0, xyz1, 50, 0)
+
+line0 = segment_tools.discrete_segment(intersection, xyz0)
+line1 = segment_tools.discrete_segment(intersection, xyz1)
+
+for coordinate in circle[0]:
+    editor.placeBlock(
+        coordinate, Block("cyan_concrete"))
+
+for coordinate in line0:
+    editor.placeBlock(
+        coordinate, Block("blue_concrete"))
+
+for coordinate in line1:
+    editor.placeBlock(
+        coordinate, Block("red_concrete"))

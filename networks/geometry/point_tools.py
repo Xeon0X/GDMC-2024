@@ -5,7 +5,7 @@ from networks.geometry.segment_tools import discrete_segment, middle_point, para
 
 def circle(center, radius):
     """
-    Can be used for circle or disc.
+    Can be used for circle or disc. Works in 2d but supports 3d.
 
     Args:
         xyC (tuple): Coordinates of the center.
@@ -17,9 +17,9 @@ def circle(center, radius):
         for a disc, positive values for a hole.
     """
     area = (
-        (round(center[0]) - round(radius), round(center[1]) - round(radius)),
+        (round(center[0]) - round(radius), round(center[-1]) - round(radius)),
         (round(center[0]) + round(radius) + 1,
-         round(center[1]) + round(radius) + 1),
+         round(center[-1]) + round(radius) + 1),
     )
 
     circle = {}
@@ -33,6 +33,7 @@ def circle(center, radius):
 
 
 def is_in_triangle(point, xy0, xy1, xy2):
+    # Works in 2d but supports 3d.
     # https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#:~:text=A%20simple%20way%20is%20to,point%20is%20inside%20the%20triangle.
     dX = point[0] - xy0[0]
     dY = point[-1] - xy0[-1]
@@ -52,6 +53,7 @@ def is_in_triangle(point, xy0, xy1, xy2):
 
 
 def distance(xy1, xy2):  # TODO : Can be better.
+    # Works in 2d but supports 3d.
     return sqrt((xy2[0] - xy1[0]) ** 2 + (xy2[-1] - xy1[-1]) ** 2)
 
 
@@ -80,6 +82,7 @@ def get_angle(xy0, xy1, xy2):
 
 
 def circle_points(center_point, radius, number=100):
+    # Works in 2d but supports 3d.
     # https://stackoverflow.com/questions/8487893/generate-all-the-points-on-the-circumference-of-a-circle
     points = [
         (cos(2 * pi / number * x) * radius, sin(2 * pi / number * x) * radius)
@@ -89,7 +92,7 @@ def circle_points(center_point, radius, number=100):
     for i in range(len(points)):
         points[i] = (
             points[i][0] + center_point[0],
-            points[i][1] + center_point[1],
+            points[i][-1] + center_point[-1],
         )
 
     return points
@@ -325,91 +328,36 @@ def perpendicular(distance, xy1, xy2):
     y3 = y1 - (distance / 2) * dx
     x4 = x1 - (distance / 2) * dy
     y4 = y1 + (distance / 2) * dx
-    return ((round(x3), round(y3)), (round(x4), round(y4)))
-
-
-def curved_corner(
-    intersection, xyz0, xyz1, distance, curvature, full_line=True, output_only_points=True
-):
-    # If curvature radius is set, compute the center of the circle as the intersection between the two lines, offseted by the curvature radius.
-    if curvature != None:
-        center = segments_intersection(parallel(
-            (xyz0, intersection), curvature), parallel((xyz1, intersection), -curvature))
-
-    # If distance is set, compute where the arc should merge on the two intersecting lines.
-    elif distance != None:
-        start_curve_point = circle_segment_intersection(
-            intersection, distance, xy0[0], intersection, full_line
-        )[0]
-        start_curve_point = (
-            round(start_curve_point[0]), round(start_curve_point[-1]))
-
-        end_curve_point = circle_segment_intersection(
-            intersection, distance, xy1[0], intersection, full_line
-        )[0]
-        end_curve_point = (
-            round(end_curve_point[0]), round(end_curve_point[-1]))
-
-        # Then compute the center as the intersection between perpendicular segment at the points computed before.
-        # Higher value for better precision
-        perpendicular0 = perpendicular(
-            10e3, start_curve_point, intersection)[0]
-        perpendicular1 = perpendicular(10e3, end_curve_point, intersection)[-1]
-
-        center = segments_intersection(
-            (perpendicular0, start_curve_point), (perpendicular1, end_curve_point))
-        center = round(center[0]), round(center[-1])
-
-        curvature = round(distance(start_curve_point, center))
-
-    if output_only_points:
-        circle_data = circle_points(
-            center, curvature, 32
-        )
-    else:
-        circle_data = circle(center, curvature)
-
-    # Find the correct points on the circle.
-    curved_corner_points_temporary = [start_curve_point]
-    for point in circle_data:
-        if is_in_triangle(point, intersection, start_curve_point, end_curve_point):
-            curved_corner_points_temporary.append(
-                (round(point[0]), round(point[1])))
-    if output_only_points:
-        curved_corner_points_temporary.append(end_curve_point)
-
-    # Be sure that all the points are in correct order.
-    curve_corner_points = optimized_path(
-        curved_corner_points_temporary, start_curve_point)
-    return curve_corner_points, center, curvature
+    return (x3, y3), (x4, y4)
 
 
 def curved_corner_by_distance(
     intersection, xyz0, xyz1, distance_from_intersection, resolution, full_line=True
 ):
-    # Comute the merging point on the first line
+    # Compute the merging point on the first line
     start_curve_point = circle_segment_intersection(
         intersection, distance_from_intersection, xyz0, intersection, full_line
     )[0]
     start_curve_point = (
-        round(start_curve_point[0]), round(start_curve_point[-1]))
+        round(start_curve_point[0]), nearest(discrete_segment(intersection, xyz0), (start_curve_point[0], 100, start_curve_point[-1]))[1], round(start_curve_point[-1]))
 
-    # Comute the merging point on the second line
+    # Compute the merging point on the second line
     end_curve_point = circle_segment_intersection(
         intersection, distance_from_intersection, xyz1, intersection, full_line
     )[0]
     end_curve_point = (
-        round(end_curve_point[0]), round(end_curve_point[-1]))
+        round(end_curve_point[0]), nearest(discrete_segment(intersection, xyz1), (end_curve_point[0], 100, end_curve_point[-1]))[1], round(end_curve_point[-1]))
 
     # Compute the intersection between perpendicular lines at the merging points
     # Higher value for better precision
-    perpendicular0 = perpendicular(
-        10e3, start_curve_point, intersection)[0]
-    perpendicular1 = perpendicular(10e3, end_curve_point, intersection)[-1]
+    perpendicular0 = perpendicular(10e3, start_curve_point, intersection)[0]
+    perpendicular0 = (round(perpendicular0[0]), round(perpendicular0[-1]))
+    perpendicular1 = perpendicular(10e3, end_curve_point, intersection)[1]
+    perpendicular1 = (round(perpendicular1[0]), round(perpendicular1[-1]))
 
     center = segments_intersection(
         (perpendicular0, start_curve_point), (perpendicular1, end_curve_point))
-    center = round(center[0]), round(center[-1])
+    center = round(center[0]), middle_point(xyz0, xyz1)[1], round(center[-1])
 
     # Compute the curvature for indications
     curvature = round(distance(start_curve_point, center))
@@ -420,19 +368,76 @@ def curved_corner_by_distance(
             center, curvature, resolution
         )
     else:
+        print(center, curvature, circle(center, curvature))
         circle_data = circle(center, curvature)[0]
 
     # Find the correct points on the circle.
     curved_corner_points_temporary = [start_curve_point]
     for point in circle_data:
-        print(point, intersection, start_curve_point, end_curve_point, is_in_triangle(
-            point, intersection, start_curve_point, end_curve_point))
         if is_in_triangle(point, intersection, start_curve_point, end_curve_point):
-            curved_corner_points_temporary.append(
-                (round(point[0]), round(point[1])))
+            curved_corner_points_temporary.append(point)
     curved_corner_points_temporary.append(end_curve_point)
 
     # Be sure that all the points are in correct order.
     curve_corner_points = optimized_path(
         curved_corner_points_temporary, start_curve_point)
+
+    for i in range(len(curve_corner_points)):
+        y = min(start_curve_point[1], end_curve_point[1]) + \
+            (i * abs(start_curve_point[1] -
+             end_curve_point[1])/len(curve_corner_points))
+        curve_corner_points[i] = (round(curve_corner_points[i][0]), round(
+            y), round(curve_corner_points[i][-1]))
     return curve_corner_points, center, curvature
+
+
+def curved_corner_by_curvature(
+    intersection, xyz0, xyz1, curvature_radius, resolution, full_line=True
+):
+    print(xyz0, intersection, xyz1)
+    # Get the center.
+    center = segments_intersection(parallel(
+        (xyz0, intersection), -curvature_radius), parallel((xyz1, intersection), curvature_radius))
+    center = round(center[0]), round(center[-1])
+
+    # Return a full discrete circle or only some points of it.
+    if resolution != 0:
+        circle_data = circle_points(
+            center, curvature_radius, resolution
+        )
+    else:
+        circle_data = circle(center, curvature_radius)[0]
+
+    # Compute the merging point on the first line.
+    print(center, curvature_radius, xyz0, intersection)
+    start_curve_point = circle_segment_intersection(
+        center, curvature_radius, xyz0, intersection, full_line
+    )[0]
+    start_curve_point = (
+        round(start_curve_point[0]), round(start_curve_point[-1]))
+
+    # Compute the merging point on the second line.
+    end_curve_point = circle_segment_intersection(
+        center, curvature_radius, xyz1, intersection, full_line
+    )[0]
+    end_curve_point = (
+        round(end_curve_point[0]), round(end_curve_point[-1]))
+
+    # Find the correct points on the circle.
+    curved_corner_points_temporary = [start_curve_point]
+    for point in circle_data:
+        # print(point, intersection, start_curve_point, end_curve_point, is_in_triangle(
+        #     point, intersection, start_curve_point, end_curve_point))
+        # if is_in_triangle(point, intersection, start_curve_point, end_curve_point):
+        curved_corner_points_temporary.append(
+            (round(point[0]), round(point[1])))
+    curved_corner_points_temporary.append(end_curve_point)
+
+    # Be sure that all the points are in correct order.
+    curve_corner_points = optimized_path(
+        curved_corner_points_temporary, start_curve_point)
+
+    # Distance from intersection just for information
+    distance_from_intersection = round(distance(start_curve_point, center))
+    return curve_corner_points, center, distance_from_intersection, parallel(
+        (xyz0, intersection), -curvature_radius), parallel((xyz1, intersection), curvature_radius)

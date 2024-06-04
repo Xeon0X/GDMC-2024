@@ -1,5 +1,5 @@
 from networks.geometry.segment_tools import parallel, orthogonal
-from networks.geometry.point_tools import sort_by_clockwise, segments_intersection, curved_corner_by_distance
+from networks.geometry.point_tools import sort_by_clockwise, segments_intersection, curved_corner_by_distance, curved_corner_by_curvature
 from networks.roads import Road
 
 
@@ -37,6 +37,9 @@ class Intersection:
                 next_parallel[0][0], next_parallel[0][-1]), (next_parallel[1][0], next_parallel[1][-1])), full_line=False)
 
             intersection = (
-                round(intersection2d[0]), 100, round(intersection2d[1]))
+                round(intersection2d[0]), 75, round(intersection2d[1]))
             self.intersections_curved.append(curved_corner_by_distance(
                 intersection, current_parallel[0], next_parallel[0], 10, 0, full_line=True))
+            # print("\n\n\nBY DISTANCE\n\n\n")
+            # self.intersections_curved.append(curved_corner_by_distance(
+            #     intersection, current_parallel[0], next_parallel[0], 10, 0, full_line=True))
