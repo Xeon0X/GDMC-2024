@@ -1,5 +1,5 @@
 from networks.geometry.segment_tools import parallel, orthogonal
-from networks.geometry.point_tools import sort_by_clockwise, segments_intersection, curved_corner_intersection
+from networks.geometry.point_tools import sort_by_clockwise, segments_intersection, curved_corner_by_distance
 from networks.roads import Road
 
 
@@ -33,5 +33,10 @@ class Intersection:
             current_parallel = tuple(self.parallel_delimitations[j][1][0]), tuple(
                 self.parallel_delimitations[j][1][1])
 
-            self.intersections_curved.append(curved_corner_intersection(
-                ((current_parallel[0][0], current_parallel[0][-1]), (current_parallel[1][0], current_parallel[1][-1])), ((next_parallel[0][0], next_parallel[0][-1]), (next_parallel[1][0], next_parallel[1][-1])), 10, angle_adaptation=True, output_only_points=False))
+            intersection2d = segments_intersection(((current_parallel[0][0], current_parallel[0][-1]), (current_parallel[1][0], current_parallel[1][-1])), ((
+                next_parallel[0][0], next_parallel[0][-1]), (next_parallel[1][0], next_parallel[1][-1])), full_line=False)
+
+            intersection = (
+                round(intersection2d[0]), 100, round(intersection2d[1]))
+            self.intersections_curved.append(curved_corner_by_distance(
+                intersection, current_parallel[0], next_parallel[0], 10, 0, full_line=True))

@@ -12,7 +12,7 @@ import random
 from networks.roads import Road as Road
 from networks.roads.intersections import Intersection as Intersection
 
-from networks.geometry.point_tools import curved_corner_intersection
+from networks.geometry.point_tools import curved_corner
 
 editor = Editor(buffering=True)
 
@@ -111,12 +111,12 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 #     print(l.get_surface())
 
 
-circle = curved_corner_intersection(
-    ((-1365, 520), (-1326, 523)), ((-1344, 496), (-1336, 535)), 10, angle_adaptation=False, output_only_points=False)
+# circle = curved_corner(
+#     ((-1365, 520), (-1326, 523)), ((-1344, 496), (-1336, 535)), 10, angle_adaptation=False, output_only_points=False)
 
-for coordinate in circle[0]:
-    editor.placeBlock(
-        (round(coordinate[0]), 125, round(coordinate[1])), Block("green_concrete"))
+# for coordinate in circle[0]:
+#     editor.placeBlock(
+#         (round(coordinate[0]), 125, round(coordinate[1])), Block("green_concrete"))
 
 # ---
 
@@ -194,4 +194,4 @@ for k in range(len(i.intersections_curved)):
         if coordinate != None:
             if k >= 0:
                 editor.placeBlock(
-                    (coordinate[0], 75, coordinate[1]), Block("cyan_concrete"))
+                    (coordinate[0], 75, coordinate[1]), Block("brown_concrete"))
