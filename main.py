@@ -212,23 +212,39 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # ---
 
-intersection = (-1510, 94, 455)
-xyz0 = (-1545, 90, 537)
-xyz1 = (-1443, 160, 452)
-circle = curved_corner_by_distance(
-    intersection, xyz0, xyz1, 50, 0)
+# intersection = (-1510, 94, 455)
+# xyz0 = (-1545, 90, 537)
+# xyz1 = (-1535, 162, 459)
+# circle = curved_corner_by_distance(
+#     intersection, xyz0, xyz1, 25, 0)
 
-line0 = segment_tools.discrete_segment(intersection, xyz0)
-line1 = segment_tools.discrete_segment(intersection, xyz1)
+# line0 = segment_tools.discrete_segment(intersection, xyz0)
+# line1 = segment_tools.discrete_segment(intersection, xyz1, pixel_perfect=False)
 
-for coordinate in circle[0]:
-    editor.placeBlock(
-        coordinate, Block("cyan_concrete"))
+# editor.placeBlock(
+#     circle[1], Block("black_concrete"))
 
-for coordinate in line0:
-    editor.placeBlock(
-        coordinate, Block("blue_concrete"))
+# editor.placeBlock(
+#     circle[3], Block("gray_concrete"))
+# print(circle[3], "center")
+# print(circle[4], "center")
 
-for coordinate in line1:
-    editor.placeBlock(
-        coordinate, Block("red_concrete"))
+# for coordinate in circle[0]:
+#     editor.placeBlock(
+#         coordinate, Block("white_concrete"))
+#     print(coordinate)
+
+# for coordinate in line0:
+#     editor.placeBlock(
+#         coordinate, Block("blue_concrete"))
+
+# for coordinate in line1:
+#     editor.placeBlock(
+#         coordinate, Block("red_concrete"))
+
+# ---
+
+r = Road.Road(((-1572, 64, 518), (-1608, 65, 513),
+              (-1627, 64, 534), (-1643, 71, 580)), "None")
+
+r.place_roads()
