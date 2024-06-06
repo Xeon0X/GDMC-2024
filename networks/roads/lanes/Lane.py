@@ -24,15 +24,25 @@ class Lane:
         for i in range(len(curve_surface.curvature)):
             normals.append((0, 1, 0))
 
-        # Compute each line
-        for distance in range(self.width):
-            offset = curve_tools.offset(curve_surface.curve, distance, normals)
-            for i in range(len(offset)-1):
-                line = segment_tools.discrete_segment(offset[i], offset[i+1])
-                for coordinate in line:
-                    self.surface.append((coordinate, random.choices(
-                        list(self.lane_materials.keys()),
-                        weights=self.lane_materials.values(),
-                        k=1,)))
+        # # Compute each line
+        # for distance in range(self.width):
+        #     offset = curve_tools.offset(curve_surface.curve, distance, normals)
+        #     for i in range(len(offset)-1):
+        #         line = segment_tools.discrete_segment(offset[i], offset[i+1])
+        #         for coordinate in line:
+        #             self.surface.append((coordinate, random.choices(
+        #                 list(self.lane_materials.keys()),
+        #                 weights=self.lane_materials.values(),
+        #                 k=1,)[0]))
+
+        curve_surface.compute_surface_perpendicular(self.width, normals)
+        for i in range(len(curve_surface.surface)):
+            for j in range(len(curve_surface.surface[i])):
+                for k in range(len(curve_surface.surface[i][j])):
+                    for l in range(len(curve_surface.surface[i][j][k])):
+                        self.surface.append((curve_surface.surface[i][j][k][l], random.choices(
+                            list(self.lane_materials.keys()),
+                            weights=self.lane_materials.values(),
+                            k=1,)[0]))
 
         return self.surface
