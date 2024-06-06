@@ -28,8 +28,8 @@ class Line:
             if block != 'None':
                 self.coordinates_with_blocks.append((coordinate, block))
 
-                pattern_iteration += 1
-                if pattern_iteration >= pattern_length:
-                    pattern_iteration = 0
+            pattern_iteration += 1
+            if pattern_iteration >= pattern_length:
+                pattern_iteration = 0
 
         return self.coordinates_with_blocks

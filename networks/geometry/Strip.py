@@ -17,8 +17,8 @@ class Strip:
         self.curvature = curve_tools.curvature(self.curve)
 
     def compute_surface_perpendicular(self, width, normals):
-        self.offset_left = curve_tools.offset(self.curve, width, normals)
-        self.offset_right = curve_tools.offset(self.curve, -width, normals)
+        self.offset_left = curve_tools.offset(self.curve, width/2, normals)
+        self.offset_right = curve_tools.offset(self.curve, -width/2, normals)
         self.perpendicular_segment = []
 
         for i in range(len(self.offset_left)):
