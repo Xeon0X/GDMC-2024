@@ -1,7 +1,7 @@
 import random as rd
 import math
 from gdpc import Editor, Block, geometry, Transform
-from utils.Enums import COLLUMN_STYLE, BORDER_RADIUS
+from utils.Enums import WINDOW_BORDER_RADIUS
 from utils.functions import *
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
@@ -39,10 +39,10 @@ class Window:
             geometry.placeCuboid(self.editor,(x1+x,0,0),(x2-x,self.height,0),Block(self.materials[3], {"up" : "true"})) 
             
     def build_border_radius(self, x1 : int, x2 : int):
-        if self.border_radius != BORDER_RADIUS.NONE:
+        if self.border_radius != WINDOW_BORDER_RADIUS.NONE:
             self.editor.placeBlock((x1,self.height,0),Block(self.materials[4], {"facing": "west", "half": "top"}))
             self.editor.placeBlock((x2,self.height,0),Block(self.materials[4], {"facing": "east", "half": "top"}))
-        if self.border_radius == BORDER_RADIUS.TOP_AND_BOTTOM:
+        if self.border_radius == WINDOW_BORDER_RADIUS.TOP_AND_BOTTOM:
             self.editor.placeBlock((x1,0,0),Block(self.materials[4], {"facing": "west"}))
             self.editor.placeBlock((x2,0,0),Block(self.materials[4], {"facing": "east"}))
     
@@ -143,4 +143,4 @@ class Window:
         return (data["vertical_crossbar"] >= rd.random(), data["horizontal_crossbar"] >= rd.random())
     
     def border_radius(self):
-        return select_random(self.rdata["border_radius"], BORDER_RADIUS)
+        return select_random(self.rdata["border_radius"], WINDOW_BORDER_RADIUS)

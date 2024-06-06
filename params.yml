@@ -54,3 +54,9 @@ buildings:
         min_width: 5
         min_gap: 1
       details: 0.35
+      border_radius:
+        # proportion of each style
+        none: 6
+        # no difference if there is no details
+        medium: 1
+        full: 1

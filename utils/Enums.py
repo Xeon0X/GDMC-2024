@@ -12,7 +12,12 @@ class COLLUMN_STYLE(Enum):
     OUTER = 2
     BOTH = 3
     
-class BORDER_RADIUS(Enum):
+class WINDOW_BORDER_RADIUS(Enum):
     NONE = 0
     TOP = 1
     TOP_AND_BOTTOM = 2  
+    
+class BALCONY_BORDER_RADIUS(Enum):
+    NONE = 0
+    MEDIUM = 1
+    FULL = 2

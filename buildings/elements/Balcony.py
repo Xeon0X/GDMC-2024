@@ -1,5 +1,7 @@
 import random as rd
-from gdpc import Editor, Block, geometry, Transform
+from gdpc import Editor, Block, geometry
+from utils.functions import *
+from utils.Enums import BALCONY_BORDER_RADIUS
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
 from buildings.elements.Window import Window
@@ -12,6 +14,7 @@ class Balcony:
         self.length = self.get_len()
         self.has_multiple = self.has_multiple()
         self.has_details = self.has_details()
+        self.border_radius = self.has_border_radius()
         self.follow_window = self.follow_window()
         self.structure = self.get_structures()
         self.editor, self.materials = None,None
@@ -23,6 +26,7 @@ class Balcony:
             s.fill(editor, materials[0])
             self.build_rembard(s)
             self.build_details(s)
+            self.build_border_radius(s)
             
     def build_rembard(self, s : Vertice):
         geometry.placeCuboid(self.editor,(s.point1.x,1,-1),(s.point1.x,1,-self.length),Block(self.materials[3]))
@@ -34,8 +38,27 @@ class Balcony:
         geometry.placeCuboid(self.editor,(s.point1.x,0,-1),(s.point1.x,0,-self.length),Block(self.materials[4], {"facing": "east", "half": "top"}))
         geometry.placeCuboid(self.editor,(s.point2.x,0,-1),(s.point2.x,0,-self.length),Block(self.materials[4], {"facing": "west", "half": "top"}))
         geometry.placeCuboid(self.editor,(s.point1.x,0,-self.length),(s.point2.x,0,-self.length),Block(self.materials[4], {"facing": "south", "half": "top"}))
+      
+    def build_border_radius(self, s : Vertice):
+        if self.border_radius == BALCONY_BORDER_RADIUS.NONE: return
+        
+        geometry.placeCuboid(self.editor,(s.point1.x,0,-self.length),(s.point1.x,1,-self.length),Block("air"))
+        geometry.placeCuboid(self.editor,(s.point2.x,0,-self.length),(s.point2.x,1,-self.length),Block("air"))
+        self.editor.placeBlock((s.point1.x+1,1,-self.length+1), Block(self.materials[3]))
+        self.editor.placeBlock((s.point2.x-1,1,-self.length+1), Block(self.materials[3]))
+        
+        if self.has_details:
+            self.editor.placeBlock((s.point1.x,0,-self.length+1), Block(self.materials[4], {"facing": "south", "half": "top"}))
+            self.editor.placeBlock((s.point1.x+1,0,-self.length), Block(self.materials[4], {"facing": "east", "half": "top"}))
+            self.editor.placeBlock((s.point2.x,0,-self.length+1), Block(self.materials[4], {"facing": "south", "half": "top"}))
+            self.editor.placeBlock((s.point2.x-1,0,-self.length), Block(self.materials[4], {"facing": "west", "half": "top"}))
+            
+            if self.border_radius == BALCONY_BORDER_RADIUS.FULL:
+                self.editor.placeBlock((s.point1.x+1,0,-self.length+1), Block(self.materials[4], {"facing": "east", "half": "top"}))
+                self.editor.placeBlock((s.point2.x-1,0,-self.length+1), Block(self.materials[4], {"facing": "west", "half": "top"}))
         
     def get_structures(self) -> list[Vertice]:
+        # structures are the base shape of the balcony
         attach_points = self.get_attach_points()
         len_attach_points = len(attach_points)-1
         min_wid = self.rdata["size"]["min_width"]
@@ -70,6 +93,7 @@ class Balcony:
         return structures
                 
     def get_attach_points(self) -> list[int]:
+        # points where the structures can start/finish
         points = [i for i in range(self.max_width)]
         if self.follow_window:
             pad = self.windows.padding
@@ -96,6 +120,10 @@ class Balcony:
     
     def has_details(self) -> bool:
         return self.rdata["details"] >= rd.random()
+    
+    def has_border_radius(self) -> bool:
+        if self.length < 2: return BALCONY_BORDER_RADIUS.NONE
+        return select_random(self.rdata["border_radius"], BALCONY_BORDER_RADIUS)
     
     def get_len(self) -> int:
         return rd.randint(self.rdata["size"]["min_len"], self.rdata["size"]["max_len"])

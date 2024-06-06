@@ -7,7 +7,7 @@ from buildings.Building import Building
 
 from buildings.geometry.Vertice import Vertice
 from buildings.geometry.Point import Point
-from utils.Enums import DIRECTION,COLLUMN_STYLE,BORDER_RADIUS
+from utils.Enums import DIRECTION,COLLUMN_STYLE,WINDOW_BORDER_RADIUS
 from buildings.Facade import Facade
 
 from utils.functions import *
@@ -42,7 +42,7 @@ for f in facade:
 
 # geometry.placeCuboid(editor, (-10,-60,-10), (85,-55,85), Block("air"))
 # B = Building((0,0), (75,75), shapes[7]['matrice'])
-# B.foundations.polygon.fill_vertice(editor, "pink_wool", -60)
+# B.foundations.polygon.fill_vertice(editor, "pink_wool", -60) 
 # for collumn in B.foundations.collumns:
 #     collumn.fill(editor, "white_concrete", -60, -55)
 # B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
