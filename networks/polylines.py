@@ -1,4 +1,4 @@
-from math import sqrt
+from math import sqrt, inf
 import numpy as np
 
 
@@ -17,36 +17,6 @@ class Point2D:
         return (self.x, self.y)
 
 
-def radius_balance(polylines, i):
-    """
-    Returns the radius that balances the radii on either end segement i.
-    """
-
-    vectors = [None] * 3
-    lengths = [None] * 3
-    unit_vectors = [None] * 3
-    tangente = [None] * 3
-
-    for j in range(3):
-        vectors[j] = polylines[i+j] - polylines[i+j-1]
-        lengths[j] = np.linalg.norm(vectors[j])
-        unit_vectors[j] = vectors[j]/lengths[j]
-
-    print("\n\n", vectors, "\n\n", lengths, "\n\n", unit_vectors, "\n\n")
-
-    for k in range(2):
-        cross = np.dot(unit_vectors[k+1], unit_vectors[k])
-        print(cross)
-        tangente[k] = sqrt((1+cross)/(1-cross))
-        print("\n", tangente[k])
-
-    alpha_a = min(lengths[0], (lengths[1]*tangente[1]) /
-                  (tangente[0] + tangente[1]))
-    alpha_b = min(lengths[2], lengths[1]-alpha_a)
-
-    return alpha_a, alpha_b, max(tangente[0]*alpha_a, tangente[1]*alpha_b)
-
-
 def coordinates_to_vectors(coordinates):
     vectors = []
     for coordinate in coordinates:
@@ -58,7 +28,86 @@ def coordinates_to_vectors(coordinates):
         return vectors
 
 
-polyline = coordinates_to_vectors(
-    (Point2D(0, 0), Point2D(0, 10), Point2D(10, 10), Point2D(10, 20)))
+class Polyline:
+    def __init__(self, points):
+        self.points = coordinates_to_vectors(points)
+        self.length_polyline = len(points)
 
-print(radius_balance(polyline, 1))
+        self.vectors = [None] * self.length_polyline
+        self.lengths = [None] * self.length_polyline
+        self.unit_vectors = [None] * self.length_polyline
+        self.tangente = [None] * self.length_polyline
+
+        self.compute_requirements()
+
+    def compute_requirements(self):
+
+        # Between two points, there is only one segment
+        for j in range(self.length_polyline-1):
+            self.vectors[j] = self.points[j+1] - self.points[j]
+            self.lengths[j] = np.linalg.norm(self.vectors[j])
+            self.unit_vectors[j] = self.vectors[j]/self.lengths[j]
+
+        # print("\n\n", vectors, "\n\n", lengths, "\n\n", unit_vectors, "\n\n")
+
+        # Between two segments, there is only one angle
+        for k in range(self.length_polyline-2):
+            cross = np.dot(self.unit_vectors[k+1], self.unit_vectors[k])
+            self.tangente[k] = sqrt((1+cross)/(1-cross))
+
+    def radius_balance(self, i):
+        """
+        Returns the radius that balances the radii on either end segement i.
+        """
+
+        alpha_a = min(self.lengths[i], (self.lengths[i+1]*self.tangente[i+1]) /
+                      (self.tangente[i] + self.tangente[i+1]))
+        alpha_b = min(self.lengths[i+2], self.lengths[i+1]-alpha_a)
+
+        return alpha_a, alpha_b, max(self.tangente[i]*alpha_a, self.tangente[i+1]*alpha_b)
+
+    def alpha_assign(polyline, alpha_radii, start_index, end_index):
+        """
+        The Alpha-assign procedure assigning radii based on a polyline.
+        """
+        minimum_radius, minimum_index = inf, end_index
+
+        if start_index + 1 >= end_index:
+            return
+
+        alpha_b = min(lenghts[start_index] -
+                      alpha_radii[start_index], lenghts[start_index + 1])
+        current_radius = max(tangente[start_index] * alpha_radii[start_index],
+                             tangente[start_index + 1] * alpha_b)  # Radis at initial segment
+
+        if current_radius < minimum_radius:
+            minimum_radius, minimum_index = current_radius, start_index
+            alpha_low, alpha_high = alpha_radii[start_index], alpha_b
+
+        for i in range(start_index + 1, end_index - 2):  # Radii for internal segments
+            alpha_a, alpha_b, current_radius = radius_balance(polyline, i)
+            if current_radius < minimum_radius:
+                alpha_low, alpha_high = alpha_a, alpha_radii[end_index]
+
+        # Assign alphas at ends of selected segment
+        alpha_radii[minimum_index] = alpha_low
+        alpha_radii[minimum_index+1] = alpha_high
+        # Recur on lower segments
+        alpha_assign(alpha_radii, start_index, minimum_index)
+        alpha_assign(alpha_radii, minimum_index + 1,
+                     end_index)  # Recur on higher segments
+
+    def compute_alpha_radii(polyline):
+        length_array = len(polyline)
+        apha_radii = [None] * length_array
+
+        alpha_radii[0] = 0
+        alpha_radii[length_array-1] = 0
+
+        for i in range(1, length_array-2):
+            alpha_radii[i] = min()
+
+
+polyline = Polyline((Point2D(0, 0), Point2D(
+    0, 10), Point2D(10, 10), Point2D(10, 20)))
+print(polyline.radius_balance(0))
