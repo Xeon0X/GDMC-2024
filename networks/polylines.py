@@ -33,10 +33,10 @@ class Polyline:
         self.points = coordinates_to_vectors(points)
         self.length_polyline = len(points)
 
-        self.vectors = [None] * self.length_polyline
-        self.lengths = [None] * self.length_polyline
-        self.unit_vectors = [None] * self.length_polyline
-        self.tangente = [None] * self.length_polyline
+        self.vectors = [0] * self.length_polyline
+        self.lengths = [0] * self.length_polyline
+        self.unit_vectors = [0] * self.length_polyline
+        self.tangente = [0] * self.length_polyline
 
         self.compute_requirements()
 
@@ -51,8 +51,8 @@ class Polyline:
         # print("\n\n", vectors, "\n\n", lengths, "\n\n", unit_vectors, "\n\n")
 
         # Between two segments, there is only one angle
-        for k in range(self.length_polyline-2):
-            cross = np.dot(self.unit_vectors[k+1], self.unit_vectors[k])
+        for k in range(1, self.length_polyline-1):
+            cross = np.dot(self.unit_vectors[k], self.unit_vectors[k-1])
             self.tangente[k] = sqrt((1+cross)/(1-cross))
 
     def radius_balance(self, i):
@@ -60,9 +60,9 @@ class Polyline:
         Returns the radius that balances the radii on either end segement i.
         """
 
-        alpha_a = min(self.lengths[i], (self.lengths[i+1]*self.tangente[i+1]) /
+        alpha_a = min(self.lengths[i-1], (self.lengths[i]*self.tangente[i+1]) /
                       (self.tangente[i] + self.tangente[i+1]))
-        alpha_b = min(self.lengths[i+2], self.lengths[i+1]-alpha_a)
+        alpha_b = min(self.lengths[i+1], self.lengths[i]-alpha_a)
 
         return alpha_a, alpha_b, max(self.tangente[i]*alpha_a, self.tangente[i+1]*alpha_b)
 
@@ -110,4 +110,4 @@ class Polyline:
 
 polyline = Polyline((Point2D(0, 0), Point2D(
     0, 10), Point2D(10, 10), Point2D(10, 20)))
-print(polyline.radius_balance(0))
+print(polyline.radius_balance(1))
