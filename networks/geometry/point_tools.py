@@ -511,3 +511,14 @@ def curved_corner_by_curvature(
     distance_from_intersection = round(distance(start_curve_point, center))
     return curve_corner_points, center, distance_from_intersection, parallel(
         (xyz0, intersection), -curvature_radius), parallel((xyz1, intersection), curvature_radius)
+
+
+def coordinates_to_vectors(coordinates):
+    vectors = []
+    for coordinate in coordinates:
+        vectors.append(np.array(coordinate.get_coordinates()))
+
+    if (len(vectors) == 1):
+        return vectors[0]
+    else:
+        return vectors
