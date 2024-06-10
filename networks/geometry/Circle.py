@@ -1,5 +1,5 @@
 from typing import Type
-import Point2D
+from networks.geometry.Point2D import Point2D
 
 
 class Circle:

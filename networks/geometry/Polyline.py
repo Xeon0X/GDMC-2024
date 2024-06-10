@@ -1,5 +1,5 @@
 from typing import Type
-import Point2D
+from networks.geometry.Point2D import Point2D
 
 from math import sqrt, inf
 import numpy as np
