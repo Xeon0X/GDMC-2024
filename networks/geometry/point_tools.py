@@ -3,20 +3,6 @@ import numpy as np
 from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
-def optimized_path(points, start=None):
-    # https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
-    if start is None:
-        start = points[0]
-    pass_by = points
-    path = [start]
-    pass_by.remove(start)
-    while pass_by:
-        nearest = min(pass_by, key=lambda x: distance(path[-1], x))
-        path.append(nearest)
-        pass_by.remove(nearest)
-    return path
-
-
 def sort_by_clockwise(points):
     """
     Sort point in a rotation order. Works in 2d but supports 3d.

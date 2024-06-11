@@ -62,6 +62,32 @@ class Point2D:
         """
         return min(points, key=lambda point: self.distance(point))
 
+    def optimized_path(self, points: List["Point2D"]):
+        """Get an optimized ordered path starting from the current point.
+
+        From: https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
+
+        Args:
+            points (List[Point2D]): List of 2d-points. Could contain the current point.
+
+        Returns:
+            List[Point2D]: Ordered list of 2d-points starting from the current point.
+
+        >>> Point2D(-2, -5).optimized_path([Point2D(0, 0), Point2D(10, 5), Point2D(1, 3)])
+        [Point2D(x: -2, y: -5), Point2D(x: 0, y: 0), Point2D(x: 1, y: 3), Point2D(x: 10, y: 5)]
+        """
+        start = self
+        if start not in points:
+            points.append(start)
+        pass_by = points
+        path = [start]
+        pass_by.remove(start)
+        while pass_by:
+            nearest = min(pass_by, key=lambda point: point.distance(path[-1]))
+            path.append(nearest)
+            pass_by.remove(nearest)
+        return path
+
     def angle(self, xy1, xy2):
         """
         Compute angle (in degrees). Corner in current point.

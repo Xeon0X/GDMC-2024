@@ -264,3 +264,6 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
+
+print(
+    Point2D(-2, -5).optimized_path([Point2D(0, 0), Point2D(10, 5), Point2D(1, 3)]))
