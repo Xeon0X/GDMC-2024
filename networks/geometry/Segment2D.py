@@ -200,6 +200,9 @@ class Segment2D:
 
         Returns:
             List[Point2D]: Two points. First one positioned on the counterclockwise side of the segment, oriented from start to end (meaning left).
+
+        >>> Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
+        (Point2D(x: -4, y: 4), Point2D(x: 4, y: -4))
         """
         delta = self.start.distance(self.end)
         dx = (self.start.x - self.end.x) / delta

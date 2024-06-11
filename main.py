@@ -268,5 +268,5 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 print(Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20))))
 
-s = Segment3D(Point3D(0, 0, 0), Point3D(10, 10, 10)).perpendicular(10)
+s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
 print(s)
