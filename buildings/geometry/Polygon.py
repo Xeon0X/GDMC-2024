@@ -1,5 +1,5 @@
 from utils.Enums import DIRECTION
-from gdpc import Editor, Block, geometry
+from gdpc import Editor, Block, geometry, Transform
 from buildings.geometry.Tile import Tile
 from buildings.geometry.Point import Point
 from buildings.geometry.Rectangle import Rectangle
@@ -11,10 +11,11 @@ class Polygon:
         self.shape = []
         self.vertices = []
         
-    def fill_polygon(self, editor : Editor, material : str, y : int, y2 : int = None):
-        if y2 == None: y2 = y
+    def fill(self, editor : Editor, material : str, y : int = 0, y2 : int = None):
+        if y2 == None: y2 = 0
         for rect in self.shape:
-            rect.fill(editor, material, y, y2)
+            with editor.pushTransform(Transform((0,y,0))):
+                rect.fill(editor, material, y2)
         
     def fill_vertice(self, editor : Editor, material : str, y : int, y2 : int = None):
         if y2 == None: y2 = y
@@ -66,7 +67,7 @@ class Polygon:
             
             if len(remaining_vertices) == 0: self.vertices.append(current)     
                     
-    def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice]):
+    def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice], height : int):
         for tile in tiles:
             targets = tile.get_neighbors_coords()
             for vertice_num,target in enumerate(targets):
@@ -74,7 +75,7 @@ class Polygon:
                 if not has_neighbor:
                     vertice = tile.get_vertice(vertice_num)
                     vertices.append(vertice)
-                    tile.set_vertice(DIRECTION(vertice_num), vertice)
+                    tile.set_vertice(DIRECTION(vertice_num), vertice, height)
                 else :
                     tile.set_neighbor(vertice_num, has_neighbor)
     

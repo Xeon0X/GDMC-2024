@@ -9,3 +9,6 @@ class Collumn(Rectangle):
     def set_is_outer(self, is_outer : bool):
         self.is_outer = is_outer
         
+    def __repr__(self):
+        return super().__repr__() + f"\nIs outer : {self.is_outer}\n\n"
+        

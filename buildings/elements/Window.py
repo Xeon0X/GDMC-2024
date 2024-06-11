@@ -1,39 +1,61 @@
 import random as rd
 import math
 from gdpc import Editor, Block, geometry, Transform
-from utils.Enums import COLLUMN_STYLE, BORDER_RADIUS
+from utils.Enums import WINDOW_BORDER_RADIUS
 from utils.functions import *
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
+from buildings.elements.WindowElt.Glass import Glass
 
 class Window:
-    def __init__(self, rdata, max_width : int, max_height : int):
+    def __init__(self, rdata, max_width : int, max_height : int, facade_len : int, facade_height : int):
         self.rdata = rdata
         self.width, self.height = self.get_size(max_width, max_height)
         self.is_grounded = self.is_grounded()
-        self.has_multiple_windows = self.has_multiple_windows()
         self.is_alternate = self.is_alternate()
-        self.has_vertical_crossbar, self.has_horizontal_crossbar = self.has_crossbars()
         self.border_radius = self.border_radius()
-        self.padding = 0
+        self.has_multiple = self.has_multiple_windows()
+        self.has_vertical_crossbar, self.has_horizontal_crossbar = self.has_crossbars()
+        self.padding, self.ypadding = self.get_padding(facade_len, facade_height)
+        self.windows = self.get_windows()
         self.editor, self.materials = None,None
         
-    def build(self, editor : Editor, facade_len : int, facade_height : int, materials : list[str]):
+    def build(self, editor : Editor, materials : list[str]):
         self.editor = editor
         self.materials = materials
+        with editor.pushTransform(Transform((self.padding,self.ypadding,0))):
+            for g in self.windows:
+                leng = len(g)
+                g.build(editor, materials[1], materials[2])
+                self.build_crossbars(g.x1, g.x2, leng)
+                if leng > 1: self.build_border_radius(g.x1, g.x2)
+                         
+    def build_crossbars(self, x1 : int, x2 : int, len : int):
+        if self.has_vertical_crossbar and self.height+1 >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
+            y = self.height//2
+            geometry.placeCuboid(self.editor,(x1,y,0),(x2,y,0),Block(self.materials[3]))
+        if self.has_horizontal_crossbar and len >= self.rdata["crossbars"]["min_width_for_horizontal_crossbar"]:
+            x = len//2
+            geometry.placeCuboid(self.editor,(x1+x,0,0),(x2-x,self.height,0),Block(self.materials[3], {"up" : "true"})) 
+            
+    def build_border_radius(self, x1 : int, x2 : int):
+        if self.border_radius != WINDOW_BORDER_RADIUS.NONE:
+            self.editor.placeBlock((x1,self.height,0),Block(self.materials[4], {"facing": "west", "half": "top"}))
+            self.editor.placeBlock((x2,self.height,0),Block(self.materials[4], {"facing": "east", "half": "top"}))
+        if self.border_radius == WINDOW_BORDER_RADIUS.TOP_AND_BOTTOM:
+            self.editor.placeBlock((x1,0,0),Block(self.materials[4], {"facing": "west"}))
+            self.editor.placeBlock((x2,0,0),Block(self.materials[4], {"facing": "east"}))
+    
+    def get_windows(self) -> list[Glass]:
+        windows = []
+        if not self.has_multiple: windows = [Glass(0,self.width-1,[self.create_window(0, self.width)])]
+        else: windows = self.get_multiple_windows()
+        if self.is_alternate: self.alternate(windows)
         
-        # correction to avoid asymetry
-        self.padding = (facade_len - self.width)//2
-        self.width = facade_len - self.padding*2
+        return windows
         
-        if not self.is_grounded: editor.transform @= Transform((0,(facade_height-self.height)//2,0))
-        editor.transform @= Transform((self.padding,0,0))
-        
-        if self.has_multiple_windows: self.build_multiple_windows()
-        else :
-            self.place_glasses(0, self.width)
-        
-    def build_multiple_windows(self):
+    def get_multiple_windows(self) -> list[Glass]:
+        windows = []
         slices = rd.randint(3, self.width//self.rdata["size"]["min_width"])
         mid = math.ceil(slices/2)
         windows_count = mid
@@ -44,63 +66,43 @@ class Window:
         is_even= slices % 2 == 0
         is_window, gap = True, 0
         remainder = self.width - (window_size*windows_count + inter_size*inter_count)
+        
+        if windows_count % 2 == 1 and inter_count % 2 == 1: 
+            inter_count -= 1
+            remainder += inter_size
+            is_even = not is_even
+            
         for i in range(1,slices+1):
             wsize,isize = window_size, inter_size
             if is_even and i == mid: wsize, isize = wsize*2, isize*2
             if i ==  mid: wsize, isize = wsize + remainder, isize + remainder
             
-            # kepp a spacing between windows, "is revert" is used to keep symetry
             if is_window:               
-                self.place_glasses(gap, gap+wsize)
+                windows.append(Glass(gap, gap+wsize-1,[self.create_window(gap, wsize)]))
                 gap += wsize
             else : 
                 gap += isize
                 
             is_window = not is_window
-    
-    def place_glasses(self, x1 : int, x2 : int):
-        len = x2 - x1
-        if self.is_alternate:
-            mid = x1 + len//2
-            
-            is_block, is_even = False, len % 2 == 0
-            for x in range(x1,x2):
-                if is_even and x == mid: is_block = not is_block # to keep symetry
-                id = 1 if not is_block else 2
-                geometry.placeCuboid(self.editor,(x,0,0),(x,self.height,0),Block(self.materials[id]))
-                is_block = not is_block
-            
-        else:
-            geometry.placeCuboid(self.editor,(x1,0,0),(x2-1,self.height,0),Block(self.materials[1]))
-            
-        self.build_crossbars(x1, x2-1, len)
-        if len > 1: self.build_border_radius(x1, x2-1)
         
-    def get_size(self, max_width : int ,max_height : int) -> tuple[int,int]:
-        return (
-                rd.randint(self.rdata["size"]["min_width"],max_width),
-                rd.randint(self.rdata["size"]["min_height"],max_height)
-            )
-                 
-    def build_crossbars(self, x1 : int, x2 : int, len : int):
-        if self.has_vertical_crossbar and self.height >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
-            y = self.height//2
-            geometry.placeCuboid(self.editor,(x1,y,0),(x2,y,0),Block(self.materials[3]))
-        if self.has_horizontal_crossbar and len >= self.rdata["crossbars"]["min_width_for_horizontal_crossbar"]:
-            x = len//2
-            geometry.placeCuboid(self.editor,(x1+x,0,0),(x2-x,self.height,0),Block(self.materials[3], {"up" : "true"})) 
+        return windows
+    
+    def alternate(self, windows : list[Glass]):
+        for g in windows:
+            g.reset_groups()
+            leng = len(g)
+            mid = g.x1 + leng//2
             
-    def build_border_radius(self, x1 : int, x2 : int):
-        if self.border_radius != BORDER_RADIUS.NONE:
-            self.editor.placeBlock((x1,self.height,0),Block(self.materials[4], {"facing": "west", "half": "top"}))
-            self.editor.placeBlock((x2,self.height,0),Block(self.materials[4], {"facing": "east", "half": "top"}))
-        if self.border_radius == BORDER_RADIUS.TOP_AND_BOTTOM:
-            self.editor.placeBlock((x1,0,0),Block(self.materials[4], {"facing": "west"}))
-            self.editor.placeBlock((x2,0,0),Block(self.materials[4], {"facing": "east"}))
-                          
-    def is_grounded(self):
-        # if the window is grounded or if there is a padding between the window and the ground
-        return self.rdata["grounded"] >= rd.random()
+            is_block, is_even = False, leng % 2 == 0
+            for x in range(g.x1,g.x2+1):
+                if is_even and x == mid: is_block = not is_block # to keep symetry
+                if is_block: g.group2.append(self.create_window(x))
+                else : g.group1.append(self.create_window(x))
+                is_block = not is_block
+        
+    def create_window(self, x1 : int, length : int = None) -> Vertice:
+        x2 = x1 if length is None else x1 + length -1
+        return Vertice(Point(x = x1), Point(x2,self.height))
     
     def has_multiple_windows(self):
         if self.width >  self.rdata["size"]["max_width"]: return True
@@ -112,6 +114,27 @@ class Window:
         # if the window alternate between glass_blocks and glass_panes
         return self.rdata["alternate"] >= rd.random()
     
+        
+    def get_size(self, max_width : int ,max_height : int) -> tuple[int,int]:
+        return (
+                rd.randint(self.rdata["size"]["min_width"],max_width),
+                rd.randint(self.rdata["size"]["min_height"],max_height)
+            )
+        
+    def get_padding(self, facade_len : int, facade_height : int) -> tuple[int]:
+        padding,ypadding = 0,0
+        if not self.is_grounded: ypadding = (facade_height - self.height)//2
+        
+        # correction to avoid asymetry
+        padding = (facade_len - self.width)//2
+        self.width = facade_len - padding*2
+        
+        return (padding, ypadding)
+                          
+    def is_grounded(self):
+        # if the window is grounded or if there is a padding between the window and the ground
+        return self.rdata["grounded"] >= rd.random()
+    
     def has_crossbars(self):
         # if the window has crossbars
         data = self.rdata["crossbars"]
@@ -119,4 +142,4 @@ class Window:
         return (data["vertical_crossbar"] >= rd.random(), data["horizontal_crossbar"] >= rd.random())
     
     def border_radius(self):
-        return select_random(self.rdata["border_radius"], BORDER_RADIUS)
+        return select_random(self.rdata["border_radius"], WINDOW_BORDER_RADIUS)

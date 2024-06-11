@@ -2,9 +2,9 @@ from enum import Enum
 
 class DIRECTION(Enum):
     NORTH = 0
-    WEST = 1
+    EAST = 1
     SOUTH = 2
-    EAST = 3
+    WEST = 3
     
 class COLLUMN_STYLE(Enum):
     NONE = 0
@@ -12,7 +12,17 @@ class COLLUMN_STYLE(Enum):
     OUTER = 2
     BOTH = 3
     
-class BORDER_RADIUS(Enum):
+class WINDOW_BORDER_RADIUS(Enum):
     NONE = 0
     TOP = 1
-    TOP_AND_BOTTOM = 2
+    TOP_AND_BOTTOM = 2  
+    
+class BALCONY_BORDER_RADIUS(Enum):
+    NONE = 0
+    MEDIUM = 1
+    FULL = 2
+    
+class INTER_FLOOR_BORDER(Enum):
+    NONE = 0
+    SLAB = 1
+    STAIRS = 2
