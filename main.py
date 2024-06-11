@@ -16,6 +16,7 @@ from buildings.Building import Building
 import random
 
 from networks.roads import Road as Road
+from networks.geometry.Enums import ROTATION
 from networks.roads.intersections import Intersection as Intersection
 
 from networks.geometry.point_tools import curved_corner_by_curvature, curved_corner_by_distance
@@ -266,4 +267,4 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # print(polyline.alpha_radii)
 
 print(
-    Point2D(-2, -5).optimized_path([Point2D(0, 0), Point2D(10, 5), Point2D(1, 3)]))
+    Point2D(-10, -10).sort_by_rotation([Point2D(10, 10), Point2D(-10, 10), Point2D(10, -10)], rotation=ROTATION.CLOCKWISE))

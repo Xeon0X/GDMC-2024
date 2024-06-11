@@ -1,6 +1,7 @@
 import numpy as np
 from typing import List
 from math import atan2, sqrt
+from networks.geometry.Enums import ROTATION
 
 
 class Point2D:
@@ -14,6 +15,11 @@ class Point2D:
 
     def __repr__(self):
         return f"Point2D(x: {self.x}, y: {self.y})"
+
+    def __eq__(self, other):
+        if isinstance(other, Point2D):
+            return self.x == other.x and self.y == other.y
+        return False
 
     def is_in_triangle(self, xy0: "Point2D", xy1: "Point2D", xy2: "Point2D"):
         """Returns True is the point is in a triangle defined by 3 others points.
@@ -62,7 +68,7 @@ class Point2D:
         """
         return min(points, key=lambda point: self.distance(point))
 
-    def optimized_path(self, points: List["Point2D"]):
+    def optimized_path(self, points: List["Point2D"]) -> List["Point2D"]:
         """Get an optimized ordered path starting from the current point.
 
         From: https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
@@ -87,6 +93,62 @@ class Point2D:
             path.append(nearest)
             pass_by.remove(nearest)
         return path
+
+    def sort_by_rotation(self, points: List["Point2D"], rotation: ROTATION = ROTATION.CLOCKWISE) -> List["Point2D"]:
+        """Sort points in clockwise order, starting from current point.
+
+        From: https://stackoverflow.com/questions/58377015/counterclockwise-sorting-of-x-y-data
+
+        Args:
+            points (List[Point2D]): List of 2d-points. Current point can be included here.
+            rotation (ROTATION): Can be ROTATION.CLOCKWISE or ROTATION.COUNTERCLOCKWISE. Optional. Defaults to ROTATION.CLOCKWISE.
+
+        Returns:
+            List[Point2D]: List of 2d-points.
+
+        >>> Point2D(-10, -10).sort_by_rotation([Point2D(10, 10), Point2D(-10, 10), Point2D(10, -10)])
+        [Point2D(x: -10, y: -10), Point2D(x: 10, y: -10), Point2D(x: 10, y: 10), Point2D(x: -10, y: 10)]
+        """
+        if self not in points:
+            points.append(self)
+        x, y = [], []
+        for i in range(len(points)):
+            x.append(points[i].x)
+            y.append(points[i].y)
+        x, y = np.array(x), np.array(y)
+
+        x0 = np.mean(x)
+        y0 = np.mean(y)
+
+        r = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
+
+        angles = np.where(
+            (y - y0) > 0,
+            np.arccos((x - x0) / r),
+            2 * np.pi - np.arccos((x - x0) / r),
+        )
+
+        mask = np.argsort(angles)
+
+        x_sorted = list(x[mask])
+        y_sorted = list(y[mask])
+
+        # Rearrange tuples to get the correct coordinates.
+        sorted_points = []
+        for i in range(len(points)):
+            j = 0
+            while (x_sorted[i] != points[j].x) and (y_sorted[i] != points[j].y):
+                j += 1
+            else:
+                sorted_points.append(Point2D(x_sorted[i], y_sorted[i]))
+
+        if rotation == ROTATION.CLOCKWISE:
+            sorted_points.reverse()
+            start_index = sorted_points.index(self)
+            return sorted_points[start_index:] + sorted_points[:start_index]
+        else:
+            start_index = sorted_points.index(self)
+            return sorted_points[start_index:] + sorted_points[:start_index]
 
     def angle(self, xy1, xy2):
         """
