@@ -3,35 +3,6 @@ import numpy as np
 from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
-def distance(xy1, xy2):  # TODO : Can be better.
-    # Works in 2d but supports 3d.
-    return sqrt((xy2[0] - xy1[0]) ** 2 + (xy2[-1] - xy1[-1]) ** 2)
-
-
-def get_angle(xy0, xy1, xy2):
-    """
-    Compute angle (in degrees) for xy0, xy1, xy2 corner.
-
-    https://stackoverflow.com/questions/13226038/calculating-angle-between-two-vectors-in-python
-
-    Args:
-        xy0 (numpy.ndarray): Points in the form of [x,y].
-        xy1 (numpy.ndarray): Points in the form of [x,y].
-        xy2 (numpy.ndarray): Points in the form of [x,y].
-
-    Returns:
-        float: Angle negative for counterclockwise angle, angle positive
-        for counterclockwise angle.
-    """
-    if xy2 is None:
-        xy2 = xy1 + np.array([1, 0])
-    v0 = np.array(xy0) - np.array(xy1)
-    v1 = np.array(xy2) - np.array(xy1)
-
-    angle = np.math.atan2(np.linalg.det([v0, v1]), np.dot(v0, v1))
-    return np.degrees(angle)
-
-
 def circle_points(center_point, radius, number=100):
     # Works in 2d but supports 3d.
     # https://stackoverflow.com/questions/8487893/generate-all-the-points-on-the-circumference-of-a-circle
@@ -467,7 +438,7 @@ def curved_corner_by_curvature(
 def coordinates_to_vectors(coordinates):
     vectors = []
     for coordinate in coordinates:
-        vectors.append(np.array(coordinate.get_coordinates()))
+        vectors.append(np.array(coordinate.coordinate))
 
     if (len(vectors) == 1):
         return vectors[0]

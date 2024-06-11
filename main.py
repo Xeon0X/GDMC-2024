@@ -1,3 +1,5 @@
+from networks.geometry.Polyline import Polyline
+from networks.geometry.Point2D import Point2D
 import networks.roads.lines.Line as Line
 import networks.roads.lanes.Lane as Lane
 from gdpc import Editor, Block, geometry
@@ -244,7 +246,17 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # ---
 
-r = Road.Road(((-1829, 141, 553), (-1830, 110, 621), (-1711, 69, 625), (-1662,
-              65, 627), (-1667, 65, 761), (-1683, 70, 800), (-1721, 70, 834)), "None")
+# r = Road.Road(((-1829, 141, 553), (-1830, 110, 621), (-1711, 69, 625), (-1662,
+#               65, 627), (-1667, 65, 761), (-1683, 70, 800), (-1721, 70, 834)), "None")
 
-r.place_roads()
+# r.place_roads()
+
+
+polyline = Polyline((Point2D(0, 0), Point2D(0, 10),
+                    Point2D(50, 10), Point2D(20, 20)))
+
+
+# print(polyline.radius_balance(2))
+
+# polyline._alpha_assign(1, polyline.length_polyline-1)
+print(polyline.alpha_radii)
