@@ -1,16 +1,17 @@
 import random as rd
 from gdpc import Editor, Block, geometry
 from utils.functions import *
-from utils.Enums import BALCONY_BORDER_RADIUS
+from utils.Enums import BALCONY_BORDER_RADIUS,COLLUMN_STYLE
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
 from buildings.elements.Window import Window
 
 class Balcony:
-    def __init__(self, rdata, max_width : int, windows : Window):
+    def __init__(self, rdata, max_width : int, windows : Window, collumn_style : COLLUMN_STYLE):
         self.rdata = rdata
         self.windows = windows
         self.max_width = max_width
+        self.collumn_style = collumn_style
         self.length = self.get_len()
         self.has_multiple = self.has_multiple()
         self.has_details = self.has_details()
@@ -94,7 +95,8 @@ class Balcony:
                 
     def get_attach_points(self) -> list[int]:
         # points where the structures can start/finish
-        points = [i for i in range(self.max_width)]
+        padding = 0 if self.collumn_style.value < 2 else 1 # collumn_style < 2 = no outer collumns
+        points = [i + padding for i in range(self.max_width)]
         if self.follow_window:
             pad = self.windows.padding
             for w in self.windows.windows:
@@ -104,7 +106,7 @@ class Balcony:
         return points
     
     def create_structure(self, x1 : int, x2 : int) -> Vertice:
-        return Vertice(Point(x1,0,0), Point(x2,0,-self.length))
+        return Vertice(Point(x = x1), Point(x = x2,z = -self.length))
     
     def append_structure(self, structures : list[Vertice], x1 : int, x2 : int, attach_points : list[int], len_attach_points : int, centered : bool):
         structures.append(self.create_structure(attach_points[x1], attach_points[x2]))

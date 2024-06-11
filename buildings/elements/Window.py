@@ -5,7 +5,7 @@ from utils.Enums import WINDOW_BORDER_RADIUS
 from utils.functions import *
 from buildings.geometry.Point import Point
 from buildings.geometry.Vertice import Vertice
-from buildings.elements.Glass import Glass
+from buildings.elements.WindowElt.Glass import Glass
 
 class Window:
     def __init__(self, rdata, max_width : int, max_height : int, facade_len : int, facade_height : int):
@@ -31,7 +31,7 @@ class Window:
                 if leng > 1: self.build_border_radius(g.x1, g.x2)
                          
     def build_crossbars(self, x1 : int, x2 : int, len : int):
-        if self.has_vertical_crossbar and self.height >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
+        if self.has_vertical_crossbar and self.height+1 >= self.rdata["crossbars"]["min_height_for_vertical_crossbar"]:
             y = self.height//2
             geometry.placeCuboid(self.editor,(x1,y,0),(x2,y,0),Block(self.materials[3]))
         if self.has_horizontal_crossbar and len >= self.rdata["crossbars"]["min_width_for_horizontal_crossbar"]:
@@ -45,7 +45,6 @@ class Window:
         if self.border_radius == WINDOW_BORDER_RADIUS.TOP_AND_BOTTOM:
             self.editor.placeBlock((x1,0,0),Block(self.materials[4], {"facing": "west"}))
             self.editor.placeBlock((x2,0,0),Block(self.materials[4], {"facing": "east"}))
-    
     
     def get_windows(self) -> list[Glass]:
         windows = []
@@ -103,7 +102,7 @@ class Window:
         
     def create_window(self, x1 : int, length : int = None) -> Vertice:
         x2 = x1 if length is None else x1 + length -1
-        return Vertice(Point(x1,0,0), Point(x2,self.height,0))
+        return Vertice(Point(x = x1), Point(x2,self.height))
     
     def has_multiple_windows(self):
         if self.width >  self.rdata["size"]["max_width"]: return True

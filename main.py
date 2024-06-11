@@ -5,11 +5,6 @@ from utils.JsonReader import JsonReader
 from utils.YamlReader import YamlReader
 from buildings.Building import Building
 
-from buildings.geometry.Vertice import Vertice
-from buildings.geometry.Point import Point
-from utils.Enums import DIRECTION,COLLUMN_STYLE,WINDOW_BORDER_RADIUS
-from buildings.Facade import Facade
-
 from utils.functions import *
 
 editor = Editor(buffering=True)
@@ -20,32 +15,23 @@ shapes = f.data
 y = YamlReader('params.yml')
 random_data = y.data
 
+# transform = Transform((0,-60,-20),rotation = 0)
+# editor.transform.push(transform)
+# for i in range(4):
+#     with editor.pushTransform(Transform(rotation = i)):
+#         geometry.placeCuboid(editor, (0,0,0), (0,3,5), Block("stone"))
 
-transform = Transform((0,-60,-5),rotation = 0)
+transform = Transform((0,-60,80),rotation = 0)
 editor.transform.push(transform)
 
-geometry.placeCuboid(editor, (0,0,-3), (100,15,1), Block("air"))
+geometry.placeCuboid(editor, (-5,0,-8), (170,25,25), Block("air"))
 
 
-x = 0
-facade = []
-for i in range(3,13):
-    facade.append(Facade(random_data["buildings"]["facade"],[Vertice(Point(x,0,0), Point(x+i,i,0), DIRECTION.NORTH)],COLLUMN_STYLE.NONE))
-    x += i+2
-
-for f in facade:
-    f.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs"])
-
- 
-# F = Foundations((0,0), (20,20), shapes[0]['matrice'])
-# F.polygon.fill_polygon(editor, "stone", -60)
-
-# geometry.placeCuboid(editor, (-10,-60,-10), (85,-55,85), Block("air"))
-# B = Building((0,0), (75,75), shapes[7]['matrice'])
-# B.foundations.polygon.fill_vertice(editor, "pink_wool", -60) 
-# for collumn in B.foundations.collumns:
-#     collumn.fill(editor, "white_concrete", -60, -55)
-# B.foundations.polygon.fill_polygon(editor, "white_concrete", -60)
+padd = 0
+for i in range(4,13):
+    building = Building(random_data["buildings"], (padd, 0), (i,i), shapes[0]['matrice'], 3)
+    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab"])
+    padd += i + 10
 
 
 

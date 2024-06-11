@@ -32,9 +32,9 @@ class Tile:
         
     def get_neighbors_coords(self):
         return [Point(x = self.pos.x, z = self.pos.z - self.size), # north
-                Point(x = self.pos.x - self.size, z = self.pos.z), # west
+                Point(x = self.pos.x + self.size, z = self.pos.z), # east
                 Point(x = self.pos.x, z = self.pos.z + self.size), # south
-                Point(x = self.pos.x + self.size, z = self.pos.z)] # east
+                Point(x = self.pos.x - self.size, z = self.pos.z)] # west
         
             
     def get_neighbor(self, direction) -> Point:
@@ -80,8 +80,9 @@ class Tile:
             case DIRECTION.SOUTH :
                 return self.south_vertice
             
-    def set_vertice(self, direction : DIRECTION, vertice : Vertice):
+    def set_vertice(self, direction : DIRECTION, vertice : Vertice, height : int):
         self.has_vertice = True
+        vertice.point2.y = height
         match(direction):
             case DIRECTION.WEST :
                 self.west_vertice = vertice
