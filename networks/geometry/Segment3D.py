@@ -1,23 +1,30 @@
-from typing import Type
 from networks.geometry.Enums import LINE_OVERLAP
 from networks.geometry.Point3D import Point3D
 
 
 class Segment3D:
-    def __init__(start: Type[Point3D], end: Type[Point3D]):
+    def __init__(self, start: Point3D, end: Point3D, overlap: bool = True):
         self.start = start
         self.end = end
         self.coordinates = []
+        self.overlap = overlap
 
-    def compute_segment(start: Type[Point3D], end: Type[Point3D], overlap=True):
+        self.compute_segment(self.start, self.end, self.overlap)
+
+    def __repr__(self):
+        return str(self.coordinates)
+
+    def compute_segment(self, start: Point3D, end: Point3D, overlap: bool = True):
         """Calculate a segment between two points in 3D space. 3d Bresenham algorithm.
 
         From: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 
         Args:
-            start (Type[Point3D]): First coordinates.
-            end (Type[Point3D]): Second coordinates.
+            start (Point3D): First coordinates.
+            end (Point3D): Second coordinates.
             overlap (bool, optional): If true, remove unnecessary coordinates connecting to other coordinates side by side, leaving only a diagonal connection. Defaults to True.
+
+        >>> Segment3D(Point3D(0, 0, 0), Point3D(10, 10, 15))
         """
         self.coordinates.append(start)
         dx = abs(end.x - start.x)

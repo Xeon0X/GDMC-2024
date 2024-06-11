@@ -1,3 +1,6 @@
+from networks.geometry.Point3D import Point3D
+from networks.geometry.Segment3D import Segment3D
+from networks.geometry.Segment2D import Segment2D
 from networks.geometry.Circle import Circle
 from networks.geometry.Polyline import Polyline
 from networks.geometry.Point2D import Point2D
@@ -261,3 +264,7 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
+
+
+s = Segment2D(Point2D(0, 0), Point2D(10, 15), 1)
+print(s)
