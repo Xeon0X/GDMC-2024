@@ -1,3 +1,4 @@
+from typing import List
 from networks.geometry.Enums import LINE_OVERLAP
 from networks.geometry.Point3D import Point3D
 

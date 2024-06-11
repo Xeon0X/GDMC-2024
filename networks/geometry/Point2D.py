@@ -183,7 +183,7 @@ class Point2D:
         return self
 
     @staticmethod
-    def to_vectors(points: List["Point3D"]):
+    def to_vectors(points: List["Point3D"]) -> List[np.array]:
         vectors = []
         for point in points:
             vectors.append(np.array(point.coordinate))

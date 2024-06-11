@@ -138,33 +138,6 @@ def circle_segment_intersection(
             return intersections
 
 
-def perpendicular(distance, xy1, xy2):
-    """
-    Return a tuple of the perpendicular coordinates.
-
-    Args:
-        distance (int): Distance from the line[xy1;xy2].
-        xy1 (tuple): First coordinates.
-        xy2 (tuple): Second coordinates.
-
-    Returns:
-        tuple: Coordinates of the line length distance, perpendicular
-        to [xy1; xy2] at xy1.
-    """
-    (x1, y1) = xy1[0], xy1[-1]
-    (x2, y2) = xy2[0], xy2[-1]
-    dx = x1 - x2
-    dy = y1 - y2
-    dist = sqrt(dx * dx + dy * dy)
-    dx /= dist
-    dy /= dist
-    x3 = x1 + (distance / 2) * dy
-    y3 = y1 - (distance / 2) * dx
-    x4 = x1 - (distance / 2) * dy
-    y4 = y1 + (distance / 2) * dx
-    return (x3, y3), (x4, y4)
-
-
 def curved_corner_by_distance(
     intersection, xyz0, xyz1, distance_from_intersection, resolution, full_line=True
 ):
@@ -345,14 +318,3 @@ def curved_corner_by_curvature(
     distance_from_intersection = round(distance(start_curve_point, center))
     return curve_corner_points, center, distance_from_intersection, parallel(
         (xyz0, intersection), -curvature_radius), parallel((xyz1, intersection), curvature_radius)
-
-
-def coordinates_to_vectors(coordinates):
-    vectors = []
-    for coordinate in coordinates:
-        vectors.append(np.array(coordinate.coordinate))
-
-    if (len(vectors) == 1):
-        return vectors[0]
-    else:
-        return vectors

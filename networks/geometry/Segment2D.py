@@ -1,18 +1,16 @@
-from typing import Type
+from typing import List
 from networks.geometry.Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
 from networks.geometry.Point2D import Point2D
+from math import sqrt
 
 
 class Segment2D:
-    def __init__(self, start: Point2D, end: Point2D, thickness: int, thickness_mode: LINE_THICKNESS_MODE = LINE_THICKNESS_MODE.MIDDLE):
+    def __init__(self, start: Point2D, end: Point2D, thickness_mode: LINE_THICKNESS_MODE = LINE_THICKNESS_MODE.MIDDLE):
         self.start = start
         self.end = end
         self.coordinates = []
-        self.thickness = thickness
+        self.thickness = None
         self.thickness_mode = thickness_mode
-
-        self.compute_thick_segment(
-            self.start, self.end, self.thickness, self.thickness_mode)
 
     def __repr__(self):
         return str(self.coordinates)
@@ -27,7 +25,7 @@ class Segment2D:
             end (Point2D): End point of the segment.
             overlap (LINE_OVERLAP): Overlap draws additional pixel when changing minor direction. For standard bresenham overlap, choose LINE_OVERLAP_NONE. Can also be LINE_OVERLAP_MAJOR or LINE_OVERLAP_MINOR.
 
-        >>> Segment2D(Point2D(0, 0), Point2D(10, 15), 1)
+        >>> Segment2D(Point2D(0, 0), Point2D(10, 15))
         """
         start = start.copy()
         end = end.copy()
@@ -95,6 +93,8 @@ class Segment2D:
             end (Point2D): End point of the segment.
             thickness (int): Total width of the surface. Placement relative to the original segment depends on thickness_mode.
             thickness_mode (LINE_THICKNESS_MODE): Can be one of LINE_THICKNESS_MIDDLE, LINE_THICKNESS_DRAW_CLOCKWISE, LINE_THICKNESS_DRAW_COUNTERCLOCKWISE.
+
+        >>> self.compute_thick_segment(self.start, self.end, self.thickness, self.thickness_mode)
         """
         delta_y = end.x - start.x
         delta_x = end.y - start.y
@@ -191,3 +191,22 @@ class Segment2D:
                 error += delta_2x
 
                 self.compute_segmen_overlap(start, end, overlap)
+
+    def perpendicular(self, distance: int) -> List[Point2D]:
+        """Compute perpendicular points from both side of the segment placed at start level.
+
+        Args:
+            distance (int): Distance bewteen the start point and the perpendicular.
+
+        Returns:
+            List[Point2D]: Two points. First one positioned on the counterclockwise side of the segment, oriented from start to end (meaning left).
+        """
+        delta = self.start.distance(self.end)
+        dx = (self.start.x - self.end.x) / delta
+        dy = (self.start.y - self.end.y) / delta
+
+        x3 = self.start.x + (distance / 2) * dy
+        y3 = self.start.y - (distance / 2) * dx
+        x4 = self.start.x - (distance / 2) * dy
+        y4 = self.start.y + (distance / 2) * dx
+        return Point2D(x3, y3).round(), Point2D(x4, y4).round()
