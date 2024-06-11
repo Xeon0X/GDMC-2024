@@ -1,3 +1,4 @@
+from networks.geometry.Circle import Circle
 from networks.geometry.Polyline import Polyline
 from networks.geometry.Point2D import Point2D
 import networks.roads.lines.Line as Line
@@ -252,11 +253,11 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # r.place_roads()
 
 
-polyline = Polyline((Point2D(0, 0), Point2D(0, 10),
-                    Point2D(50, 10), Point2D(20, 20)))
+# polyline = Polyline((Point2D(0, 0), Point2D(0, 10),
+#                     Point2D(50, 10), Point2D(20, 20)))
 
 
-# print(polyline.radius_balance(2))
+# # print(polyline.radius_balance(2))
 
-# polyline._alpha_assign(1, polyline.length_polyline-1)
-print(polyline.alpha_radii)
+# # polyline._alpha_assign(1, polyline.length_polyline-1)
+# print(polyline.alpha_radii)

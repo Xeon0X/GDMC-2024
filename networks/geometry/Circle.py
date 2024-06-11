@@ -3,15 +3,15 @@ from networks.geometry.Point2D import Point2D
 
 
 class Circle:
-    def __init__(center: Type[Point2D], inner: int, outer: int):
+    def __init__(self, center: Point2D, inner: int, outer: int):
         self.center = center
         self.inner = inner
         self.outer = outer
         self.coordinates = []
 
-        circle(self.center, self.inner, self.outer)
+        self.circle(self.center, self.inner, self.outer)
 
-    def circle(center: Type[Point2D], inner: int, outer: int):
+    def circle(self, center: Point2D, inner: int, outer: int):
         """Compute discrete value of a 2d-circle with thickness. 
 
         https://stackoverflow.com/questions/27755514/circle-with-thickness-drawing-algorithm
@@ -20,6 +20,8 @@ class Circle:
             center (Type[Point2D]): Center of the circle. Circles always have an odd diameter due to the central coordinate.
             inner (int): The minimum radius at which the disc is filled (included).
             outer (int): The maximum radius where disc filling stops (included).
+
+        >>> Circle(Point2D(0, 0), 5, 10)
         """
         xo = outer
         xi = inner
@@ -28,14 +30,14 @@ class Circle:
         erri = 1 - xi
 
         while xo >= y:
-            _x_line(center.x + xi, center.x + xo, center.y + y)
-            _y_line(center.x + y,  center.y + xi, center.y + xo)
-            _x_line(center.x - xo, center.x - xi, center.y + y)
-            _y_line(center.x - y,  center.y + xi, center.y + xo)
-            _x_line(center.x - xo, center.x - xi, center.y - y)
-            _y_line(center.x - y,  center.y - xo, center.y - xi)
-            _x_line(center.x + xi, center.x + xo, center.y - y)
-            _y_line(center.x + y,  center.y - xo, center.y - xi)
+            self._x_line(center.x + xi, center.x + xo, center.y + y)
+            self._y_line(center.x + y,  center.y + xi, center.y + xo)
+            self._x_line(center.x - xo, center.x - xi, center.y + y)
+            self._y_line(center.x - y,  center.y + xi, center.y + xo)
+            self._x_line(center.x - xo, center.x - xi, center.y - y)
+            self._y_line(center.x - y,  center.y - xo, center.y - xi)
+            self._x_line(center.x + xi, center.x + xo, center.y - y)
+            self._y_line(center.x + y,  center.y - xo, center.y - xi)
 
             y += 1
 
@@ -54,14 +56,14 @@ class Circle:
                     xi -= 1
                     erri += 2 * (y - xi + 1)
 
-    def _x_line(x1, x2, y):
+    def _x_line(self, x1, x2, y):
         while x1 <= x2:
             self.coordinates.append(Point2D(x1, y))
             x1 += 1
 
-    def _y_line(x, y1, y2):
+    def _y_line(self, x, y1, y2):
         while y1 <= y2:
-            self.coordinate.append(Point2D(x, y1))
+            self.coordinates.append(Point2D(x, y1))
             y1 += 1
 
     def __repr__(self):
