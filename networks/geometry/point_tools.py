@@ -3,55 +3,6 @@ import numpy as np
 from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
-def circle(center, radius):
-    """
-    Can be used for circle or disc. Works in 2d but supports 3d.
-
-    Args:
-        xyC (tuple): Coordinates of the center.
-        r (int): Radius of the circle.
-
-    Returns:
-        dict: Keys are distance from the circle. Value is a list of all
-        coordinates at this distance. 0 for a circle. Negative values
-        for a disc, positive values for a hole.
-    """
-    area = (
-        (round(center[0]) - round(radius), round(center[-1]) - round(radius)),
-        (round(center[0]) + round(radius) + 1,
-         round(center[-1]) + round(radius) + 1),
-    )
-
-    circle = {}
-    for x in range(area[0][0], area[1][0]):
-        for y in range(area[0][1], area[1][1]):
-            d = round(distance((x, y), (center))) - radius
-            if circle.get(d) == None:
-                circle[d] = []
-            circle[d].append((x, y))
-    return circle
-
-
-def is_in_triangle(point, xy0, xy1, xy2):
-    # Works in 2d but supports 3d.
-    # https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#:~:text=A%20simple%20way%20is%20to,point%20is%20inside%20the%20triangle.
-    dX = point[0] - xy0[0]
-    dY = point[-1] - xy0[-1]
-    dX20 = xy2[0] - xy0[0]
-    dY20 = xy2[-1] - xy0[-1]
-    dX10 = xy1[0] - xy0[0]
-    dY10 = xy1[-1] - xy0[-1]
-
-    s_p = (dY20 * dX) - (dX20 * dY)
-    t_p = (dX10 * dY) - (dY10 * dX)
-    D = (dX10 * dY20) - (dY10 * dX20)
-
-    if D > 0:
-        return (s_p >= 0) and (t_p >= 0) and (s_p + t_p) <= D
-    else:
-        return (s_p <= 0) and (t_p <= 0) and (s_p + t_p) >= D
-
-
 def distance(xy1, xy2):  # TODO : Can be better.
     # Works in 2d but supports 3d.
     return sqrt((xy2[0] - xy1[0]) ** 2 + (xy2[-1] - xy1[-1]) ** 2)
