@@ -1,4 +1,4 @@
-from District import District, CustomDistrict, VoronoiDistrict
+from District import District
 from Position import Position
 from PIL import Image
 import random
@@ -33,13 +33,14 @@ class City:
         watermap.close()
         heightmap.close()
 
-    def add_district(self, center: Position):
+    def add_district(self, center: Position, district_type: str = ""):
         """
         Add a new district to the city.
 
+        :param district_type:
         :param center: The center position of the new district.
         """
-        self.districts.append(CustomDistrict(len(self.districts) + 1, center))
+        self.districts.append(District(len(self.districts) + 1, center, district_type))
         self.map_data[center.y][center.x] = len(self.districts)
 
     def is_expend_finished(self):
@@ -121,6 +122,6 @@ class City:
 if __name__ == '__main__':
     city = City()
     for i in range(10):
-        city.add_district(Position(random.randint(0, 600), random.randint(0, 600)))
+        city.add_district(Position(random.randint(0, 400), random.randint(0, 400)))
     city.loop_expend_district()
     city.custom_district_draw_map()
