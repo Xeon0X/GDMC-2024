@@ -1,4 +1,4 @@
 gdpc==7.1.0
-matplotlib==3.8.2
 numpy==1.26.4
+pygame==2.5.2
 scipy==1.13.0
