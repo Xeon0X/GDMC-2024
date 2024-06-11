@@ -264,11 +264,3 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
-
-
-s = Segment2D(Point2D(0, 0), Point2D(10, 15), 1)
-print(s)
-
-
-c = Circle(Point2D(0, 0), 5, 10)
-print(c.circle_points(10, 10))

@@ -1,5 +1,6 @@
 import numpy as np
-import math
+from typing import List
+from math import atan2, sqrt
 
 
 class Point2D:
@@ -47,8 +48,19 @@ class Point2D:
         else:
             return (s_p <= 0) and (t_p <= 0) and (s_p + t_p) >= d
 
-    def distance(self, point: "Point2D"):
+    def distance(self, point: "Point2D") -> int:
         return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
+
+    def nearest(self, points: List["Point2D"]) -> "Point2D":
+        """Return the nearest point. If multiple nearest point, returns the first in the list.
+
+        Args:
+            points (List[Point2D]): List of the points to test.
+
+        Returns:
+            Point2D: The nearest point, and if multiple, the first in the list.
+        """
+        return min(points, key=lambda point: self.distance(point))
 
     def angle(self, xy1, xy2):
         """
@@ -73,7 +85,7 @@ class Point2D:
         v0 = np.array(xy1.coordinate) - np.array(self.coordinate)
         v1 = np.array(xy2.coordinate) - np.array(self.coordinate)
 
-        angle = math.atan2(np.linalg.det([v0, v1]), np.dot(v0, v1))
+        angle = atan2(np.linalg.det([v0, v1]), np.dot(v0, v1))
         return np.degrees(angle)
 
     def round(self, ndigits: int = None) -> "Point2D":

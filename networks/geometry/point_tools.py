@@ -17,10 +17,6 @@ def optimized_path(points, start=None):
     return path
 
 
-def nearest(points, start):
-    return min(points, key=lambda x: distance(start, x))
-
-
 def sort_by_clockwise(points):
     """
     Sort point in a rotation order. Works in 2d but supports 3d.
