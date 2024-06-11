@@ -266,5 +266,4 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
 
-print(
-    Point2D(-10, -10).sort_by_rotation([Point2D(10, 10), Point2D(-10, 10), Point2D(10, -10)], rotation=ROTATION.CLOCKWISE))
+print(Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20))))

@@ -1,5 +1,5 @@
 from networks.geometry.segment_tools import parallel, orthogonal
-from networks.geometry.point_tools import sort_by_clockwise, segments_intersection, curved_corner_by_distance, curved_corner_by_curvature
+from networks.geometry.point_tools import segments_intersection, curved_corner_by_distance, curved_corner_by_curvature
 from networks.roads import Road
 
 

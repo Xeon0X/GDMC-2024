@@ -3,59 +3,6 @@ import numpy as np
 from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
-def sort_by_clockwise(points):
-    """
-    Sort point in a rotation order. Works in 2d but supports 3d.
-
-    https://stackoverflow.com/questions/58377015/counterclockwise-sorting-of-x-y-data
-
-    Args:
-        points: List of points to sort in the form of [(x, y, z), (x, y,
-        z)] or [(x, y), (x, y), (x, y), (x, y)]...
-
-    Returns:
-        list: List of tuples of coordinates sorted (2d or 3d).
-
-    >>> sort_by_clockwise([(0, 45, 100), (4, -5, 5),(-5, 36, -2)])
-    [(0, 45, 100), (-5, 36, -2), (4, -5, 5)]
-    """
-    x, y = [], []
-    for i in range(len(points)):
-        x.append(points[i][0])
-        y.append(points[i][-1])
-    x, y = np.array(x), np.array(y)
-
-    x0 = np.mean(x)
-    y0 = np.mean(y)
-
-    r = np.sqrt((x - x0) ** 2 + (y - y0) ** 2)
-
-    angles = np.where(
-        (y - y0) > 0,
-        np.arccos((x - x0) / r),
-        2 * np.pi - np.arccos((x - x0) / r),
-    )
-
-    mask = np.argsort(angles)
-
-    x_sorted = list(x[mask])
-    y_sorted = list(y[mask])
-
-    # Rearrange tuples to get the right coordinates.
-    sorted_points = []
-    for i in range(len(points)):
-        j = 0
-        while (x_sorted[i] != points[j][0]) and (y_sorted[i] != points[j][-1]):
-            j += 1
-        else:
-            if len(points[0]) == 3:
-                sorted_points.append((x_sorted[i], points[j][1], y_sorted[i]))
-            else:
-                sorted_points.append((x_sorted[i], y_sorted[i]))
-
-    return sorted_points
-
-
 def segments_intersection(line0, line1, full_line=True):
     """
     Find (or not) intersection between two lines. Works in 2d but

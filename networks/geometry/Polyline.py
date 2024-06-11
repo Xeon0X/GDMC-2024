@@ -1,5 +1,4 @@
 from networks.geometry.Point2D import Point2D
-from networks.geometry.point_tools import coordinates_to_vectors
 
 from math import sqrt, inf
 import numpy as np
@@ -19,7 +18,7 @@ class Polyline:
 
         >>> Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20)))
         """
-        self.points = coordinates_to_vectors(points)
+        self.points = Point2D.to_vectors(points)
         self.length_polyline = len(points)
 
         if self.length_polyline < 4:
@@ -36,6 +35,9 @@ class Polyline:
         self._compute_alpha_radii()
 
         self._alpha_assign(0, self.length_polyline-1)
+
+    def __repr__(self):
+        return str(self.alpha_radii)
 
     def _alpha_assign(self, start_index: int, end_index: int):
         """

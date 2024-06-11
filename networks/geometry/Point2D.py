@@ -181,3 +181,14 @@ class Point2D:
         self.y = round(self.y, ndigits)
         self.coordinate = (self.x, self.y)
         return self
+
+    @staticmethod
+    def to_vectors(points: List["Point3D"]):
+        vectors = []
+        for point in points:
+            vectors.append(np.array(point.coordinate))
+
+        if (len(vectors) == 1):
+            return vectors[0]
+        else:
+            return vectors
