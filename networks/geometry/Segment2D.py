@@ -9,7 +9,7 @@ class Segment2D:
         self.end = end
         self.coordinates = []
 
-    def draw_line_overlap(start: Type[Point2D], end: Type[Point2D], overlap: Type[LINE_OVERLAP]):
+    def compute_segment_overlap(start: Type[Point2D], end: Type[Point2D], overlap: Type[LINE_OVERLAP]):
         """Modified Bresenham draw (line) with optional overlap.
 
         From https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -74,7 +74,7 @@ class Segment2D:
                 error += delta_2x
                 self.coordinates.append(start)
 
-    def draw_thick_line(start: Type[Point2D], end: Type[Point2D], thickness: int, thickness_mode: Type[LINE_THICKNESS_MODE]):
+    def compute_thick_segment(start: Type[Point2D], end: Type[Point2D], thickness: int, thickness_mode: Type[LINE_THICKNESS_MODE]):
         """Bresenham with thickness.
 
         From https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
