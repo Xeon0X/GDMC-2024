@@ -18,6 +18,8 @@ class Point2D:
     def is_in_triangle(self, xy0: Type[Point2D], xy1: Type[Point2D], xy2: Type[Point2D]):
         """Returns True is the point is in a triangle defined by 3 others points.
 
+        From: https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#:~:text=A%20simple%20way%20is%20to,point%20is%20inside%20the%20triangle.
+
         Args:
             xy0 (Type[Point2D]): Point of the triangle.
             xy1 (Type[Point2D]): Point of the triangle.
@@ -26,7 +28,6 @@ class Point2D:
         Returns:
             bool: False if the point is not inside the triangle.
         """
-        # https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#:~:text=A%20simple%20way%20is%20to,point%20is%20inside%20the%20triangle.
         dx = self.x - xy0.x
         dy = self.y - xy0.y
 
@@ -43,3 +44,6 @@ class Point2D:
             return (s_p >= 0) and (t_p >= 0) and (s_p + t_p) <= d
         else:
             return (s_p <= 0) and (t_p <= 0) and (s_p + t_p) >= d
+
+    def distance(self, point: Type[Point2D]):
+        return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
