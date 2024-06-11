@@ -268,3 +268,7 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 
 s = Segment2D(Point2D(0, 0), Point2D(10, 15), 1)
 print(s)
+
+
+c = Circle(Point2D(0, 0), 5, 10)
+print(c.circle_points(10, 10))

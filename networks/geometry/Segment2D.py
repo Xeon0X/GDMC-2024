@@ -26,6 +26,8 @@ class Segment2D:
             start (Point2D): Start point of the segment.
             end (Point2D): End point of the segment.
             overlap (LINE_OVERLAP): Overlap draws additional pixel when changing minor direction. For standard bresenham overlap, choose LINE_OVERLAP_NONE. Can also be LINE_OVERLAP_MAJOR or LINE_OVERLAP_MINOR.
+
+        >>> Segment2D(Point2D(0, 0), Point2D(10, 15), 1)
         """
         start = start.copy()
         end = end.copy()

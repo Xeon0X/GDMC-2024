@@ -75,3 +75,9 @@ class Point2D:
 
         angle = math.atan2(np.linalg.det([v0, v1]), np.dot(v0, v1))
         return np.degrees(angle)
+
+    def round(self, ndigits: int = None) -> "Point2D":
+        self.x = round(self.x, ndigits)
+        self.y = round(self.y, ndigits)
+        self.coordinate = (self.x, self.y)
+        return self

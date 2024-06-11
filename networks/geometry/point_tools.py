@@ -3,23 +3,6 @@ import numpy as np
 from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
-def circle_points(center_point, radius, number=100):
-    # Works in 2d but supports 3d.
-    # https://stackoverflow.com/questions/8487893/generate-all-the-points-on-the-circumference-of-a-circle
-    points = [
-        (cos(2 * pi / number * x) * radius, sin(2 * pi / number * x) * radius)
-        for x in range(0, number + 1)
-    ]
-
-    for i in range(len(points)):
-        points[i] = (
-            points[i][0] + center_point[0],
-            points[i][-1] + center_point[-1],
-        )
-
-    return points
-
-
 def optimized_path(points, start=None):
     # https://stackoverflow.com/questions/45829155/sort-points-in-order-to-have-a-continuous-curve-using-python
     if start is None:

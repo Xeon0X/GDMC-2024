@@ -15,3 +15,10 @@ class Point3D:
 
     def distance(self, point: "Point3D"):
         return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2 + (point.z - self.z) ** 2)
+
+    def round(self, ndigits: int = None) -> "Point3D":
+        self.x = round(self.x, ndigits)
+        self.y = round(self.y, ndigits)
+        self.z = round(self.z, ndigits)
+        self.coordinate = (self.x, self.y, self.z)
+        return self
