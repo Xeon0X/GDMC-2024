@@ -266,7 +266,17 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
 
-print(Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20))))
+p = Polyline((Point2D(0, 0), Point2D(8, 0), Point2D(
+    8, 8), Point2D(16, 16)))
 
-s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
-print(s)
+# print(p.alpha_radii)
+
+print(p.get_radius())
+
+# s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
+# print(s)
+
+# Note: passer parrallel dans Segment2D pour pouvoir calculer l'intersection entre deux segments
+# de la Polyline pour trouver le centre du cercle. Faire l'arc de cercle en utilise is_in_triangle
+# Okay mb, l'article scientifique explique une procédure sans doute plus efficace.
+# alpha n'est pas un angle.
