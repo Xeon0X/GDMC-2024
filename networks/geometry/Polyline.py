@@ -98,8 +98,8 @@ class Polyline:
             alpha_low, alpha_high = alpha_a, self.alpha_radii[end_index]
 
         # Assign alphas at ends of selected segment
-        self.alpha_radii[minimum_index] = alpha_low
-        self.alpha_radii[minimum_index+1] = alpha_high
+        self.alpha_radii[minimum_index] = alpha_low/1.5
+        self.alpha_radii[minimum_index+1] = alpha_high/1.5
 
         # Recur on lower segments
         self._alpha_assign(start_index, minimum_index)

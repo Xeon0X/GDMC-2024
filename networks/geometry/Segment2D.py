@@ -27,6 +27,7 @@ class Segment2D:
 
         >>> Segment2D(Point2D(0, 0), Point2D(10, 15))
         """
+
         start = start.copy()
         end = end.copy()
 
@@ -62,10 +63,10 @@ class Segment2D:
                     start.y += step_y
                     if (overlap == LINE_OVERLAP.MINOR):
                         self.coordinates.append(
-                            Point2D(start.x - step_x, start.y))
+                            Point2D(start.copy().x - step_x, start.copy().y))
                     error -= delta_2x
                 error += delta_2y
-                self.coordinates.append(start)
+                self.coordinates.append(start.copy())
         else:
             error = delta_2x - delta_y
             while (start.y != end.y):
@@ -77,12 +78,12 @@ class Segment2D:
                     start.x += step_x
                     if (overlap == LINE_OVERLAP.MINOR):
                         self.coordinates.append(
-                            Point2D(start.x, start.y - step_y))
+                            Point2D(start.copy().x, start.copy().y - step_y))
                     error -= delta_2y
                 error += delta_2x
                 self.coordinates.append(start.copy())
 
-    def compute_thick_segment(self, start: Point2D, end: Point2D, thickness: int, thickness_mode: LINE_THICKNESS_MODE):
+    def compute_thick_segment(self, thickness: int, thickness_mode: LINE_THICKNESS_MODE):
         """Bresenham with thickness.
 
         From https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -96,11 +97,14 @@ class Segment2D:
 
         >>> self.compute_thick_segment(self.start, self.end, self.thickness, self.thickness_mode)
         """
+        start = self.start.copy()
+        end = self.end.copy()
+
         delta_y = end.x - start.x
         delta_x = end.y - start.y
 
         swap = True
-        if delta_x < 0:
+        if (delta_x < 0):
             delta_x = -delta_x
             step_x = -1
             swap = not swap
@@ -156,7 +160,7 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2y
 
-                self.compute_segmen_overlap(start, end, overlap)
+                self.compute_segment_overlap(start, end, overlap)
 
         else:
             if swap:
@@ -176,7 +180,7 @@ class Segment2D:
                     error -= delta_2y
                 error += delta_2x
 
-            self.compute_segmen_overlap(start, end, LINE_OVERLAP.NONE)
+            self.compute_segment_overlap(start, end, LINE_OVERLAP.NONE)
 
             error = delta_2x - delta_y
             for i in range(thickness, 1, -1):
@@ -190,7 +194,7 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2x
 
-                self.compute_segmen_overlap(start, end, overlap)
+                self.compute_segment_overlap(start, end, overlap)
 
     def perpendicular(self, distance: int) -> List[Point2D]:
         """Compute perpendicular points from both side of the segment placed at start level.
