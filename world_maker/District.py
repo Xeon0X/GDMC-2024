@@ -10,18 +10,18 @@ class District:
         area_expend_from_point (list): The list of positions from which the district can expand.
         area_expend (list): The list of positions to which the district will maybe expand.
     """
-    def __init__(self, tile_id: int, center: Position, type: str = ""):
+    def __init__(self, tile_id: int, center: Position, district_type: str = ""):
         """
         The constructor for the District class.
 
         :param tile_id: Unique id of the district (Must be greater than 0)
         :param center: The center position from which the district expands.
-        :param type: The type of the district (Forest, City, Mountain, Villa)
+        :param district_type: The type of the district (Forest, City, Mountain, Villa)
         """
         if tile_id <= 0:
             raise ValueError("Tile id must be greater than 0")
         self.tile_id = tile_id
-        self.type = type
+        self.type = district_type
         self.center_expend = center
         self.area = [center]
         self.area_expend_from_point = [center]

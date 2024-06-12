@@ -145,7 +145,7 @@ class World:
                     number = 0
                     for i in range(-1, 2):
                         for j in range(-1, 2):
-                            if (i != 0 or j != 0):
+                            if i != 0 or j != 0:
                                 if (0 <= x + i < xzDistance[0]) and (0 <= z + j < xzDistance[1]):
                                     k = heightmapData[x + i][z + j] - 1
 
@@ -160,10 +160,10 @@ class World:
                         print(average, "average")
                         heightmap.putpixel((x, z), (average, average, average))
 
-                if ((biome in waterBiomes) or (block.id in waterBlocks)):
-                    watermap.putpixel((x, z), (255))
+                if (biome in waterBiomes) or (block.id in waterBlocks):
+                    watermap.putpixel((x, z), 255)
                 else:
-                    watermap.putpixel((x, z), (0))
+                    watermap.putpixel((x, z), 0)
 
                 self.addBlocks([Block((xzStart[0] + x, 100, xzStart[1] + z), block)])  # y set to 100 for 2D
 
@@ -190,7 +190,7 @@ class World:
             for y in range(self.length_y):
                 binaryImage[x].append([])
                 for z in range(self.length_z):
-                    if (self.volume[x][y][z] != None):
+                    if self.volume[x][y][z] != None:
                         binaryImage[x][y].append(True)
                     else:
                         binaryImage[x][y].append(False)
@@ -222,7 +222,7 @@ class World:
         for x in range(0, xzDistance[0]):
             for z in range(0, xzDistance[1]):
                 y = heightmapData[x][z] - 1
-                if mask.getpixel((x, z)) == (255):
+                if mask.getpixel((x, z)) == 255:
                     self.removeBlock((x, 100, z))  # y set to 100 for 2D
 
     def simplifyVolume(self):

@@ -63,15 +63,15 @@ class City:
         """
         min_distance = point.distance_to(self.districts[index_district].center_expend)
         index_district_chosen = index_district
-        for i in range(index_district + 1, len(self.districts)):
-            if point in self.districts[i].area_expend:
-                distance = point.distance_to(self.districts[i].center_expend)
+        for index in range(index_district + 1, len(self.districts)):
+            if point in self.districts[index].area_expend:
+                distance = point.distance_to(self.districts[index].center_expend)
                 if distance < min_distance:
                     min_distance = distance
                     self.districts[index_district_chosen].area_expend.remove(point)
-                    index_district_chosen = i
+                    index_district_chosen = index
                 else:
-                    self.districts[i].area_expend.remove(point)
+                    self.districts[index].area_expend.remove(point)
         self.districts[index_district_chosen].area.append(point)
         self.districts[index_district_chosen].area_expend_from_point.append(point)
         self.districts[index_district_chosen].area_expend.remove(point)
@@ -106,8 +106,8 @@ class City:
         """
         width, height = len(self.map_data[0]), len(self.map_data)
         img = Image.new('RGB', (width, height))
-        colors = {i: (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-                  for i in range(1, len(self.districts) + 1)}
+        colors = {id_district: (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                  for id_district in range(1, len(self.districts) + 1)}
 
         for y in range(height):
             for x in range(width):
