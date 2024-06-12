@@ -10,12 +10,12 @@ class Segment3D:
         self.coordinates = []
         self.overlap = overlap
 
-        self.compute_segment(self.start, self.end, self.overlap)
+        self._compute_segment(self.start, self.end, self.overlap)
 
     def __repr__(self):
         return str(self.coordinates)
 
-    def compute_segment(self, start: Point3D, end: Point3D, overlap: bool = True):
+    def _compute_segment(self, start: Point3D, end: Point3D, overlap: bool = False):
         """Calculate a segment between two points in 3D space. 3d Bresenham algorithm.
 
         From: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
@@ -23,11 +23,11 @@ class Segment3D:
         Args:
             start (Point3D): First coordinates.
             end (Point3D): Second coordinates.
-            overlap (bool, optional): If true, remove unnecessary coordinates connecting to other coordinates side by side, leaving only a diagonal connection. Defaults to True.
+            overlap (bool, optional): If False, remove unnecessary coordinates connecting to other coordinates side by side, leaving only a diagonal connection. Defaults to False.
 
         >>> Segment3D(Point3D(0, 0, 0), Point3D(10, 10, 15))
         """
-        self.coordinates.append(start)
+        self.coordinates.append(start.copy())
         dx = abs(end.x - start.x)
         dy = abs(end.y - start.y)
         dz = abs(end.z - start.z)
@@ -50,18 +50,18 @@ class Segment3D:
             p2 = 2 * dz - dx
             while start.x != end.x:
                 start.x += xs
-                self.coordinates.append(start)
+                self.coordinates.append(start.copy())
                 if p1 >= 0:
                     start.y += ys
                     if not overlap:
                         if self.coordinates[-1].y != start.y:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p1 -= 2 * dx
                 if p2 >= 0:
                     start.z += zs
                     if not overlap:
                         if self.coordinates[-1].z != start.z:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p2 -= 2 * dx
                 p1 += 2 * dy
                 p2 += 2 * dz
@@ -72,18 +72,18 @@ class Segment3D:
             p2 = 2 * dz - dy
             while start.y != end.y:
                 start.y += ys
-                self.coordinates.append(start)
+                self.coordinates.append(start.copy())
                 if p1 >= 0:
                     start.x += xs
                     if not overlap:
                         if self.coordinates[-1].x != start.x:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p1 -= 2 * dy
                 if p2 >= 0:
                     start.z += zs
                     if not overlap:
                         if self.coordinates[-1].z != start.z:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p2 -= 2 * dy
                 p1 += 2 * dx
                 p2 += 2 * dz
@@ -94,18 +94,18 @@ class Segment3D:
             p2 = 2 * dx - dz
             while start.z != end.z:
                 start.z += zs
-                self.coordinates.append(start)
+                self.coordinates.append(start.copy())
                 if p1 >= 0:
                     start.y += ys
                     if not overlap:
                         if self.coordinates[-1].y != start.y:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p1 -= 2 * dz
                 if p2 >= 0:
                     start.x += xs
                     if not overlap:
                         if self.coordinates[-1].x != start.x:
-                            self.coordinates.append(start)
+                            self.coordinates.append(start.copy())
                     p2 -= 2 * dz
                 p1 += 2 * dy
                 p2 += 2 * dx

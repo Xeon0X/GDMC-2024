@@ -8,6 +8,7 @@ class Point3D:
         self.x = x
         self.y = y
         self.z = z
+        self.coordinate = (x, y, z)
 
     def copy(self):
         return Point3D(self.x, self.y, self.z)

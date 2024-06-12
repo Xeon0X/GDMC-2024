@@ -266,12 +266,46 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # # polyline._alpha_assign(1, polyline.length_polyline-1)
 # print(polyline.alpha_radii)
 
-p = Polyline((Point2D(0, 0), Point2D(8, 0), Point2D(
-    8, 8), Point2D(16, 16)))
+# p = Polyline((Point2D(0, 0), Point2D(8, 0), Point2D(
+#     16, 8), Point2D(24, 0)))
 
+# p = Polyline((Point2D(-1420, 867), Point2D(-1362, 738),
+#              Point2D(-1157, 717), Point2D(-1099, 843)))
+
+# p = Polyline((Point2D(-1183, 528), Point2D(-1138, 481),
+#              Point2D(-1188, 451), Point2D(-1152, 416)))
+
+p = Polyline((Point2D(-1225, 468), Point2D(-1138, 481),
+             Point2D(-1188, 451), Point2D(-1152, 416)))
+
+# Point2D(-1156, 378), Point2D(-1220, 359), Point2D(-1265, 290)
 # print(p.alpha_radii)
 
-print(p.get_radius())
+radius = p.get_radii()
+center = p.get_centers()
+
+print(radius)
+print(center)
+print(p.lengths)
+
+y = 280
+
+for i in range(len(p.coordinates)-1):
+    if p.coordinates[i] != None:
+        s = Segment3D(Point3D(p.coordinates[i].x, y, p.coordinates[i].y), Point3D(
+            p.coordinates[i+1].x, y, p.coordinates[i+1].y))
+        for j in range(len(s.coordinates)-1):
+            editor.placeBlock(
+                s.coordinates[j].coordinate, Block("cyan_concrete"))
+
+
+for i in range(len(center)):
+    if center[i]:
+        circle = Circle(center[i], radius[i], radius[i])
+        for j in range(len(circle.coordinates)-1):
+            editor.placeBlock(
+                (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+
 
 # s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
 # print(s)
