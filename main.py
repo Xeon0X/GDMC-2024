@@ -1,3 +1,6 @@
+
+from PIL import Image, ImageDraw
+import matplotlib.pyplot as plt
 from networks.geometry.Point3D import Point3D
 from networks.geometry.Segment3D import Segment3D
 from networks.geometry.Segment2D import Segment2D
@@ -20,6 +23,11 @@ from networks.geometry.Enums import ROTATION
 from networks.roads.intersections import Intersection as Intersection
 
 from networks.geometry.point_tools import curved_corner_by_curvature, curved_corner_by_distance
+
+
+import matplotlib
+matplotlib.use('Agg')
+
 
 editor = Editor(buffering=True)
 
@@ -278,8 +286,8 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # p = Polyline((Point2D(-1225, 468), Point2D(-1138, 481),
 #              Point2D(-1188, 451), Point2D(-1176, 409), Point2D(-1179, 399)))
 
-p = Polyline((Point2D(-1206, 414), Point2D(-1176, 409),
-             Point2D(-1188, 451), Point2D(-1138, 481), Point2D(-1225, 500)))
+p = Polyline((Point2D(32, 0), Point2D(16, 16),
+             Point2D(16, 0), Point2D(0, 0)))
 
 # Point2D(-1156, 378), Point2D(-1220, 359), Point2D(-1265, 290)
 # print(p.alpha_radii)
@@ -293,14 +301,11 @@ print(p.lengths)
 
 y = 160
 
-for i in range(len(p.coordinates)-1):
-    if p.coordinates[i] != None:
-        s = Segment3D(Point3D(p.coordinates[i].x, y, p.coordinates[i].y), Point3D(
-            p.coordinates[i+1].x, y, p.coordinates[i+1].y))
-        for j in range(len(s.coordinates)-1):
-            editor.placeBlock(
-                s.coordinates[j].coordinate, Block("cyan_concrete"))
 
+width, height = 100, 100
+image = Image.new('RGB', (width, height), 'white')
+
+draw = ImageDraw.Draw(image)
 
 for i in range(len(center)):
     if center[i]:
@@ -308,7 +313,21 @@ for i in range(len(center)):
         for j in range(len(circle.coordinates)-1):
             editor.placeBlock(
                 (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+            draw.point((circle.coordinates[j].x+25,
+                        50-circle.coordinates[j].y), fill='black')
 
+for i in range(len(p.coordinates)-1):
+    if p.coordinates[i] != None:
+        s = Segment3D(Point3D(p.coordinates[i].x, y, p.coordinates[i].y), Point3D(
+            p.coordinates[i+1].x, y, p.coordinates[i+1].y))
+        for j in range(len(s.coordinates)-1):
+            editor.placeBlock(
+                s.coordinates[j].coordinate, Block("cyan_concrete"))
+            draw.point((s.coordinates[j].x+25,
+                        50-s.coordinates[j].z), fill='red')
+
+
+image.save('output_image.png')
 
 # s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
 # print(s)
