@@ -45,6 +45,8 @@ class Polyline:
 
     def get_radii(self):
         for i in range(1, self.length_polyline-1):
+            print(self.alpha_radii[i] * self.tangente[i],
+                  self.alpha_radii[i], self.tangente[i])
             self.radii[i] = round(self.alpha_radii[i] * self.tangente[i])
         return self.radii
 
@@ -79,6 +81,7 @@ class Polyline:
 
         for i in range(start_index + 1, end_index - 1):  # Radii for internal segments
             alpha_a, alpha_b, current_radius = self._radius_balance(i)
+
             if current_radius < minimum_radius:
                 minimum_radius, minimum_index = current_radius, i
                 alpha_low, alpha_high = alpha_a, alpha_b
@@ -106,6 +109,7 @@ class Polyline:
         """
         Returns the radius that balances the radii on either end segement i.
         """
+
         alpha_a = min(self.lengths[i-1], (self.lengths[i]*self.tangente[i+1]) /
                       (self.tangente[i] + self.tangente[i+1]))
         alpha_b = min(self.lengths[i+1], self.lengths[i]-alpha_a)
