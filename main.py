@@ -286,8 +286,8 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # p = Polyline((Point2D(-1225, 468), Point2D(-1138, 481),
 #              Point2D(-1188, 451), Point2D(-1176, 409), Point2D(-1179, 399)))
 
-p = Polyline((Point2D(32, 0), Point2D(16, 16),
-             Point2D(16, 0), Point2D(0, 0)))
+p = Polyline((Point2D(64, -20), Point2D(48, 32),
+             Point2D(16, 0), Point2D(0, 0), Point2D(-10, -10)))
 
 # Point2D(-1156, 378), Point2D(-1220, 359), Point2D(-1265, 290)
 # print(p.alpha_radii)

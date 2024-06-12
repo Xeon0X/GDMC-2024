@@ -26,7 +26,7 @@ class Polyline:
             raise ValueError("The list must contain at least 4 elements.")
 
         self.vectors = [None] * self.length_polyline  # v
-        self.lengths = [None] * self.length_polyline  # l
+        self.lengths = [None] * (self.length_polyline - 1)  # l
         self.unit_vectors = [None] * self.length_polyline  # n
         self.tangente = [0] * self.length_polyline  # f
 
@@ -45,7 +45,7 @@ class Polyline:
 
     def get_radii(self):
         for i in range(1, self.length_polyline-1):
-            print(self.alpha_radii[i] * self.tangente[i],
+            print("\nalpha_radii, tan", self.alpha_radii[i] * self.tangente[i],
                   self.alpha_radii[i], self.tangente[i])
             self.radii[i] = round(self.alpha_radii[i] * self.tangente[i])
         return self.radii
@@ -53,10 +53,11 @@ class Polyline:
     def get_centers(self):
         for i in range(1, self.length_polyline-1):
             bisector = (self.unit_vectors[i] - self.unit_vectors[i-1]) / (
-                np.linalg.norm(self.unit_vectors[i] + self.unit_vectors[i-1]))
+                np.linalg.norm(self.unit_vectors[i] - self.unit_vectors[i-1]))
+            print("bi", bisector)
 
-            array = self.points[i] + sqrt(self.radii[i]
-                                          ** 2 + self.alpha_radii[i] ** 2) * bisector
+            array = self.points[i] + sqrt((self.radii[i]
+                                          ** 2) + (self.alpha_radii[i] ** 2)) * bisector
             self.centers[i] = Point2D(array[0], array[1]).round()
         return self.centers
 
@@ -124,7 +125,7 @@ class Polyline:
 
         # Between two segments, there is only one angle
         for k in range(1, self.length_polyline-1):
-            dot = np.dot(self.unit_vectors[k], -self.unit_vectors[k-1])
+            dot = np.dot(self.unit_vectors[k], self.unit_vectors[k-1])
             self.tangente[k] = sqrt((1+dot)/(1-dot))
 
     def _compute_alpha_radii(self):
