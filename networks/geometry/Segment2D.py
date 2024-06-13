@@ -1,5 +1,5 @@
 from typing import List
-from networks.geometry.Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
+from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
 from networks.geometry.Point2D import Point2D
 from math import sqrt
 

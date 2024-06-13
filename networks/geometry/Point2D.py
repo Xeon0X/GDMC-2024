@@ -1,7 +1,7 @@
 import numpy as np
 from typing import List
 from math import atan2, sqrt
-from networks.geometry.Enums import ROTATION
+from Enums import ROTATION
 
 
 class Point2D:
