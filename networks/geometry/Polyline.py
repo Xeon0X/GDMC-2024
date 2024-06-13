@@ -18,8 +18,7 @@ class Polyline:
 
         >>> Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20)))
         """
-        self.coordinates = points
-        self.points = Point2D.to_vectors(points)
+        self.points = Point2D.to_vectors(self._remove_collinear_points(points))
         self.length_polyline = len(points)
 
         if self.length_polyline < 4:
@@ -34,11 +33,14 @@ class Polyline:
 
         self.radii = [None] * self.length_polyline  # r
         self.centers = [None] * self.length_polyline  # c
+        self.connections = [None] * self.length_polyline
 
         self._compute_requirements()
         self._compute_alpha_radii()
 
         self._alpha_assign(0, self.length_polyline-1)
+
+        self.output_points = points
 
     def __repr__(self):
         return str(self.alpha_radii)
@@ -51,6 +53,9 @@ class Polyline:
         return self.radii
 
     def get_centers(self):
+        if self.radii == [None] * self.length_polyline:
+            raise ValueError("No radii found. Run get_radii before.")
+
         for i in range(1, self.length_polyline-1):
             bisector = (self.unit_vectors[i] - self.unit_vectors[i-1]) / (
                 np.linalg.norm(self.unit_vectors[i] - self.unit_vectors[i-1]))
@@ -60,6 +65,15 @@ class Polyline:
                                           ** 2) + (self.alpha_radii[i] ** 2)) * bisector
             self.centers[i] = Point2D(array[0], array[1]).round()
         return self.centers
+
+    def get_arcs(self):
+        for i in range(1, self.length_polyline-1):
+            point_1 = self.points[i] - \
+                self.alpha_radii[i] * self.unit_vectors[i-1]
+            point_2 = self.points[i] + \
+                self.alpha_radii[i] * self.unit_vectors[i]
+            self.connections[i] = (point_1, point_2)
+        return self.connections
 
     def _alpha_assign(self, start_index: int, end_index: int):
         """
@@ -131,3 +145,15 @@ class Polyline:
     def _compute_alpha_radii(self):
         self.alpha_radii[0] = 0
         self.alpha_radii[self.length_polyline-1] = 0
+
+    @staticmethod
+    def _remove_collinear_points(points):
+        output_points = [points[0]]
+
+        for i in range(1, len(points) - 1):
+            if not Point2D.collinear(
+                    points[i-1], points[i], points[i+1]):
+                output_points.append(points[i])
+
+        output_points.append(points[-1])
+        return output_points

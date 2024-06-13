@@ -8,7 +8,7 @@ class Point3D:
         self.x = x
         self.y = y
         self.z = z
-        self.coordinate = (x, y, z)
+        self.coordinates = (x, y, z)
 
     def copy(self):
         return Point3D(self.x, self.y, self.z)
@@ -29,7 +29,7 @@ class Point3D:
         Returns:
             Point3D: The nearest point, and if multiple, the first in the list.
 
-        >>> print(Point3D(0, 0, 0).nearest((Point3D(-10, 10, 5), Point3D(10, 10, 1))))
+        >>> Point3D(0, 0, 0).nearest((Point3D(-10, 10, 5), Point3D(10, 10, 1)))
         Point3D(x: 10, y: 10, z: 1)
         """
         return min(points, key=lambda point: self.distance(point))
@@ -64,7 +64,7 @@ class Point3D:
         self.x = round(self.x, ndigits)
         self.y = round(self.y, ndigits)
         self.z = round(self.z, ndigits)
-        self.coordinate = (self.x, self.y, self.z)
+        self.coordinates = (self.x, self.y, self.z)
         return self
 
     def distance(self, point: "Point3D"):
@@ -74,7 +74,7 @@ class Point3D:
     def to_vectors(points: List["Point3D"]):
         vectors = []
         for point in points:
-            vectors.append(np.array(point.coordinate))
+            vectors.append(np.array(point.coordinates))
 
         if (len(vectors) == 1):
             return vectors[0]

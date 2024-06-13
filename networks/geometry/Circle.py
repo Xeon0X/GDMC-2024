@@ -8,14 +8,14 @@ class Circle:
         self.center = center
 
         self.radius = None
-        self.coordinates = []
+        self.points = []
 
         self.inner = None
         self.outer = None
-        self.coordinates_thick = []
+        self.points_thick = []
 
         self.spaced_radius = None
-        self.spaced_coordinates = []
+        self.spaced_points = []
 
     def __repr__(self):
         return f"Circle(center: {self.center}, radius: {self.radius}, spaced_radius: {self.spaced_radius}, inner: {self.inner}, outer: {self.outer})"
@@ -28,10 +28,10 @@ class Circle:
         y = 0
         error = 2-2*radius
         while (True):
-            self.coordinates.append(Point2D(center.x-x, center.y+y))
-            self.coordinates.append(Point2D(center.x-y, center.y-x))
-            self.coordinates.append(Point2D(center.x+x, center.y-y))
-            self.coordinates.append(Point2D(center.x+y, center.y+x))
+            self.points.append(Point2D(center.x-x, center.y+y))
+            self.points.append(Point2D(center.x-y, center.y-x))
+            self.points.append(Point2D(center.x+x, center.y-y))
+            self.points.append(Point2D(center.x+y, center.y+x))
             r = error
             if (r <= y):
                 y += 1
@@ -96,7 +96,7 @@ class Circle:
                 else:
                     xi -= 1
                     erri += 2 * (y - xi + 1)
-        return self.coordinates_thick
+        return self.points_thick
 
     def circle_spaced(self, number: int, radius: int) -> List[Point2D]:
         """Get evenly spaced coordinates of the circle.
@@ -113,25 +113,25 @@ class Circle:
         self.spaced_radius = radius
         center = self.center
 
-        self.spaced_coordinates = [
+        self.spaced_points = [
             Point2D(cos(2 * pi / number * i) * radius,
                     sin(2 * pi / number * i) * radius)
             for i in range(0, number + 1)
         ]
 
-        for i in range(len(self.spaced_coordinates)):
-            self.spaced_coordinates[i] = Point2D(
-                self.spaced_coordinates[i].x + center.x,
-                self.spaced_coordinates[i].y + center.y
+        for i in range(len(self.spaced_points)):
+            self.spaced_points[i] = Point2D(
+                self.spaced_points[i].x + center.x,
+                self.spaced_points[i].y + center.y
             ).round()
-        return self.spaced_coordinates
+        return self.spaced_points
 
     def _x_line(self, x1, x2, y):
         while x1 <= x2:
-            self.coordinates_thick.append(Point2D(x1, y))
+            self.points_thick.append(Point2D(x1, y))
             x1 += 1
 
     def _y_line(self, x, y1, y2):
         while y1 <= y2:
-            self.coordinates_thick.append(Point2D(x, y1))
+            self.points_thick.append(Point2D(x, y1))
             y1 += 1

@@ -1,6 +1,5 @@
 from math import sqrt, cos, pi, sin
 import numpy as np
-from networks.geometry.segment_tools import discrete_segment, middle_point, parallel
 
 
 def segments_intersection(line0, line1, full_line=True):

@@ -8,14 +8,14 @@ class Segment2D:
     def __init__(self, start: Point2D, end: Point2D):
         self.start = start
         self.end = end
-        self.coordinates = []
-        self.coordinates_thick = []
+        self.points = []
+        self.points_thick = []
         self.thickness = None
 
     def __repr__(self):
-        return str(self.coordinates)
+        return str(self.points)
 
-    def segment(self, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, is_computing_thickness: bool = False) -> List[Point2D]:
+    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: bool = False) -> List[Point2D]:
         """Modified Bresenham draw (line) with optional overlap.
 
         From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -24,12 +24,17 @@ class Segment2D:
             start (Point2D): Start point of the segment.
             end (Point2D): End point of the segment.
             overlap (LINE_OVERLAP): Overlap draws additional pixel when changing minor direction. For standard bresenham overlap, choose LINE_OVERLAP_NONE. Can also be LINE_OVERLAP_MAJOR or LINE_OVERLAP_MINOR.
+            _is_computing_thickness (bool, optionnal): Used by segment_thick. Don't touch.
 
         >>> Segment2D(Point2D(0, 0), Point2D(10, 15))
         """
 
-        start = self.start.copy()
-        end = self.end.copy()
+        if start == None or end == None:
+            start = self.start.copy()
+            end = self.end.copy()
+        else:
+            start = start.copy()
+            end = end.copy()
 
         # Direction
         delta_x = end.x - start.x
@@ -50,7 +55,7 @@ class Segment2D:
         delta_2x = 2*delta_x
         delta_2y = 2*delta_y
 
-        self._add_coordinates(start, is_computing_thickness)
+        self._add_points(start, _is_computing_thickness)
 
         if (delta_x > delta_y):
             error = delta_2y - delta_x
@@ -58,33 +63,33 @@ class Segment2D:
                 start.x += step_x
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self._add_coordinates(start, is_computing_thickness)
+                        self._add_points(start, _is_computing_thickness)
 
                     start.y += step_y
                     if (overlap == LINE_OVERLAP.MINOR):
-                        self._add_coordinates(
-                            Point2D(start.copy().x - step_x, start.copy().y), is_computing_thickness)
+                        self._add_points(
+                            Point2D(start.copy().x - step_x, start.copy().y), _is_computing_thickness)
                     error -= delta_2x
                 error += delta_2y
-                self._add_coordinates(start, is_computing_thickness)
+                self._add_points(start, _is_computing_thickness)
         else:
             error = delta_2x - delta_y
             while (start.y != end.y):
                 start.y += step_y
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self._add_coordinates(start, is_computing_thickness)
+                        self._add_points(start, _is_computing_thickness)
 
                     start.x += step_x
                     if (overlap == LINE_OVERLAP.MINOR):
-                        self._add_coordinates(
-                            Point2D(start.copy().x, start.copy().y - step_y), is_computing_thickness)
+                        self._add_points(
+                            Point2D(start.copy().x, start.copy().y - step_y), _is_computing_thickness)
                     error -= delta_2y
                 error += delta_2x
-                self._add_coordinates(start, is_computing_thickness)
+                self._add_points(start, _is_computing_thickness)
 
-        if not is_computing_thickness:
-            return self.coordinates
+        if not _is_computing_thickness:
+            return self.points
 
     def segment_thick(self, thickness: int, thickness_mode: LINE_THICKNESS_MODE) -> List[Point2D]:
         """Bresenham with thickness.
@@ -150,7 +155,7 @@ class Segment2D:
                 error += delta_2x
 
             self.segment(
-                start, end, LINE_OVERLAP.NONE, is_computing_thickness=True)
+                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=True)
 
             error = delta_2x - delta_x
             for i in range(thickness, 1, -1):
@@ -165,7 +170,7 @@ class Segment2D:
                 error += delta_2y
 
                 self.segment(
-                    start, end, overlap, is_computing_thickness=True)
+                    start, end, overlap=overlap, _is_computing_thickness=True)
 
         else:
             if swap:
@@ -186,7 +191,7 @@ class Segment2D:
                 error += delta_2x
 
             self.segment(
-                start, end, LINE_OVERLAP.NONE, is_computing_thickness=True)
+                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=True)
 
             error = delta_2x - delta_y
             for i in range(thickness, 1, -1):
@@ -201,9 +206,9 @@ class Segment2D:
                 error += delta_2x
 
                 self.segment(
-                    start, end, overlap, is_computing_thickness=True)
+                    start, end, overlap=overlap, _is_computing_thickness=True)
 
-        return self.coordinates
+        return self.points
 
     def perpendicular(self, distance: int) -> List[Point2D]:
         """Compute perpendicular points from both side of the segment placed at start level.
@@ -232,8 +237,8 @@ class Segment2D:
                 np.round((self.start.y + self.end.y) / 2.0).astype(int),
                 )
 
-    def _add_coordinates(self, coordinates, is_computing_thickness):
+    def _add_points(self, points, is_computing_thickness):
         if is_computing_thickness:
-            self.coordinates_thick.append(coordinates.copy())
+            self.points_thick.append(points.copy())
         else:
-            self.coordinates.append(coordinates.copy())
+            self.points.append(points.copy())

@@ -1,5 +1,5 @@
 
-from networks.geometry.Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
+from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE, ROTATION
 from PIL import Image, ImageDraw
 import matplotlib.pyplot as plt
 from networks.geometry.Point3D import Point3D
@@ -20,7 +20,6 @@ from buildings.Building import Building
 import random
 
 from networks.roads import Road as Road
-from networks.geometry.Enums import ROTATION
 from networks.roads.intersections import Intersection as Intersection
 
 from networks.geometry.point_tools import curved_corner_by_curvature, curved_corner_by_distance
@@ -319,27 +318,33 @@ image = Image.new('RGB', (width, height), 'white')
 
 draw = ImageDraw.Draw(image)
 
-for i in range(len(p.coordinates)-1):
-    if p.coordinates[i] != None:
-        s = Segment2D(Point2D(p.coordinates[i].x, p.coordinates[i].y), Point2D(
-            p.coordinates[i+1].x, p.coordinates[i+1].y))
+for i in range(len(p.output_points)-1):
+    print("iiii", i)
+    if p.output_points[i] != None:
+        s = Segment2D(Point2D(p.output_points[i].x, p.output_points[i].y), Point2D(
+            p.output_points[i+1].x, p.output_points[i+1].y))
         s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
-        print(s.coordinates)
-        for j in range(len(s.coordinates)-1):
+
+        for j in range(len(s.points_thick)-1):
+            print("j", j)
             # editor.placeBlock(
             #     s.coordinates[j].coordinate, Block("cyan_concrete"))
-            draw.point((s.coordinates[j].x+w,
-                        w-s.coordinates[j].y), fill='red')
+            draw.point((s.points_thick[j].x+w,
+                        w-s.points_thick[j].y), fill='red')
+            print(s.points_thick[j])
 
 
 for i in range(len(center)):
+    print("iiii", i)
     if center[i]:
-        circle = Circle(center[i], radius[i]-ww/2+1, radius[i]+ww/2+1)
-        for j in range(len(circle.coordinates)-1):
+        circle = Circle(center[i])
+        circle.circle_thick(radius[i]-ww/2+1, radius[i]+ww/2+1)
+        for j in range(len(circle.points_thick)-1):
             # editor.placeBlock(
             #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
-            draw.point((circle.coordinates[j].x+w,
-                        w-circle.coordinates[j].y), fill='black')
+            draw.point((circle.points_thick[j].x+w,
+                        w-circle.points_thick[j].y), fill='black')
+            print(circle.points_thick[j])
 
 
 image.save('output_image.png')

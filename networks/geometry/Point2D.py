@@ -8,7 +8,7 @@ class Point2D:
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
-        self.coordinate = (self.x, self.y)
+        self.coordinates = (self.x, self.y)
 
     def copy(self):
         return Point2D(self.x, self.y)
@@ -167,8 +167,8 @@ class Point2D:
         """
         if xy2 is None:
             xy2 = xy1.coordinate + np.array([1, 0])
-        v0 = np.array(xy1.coordinate) - np.array(self.coordinate)
-        v1 = np.array(xy2.coordinate) - np.array(self.coordinate)
+        v0 = np.array(xy1.coordinate) - np.array(self.coordinates)
+        v1 = np.array(xy2.coordinate) - np.array(self.coordinates)
 
         angle = atan2(np.linalg.det([v0, v1]), np.dot(v0, v1))
         return np.degrees(angle)
@@ -176,17 +176,24 @@ class Point2D:
     def round(self, ndigits: int = None) -> "Point2D":
         self.x = round(self.x, ndigits)
         self.y = round(self.y, ndigits)
-        self.coordinate = (self.x, self.y)
+        self.coordinates = (self.x, self.y)
         return self
 
     def distance(self, point: "Point2D") -> int:
         return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
 
     @staticmethod
+    def collinear(p0: "Point2D", p1: "Point2D", p2: "Point2D") -> bool:
+        # https://stackoverflow.com/questions/9608148/python-script-to-determine-if-x-y-coordinates-are-colinear-getting-some-e
+        x1, y1 = p1.x - p0.x, p1.y - p0.y
+        x2, y2 = p2.x - p0.x, p2.y - p0.y
+        return abs(x1 * y2 - x2 * y1) < 1e-12
+
+    @staticmethod
     def to_vectors(points: List["Point3D"]) -> List[np.array]:
         vectors = []
         for point in points:
-            vectors.append(np.array(point.coordinate))
+            vectors.append(np.array(point.coordinates))
 
         if (len(vectors) == 1):
             return vectors[0]
