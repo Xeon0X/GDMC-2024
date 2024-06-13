@@ -47,8 +47,6 @@ class Polyline:
 
     def get_radii(self):
         for i in range(1, self.length_polyline-1):
-            print("\nalpha_radii, tan", self.alpha_radii[i] * self.tangente[i],
-                  self.alpha_radii[i], self.tangente[i])
             self.radii[i] = round(self.alpha_radii[i] * self.tangente[i])
         return self.radii
 
@@ -59,7 +57,6 @@ class Polyline:
         for i in range(1, self.length_polyline-1):
             bisector = (self.unit_vectors[i] - self.unit_vectors[i-1]) / (
                 np.linalg.norm(self.unit_vectors[i] - self.unit_vectors[i-1]))
-            print("bi", bisector)
 
             array = self.points[i] + sqrt((self.radii[i]
                                           ** 2) + (self.alpha_radii[i] ** 2)) * bisector

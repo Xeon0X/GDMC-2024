@@ -305,9 +305,6 @@ p = Polyline(random_points)
 
 radius = p.get_radii()
 center = p.get_centers()
-print(radius)
-print(center)
-print(p.lengths)
 
 y = 200
 
@@ -319,23 +316,19 @@ image = Image.new('RGB', (width, height), 'white')
 draw = ImageDraw.Draw(image)
 
 for i in range(len(p.output_points)-1):
-    print("iiii", i)
     if p.output_points[i] != None:
         s = Segment2D(Point2D(p.output_points[i].x, p.output_points[i].y), Point2D(
             p.output_points[i+1].x, p.output_points[i+1].y))
         s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
 
         for j in range(len(s.points_thick)-1):
-            print("j", j)
             # editor.placeBlock(
             #     s.coordinates[j].coordinate, Block("cyan_concrete"))
             draw.point((s.points_thick[j].x+w,
                         w-s.points_thick[j].y), fill='red')
-            print(s.points_thick[j])
 
 
 for i in range(len(center)):
-    print("iiii", i)
     if center[i]:
         circle = Circle(center[i])
         circle.circle_thick(radius[i]-ww/2+1, radius[i]+ww/2+1)
@@ -344,8 +337,6 @@ for i in range(len(center)):
             #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
             draw.point((circle.points_thick[j].x+w,
                         w-circle.points_thick[j].y), fill='black')
-            print(circle.points_thick[j])
-
 
 image.save('output_image.png')
 
