@@ -18,8 +18,9 @@ class Polyline:
 
         >>> Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20)))
         """
-        self.points = Point2D.to_vectors(self._remove_collinear_points(points))
-        self.length_polyline = len(points)
+        self.points_array = Point2D.to_vectors(
+            self._remove_collinear_points(points))
+        self.length_polyline = len(self.points_array)
 
         if self.length_polyline < 4:
             raise ValueError("The list must contain at least 4 elements.")
@@ -29,11 +30,12 @@ class Polyline:
         self.unit_vectors = [None] * self.length_polyline  # n
         self.tangente = [0] * self.length_polyline  # f
 
-        self.alpha_radii = [None] * self.length_polyline  # alpha
+        # alpha, maximum radius factor
+        self.alpha_radii = [None] * self.length_polyline
 
         self.radii = [None] * self.length_polyline  # r
         self.centers = [None] * self.length_polyline  # c
-        self.connections = [None] * self.length_polyline
+        self.acrs_intersections = [None] * self.length_polyline
 
         self._compute_requirements()
         self._compute_alpha_radii()
@@ -58,19 +60,20 @@ class Polyline:
             bisector = (self.unit_vectors[i] - self.unit_vectors[i-1]) / (
                 np.linalg.norm(self.unit_vectors[i] - self.unit_vectors[i-1]))
 
-            array = self.points[i] + sqrt((self.radii[i]
-                                          ** 2) + (self.alpha_radii[i] ** 2)) * bisector
+            array = self.points_array[i] + sqrt((self.radii[i]
+                                                 ** 2) + (self.alpha_radii[i] ** 2)) * bisector
             self.centers[i] = Point2D(array[0], array[1]).round()
         return self.centers
 
-    def get_arcs(self):
+    def get_arcs_intersections(self):
         for i in range(1, self.length_polyline-1):
-            point_1 = self.points[i] - \
+            point_1 = self.points_array[i] - \
                 self.alpha_radii[i] * self.unit_vectors[i-1]
-            point_2 = self.points[i] + \
+            point_2 = self.points_array[i] + \
                 self.alpha_radii[i] * self.unit_vectors[i]
-            self.connections[i] = (point_1, point_2)
-        return self.connections
+            self.acrs_intersections[i] = Point2D(
+                point_1[0], point_1[1]).round(), Point2D(self.points_array[i][0], self.points_array[i][1]), Point2D(point_2[0], point_2[1]).round()
+        return self.acrs_intersections
 
     def _alpha_assign(self, start_index: int, end_index: int):
         """
@@ -109,9 +112,8 @@ class Polyline:
             alpha_low, alpha_high = alpha_a, self.alpha_radii[end_index]
 
         # Assign alphas at ends of selected segment
-        self.alpha_radii[minimum_index] = alpha_low/1.5
-        self.alpha_radii[minimum_index+1] = alpha_high/1.5
-
+        self.alpha_radii[minimum_index] = alpha_low
+        self.alpha_radii[minimum_index+1] = alpha_high
         # Recur on lower segments
         self._alpha_assign(start_index, minimum_index)
         # Recur on higher segments
@@ -130,7 +132,7 @@ class Polyline:
     def _compute_requirements(self):
         # Between two points, there is only one segment
         for j in range(self.length_polyline-1):
-            self.vectors[j] = self.points[j+1] - self.points[j]
+            self.vectors[j] = self.points_array[j+1] - self.points_array[j]
             self.lengths[j] = np.linalg.norm(self.vectors[j])
             self.unit_vectors[j] = self.vectors[j]/self.lengths[j]
 

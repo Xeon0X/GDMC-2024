@@ -286,9 +286,9 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # p = Polyline((Point2D(-1225, 468), Point2D(-1138, 481),
 #              Point2D(-1188, 451), Point2D(-1176, 409), Point2D(-1179, 399)))
 
-w = 250
+w = 200
 
-n_points = 5
+n_points = 20
 min_val, max_val = -w, w
 
 random_points = [Point2D(random.randint(min_val, max_val), random.randint(
@@ -297,6 +297,8 @@ random_points = [Point2D(random.randint(min_val, max_val), random.randint(
 
 # random_points = (Point2D(-75, -75), Point2D(0, -75), Point2D(75, 75),
 #                  Point2D(75, -50), Point2D(-50, 50), Point2D(0, 0))
+
+random_points = random_points[0].optimized_path(random_points)
 
 p = Polyline(random_points)
 
@@ -307,13 +309,14 @@ radius = p.get_radii()
 center = p.get_centers()
 
 y = 200
-
-ww = 40
+ww = 15
 
 width, height = 2*w, 2*w
-image = Image.new('RGB', (width, height), 'white')
+image = Image.new('RGB', (width, height), 'black')
 
 draw = ImageDraw.Draw(image)
+
+print(p.output_points)
 
 for i in range(len(p.output_points)-1):
     if p.output_points[i] != None:
@@ -325,18 +328,59 @@ for i in range(len(p.output_points)-1):
             # editor.placeBlock(
             #     s.coordinates[j].coordinate, Block("cyan_concrete"))
             draw.point((s.points_thick[j].x+w,
-                        w-s.points_thick[j].y), fill='red')
+                        w-s.points_thick[j].y), fill='grey')
+
+
+for i in range(2, len(p.get_arcs_intersections())-2):
+
+    s = Segment2D(Point2D(p.acrs_intersections[i][0].x, p.acrs_intersections[i][0].y), Point2D(
+        p.acrs_intersections[i-1][-1].x, p.acrs_intersections[i-1][-1].y))
+    s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
+
+    for j in range(len(s.points_thick)-1):
+        # editor.placeBlock(
+        #     s.coordinates[j].coordinate, Block("cyan_concrete"))
+        draw.point((s.points_thick[j].x+w,
+                    w-s.points_thick[j].y), fill='white')
+    draw.point((p.acrs_intersections[i][0].x+w,
+                w-p.acrs_intersections[i][0].y), fill='blue')
+    draw.point((p.acrs_intersections[i][-1].x+w,
+                w-p.acrs_intersections[i][-1].y), fill='red')
 
 
 for i in range(len(center)):
     if center[i]:
         circle = Circle(center[i])
-        circle.circle_thick(radius[i]-ww/2+1, radius[i]+ww/2+1)
+        circle.circle_thick(round(radius[i]-ww/2), round(radius[i]+ww/2))
         for j in range(len(circle.points_thick)-1):
-            # editor.placeBlock(
-            #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
-            draw.point((circle.points_thick[j].x+w,
-                        w-circle.points_thick[j].y), fill='black')
+            if circle.points_thick[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
+                # editor.placeBlock(
+                #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+                draw.point((circle.points_thick[j].x+w,
+                            w-circle.points_thick[j].y), fill='white')
+        circle.circle(radius[i])
+        for j in range(len(circle.points)-1):
+            if circle.points[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
+                # editor.placeBlock(
+                #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+                draw.point((circle.points[j].x+w,
+                            w-circle.points[j].y), fill='purple')
+
+s1 = Segment2D(Point2D(p.acrs_intersections[1][0].x, p.acrs_intersections[1][0].y), Point2D(
+    p.output_points[0].x, p.output_points[0].y))
+s1.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
+
+for j in range(len(s1.points_thick)-1):
+    draw.point((s1.points_thick[j].x+w,
+                w-s1.points_thick[j].y), fill='white')
+
+s1 = Segment2D(Point2D(p.acrs_intersections[-2][2].x, p.acrs_intersections[-2][2].y), Point2D(
+    p.output_points[-1].x, p.output_points[-1].y))
+s1.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
+
+for j in range(len(s1.points_thick)-1):
+    draw.point((s1.points_thick[j].x+w,
+                w-s1.points_thick[j].y), fill='white')
 
 image.save('output_image.png')
 

@@ -20,7 +20,7 @@ class Circle:
     def __repr__(self):
         return f"Circle(center: {self.center}, radius: {self.radius}, spaced_radius: {self.spaced_radius}, inner: {self.inner}, outer: {self.outer})"
 
-    def cirlce(self, radius: int) -> List[Point2D]:
+    def circle(self, radius: int) -> List[Point2D]:
         self.radius = radius
         center = self.center.copy()
 
