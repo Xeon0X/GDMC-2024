@@ -76,3 +76,5 @@ buildings:
     size:
       min_height: 5
       max_height: 9
+    door:
+      

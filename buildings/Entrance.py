@@ -29,12 +29,17 @@ class Entrance:
             oriented_vertices.sort(key = lambda v: v.point1.x if self.direction.value % 2 == 0 else v.point1.z) # if direction is north or south, sort by x, else sort by z
             mid = len(oriented_vertices) // 2
             ver1, ver2 = oriented_vertices[mid], oriented_vertices[-mid-1]
-            if ver1.point1.position == ver2.point1.position:
+            
+            if ver1.point1.x != ver2.point1.x and ver1.point1.z != ver2.point1.z:
+                door_vertice = rd.choice(ver1, ver2)
+                facade_vertices.remove(door_vertice)
+            elif ver1.point1.position == ver2.point1.position:
                 door_vertice = ver1
+                facade_vertices.remove(door_vertice)
             else : 
                 door_vertice =  Vertice(ver2.point1, ver1.point2)
+                facade_vertices.remove(ver1)
                 facade_vertices.remove(ver2)
-            facade_vertices.remove(ver1)
             
         else: 
             door_vertice = rd.choice(oriented_vertices)
@@ -44,12 +49,23 @@ class Entrance:
         return(door_vertice, facade)
         
     def get_oriented_vertices(self) -> list[Vertice]:
-        # get the most off-centered vertices that are in the same direction as self.direction
-        same_direction_vertices = sorted([v for v in self.vertices if v.facing == self.direction],
-                                         key = lambda v: v.point1.z if self.direction.value % 2 == 0 else v.point1.x, # if direction is north or south, sort by x, else sort by z
-                                         reverse = self.direction == DIRECTION.NORTH or self.direction == DIRECTION.WEST) # if direction is north or west, sort in reverse
-        extremum = same_direction_vertices[0]
-        return [v for v in same_direction_vertices if 
-                (v.point1.x == extremum.point1.x and self.direction.value % 2 == 0) or 
-                (v.point1.z == extremum.point1.z and self.direction.value % 2 == 1)]
+        # Get all the vertice that can contain the door
+        
+        # if direction is north or south, compare by x, else compare by z
+        compare  = lambda v: (v.point1.x,v.point1.z) if self.direction.value % 2 == 0 else (v.point1.z,v.point1.x) 
+        # if direction is north or west, the most off_centered is the maximum, else it is the minimum
+        off_centered = lambda p1,p2: max(p1,p2) if self.direction == DIRECTION.NORTH or self.direction == DIRECTION.WEST else min(p1,p2) 
+        
+        oriented_vertices = []
+        for v in self.vertices:
+            if v.facing != self.direction: continue
+            oriented_vertices.append(v)
+            sortby,position = compare(v)
+            for ov in oriented_vertices:
+                ov_sorted, ov_position = compare(ov)
+                if position == ov_position:
+                    if off_centered(sortby,ov_sorted) == sortby: oriented_vertices.remove(ov)
+                    else: oriented_vertices.remove(v)
+                    
+        return oriented_vertices
         
