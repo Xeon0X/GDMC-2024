@@ -1,13 +1,16 @@
 Encadrement fenêtre
 toit de balcon avec/sans pilliers
-border radius balcon
 collumn style
 rembard object
 détails facade
 rdc
-toit
+toit (clim, chateau deau, pubs)
 tiles 3d
 textures object
 opti textures
 opti géométrique
 opti gdpc
+pilliers quand trop de fenêtres + pas de pilliers si tile trop petite
+limitateur taille
+facade lisses/ immeubles collés
+matrices pré-distribués

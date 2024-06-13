@@ -61,16 +61,16 @@ class Tile:
     
     def get_vertice(self,vertice : int|DIRECTION) -> Vertice:
         # gives the corresponding vertice : 
-        # 0 = north, 1 = west, 2 = south, 3 = east
+        # 0 = north, 1 = east, 2 = south, 3 = west
         match(vertice):
             case 0 :
                 return Vertice(self.north_west, self.north_east, DIRECTION.NORTH)
             case 1 :
-                return Vertice(self.north_west, self.south_west, DIRECTION.WEST)
+                return Vertice(self.north_east, self.south_east, DIRECTION.EAST)
             case 2 :
                 return Vertice(self.south_west, self.south_east, DIRECTION.SOUTH)
             case 3 :
-                return Vertice(self.north_east, self.south_east, DIRECTION.EAST)
+                return Vertice(self.north_west, self.south_west, DIRECTION.WEST)
             case DIRECTION.WEST :
                 return self.west_vertice
             case DIRECTION.EAST :
