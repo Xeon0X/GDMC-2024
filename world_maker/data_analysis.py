@@ -130,18 +130,17 @@ def filter_smooth(image: Union[str, Image], radius: int = 3):
     return Image.fromarray(bool_array)
 
 
-def remove_water_from_map(image: Union[str, Image]) -> Image:
+def subtract_map(image: Union[str, Image], substractImage: Union[str, Image]) -> Image:
     image = handle_import_image(image)
-    watermap = Image.open('./data/watermap.png').convert('L')
+    substractImage = handle_import_image(substractImage).convert('L')
 
     array_heightmap = np.array(image)
-    array_watermap = np.array(watermap)
+    array_substractImage = np.array(substractImage)
 
-    mask = array_watermap == 255
+    mask = array_substractImage == 255
     array_heightmap[mask] = 0
 
-    result_image = Image.fromarray(array_heightmap)
-    return result_image
+    return Image.fromarray(array_heightmap)
 
 
 def group_map(image1: Union[str, Image], image2: Union[str, Image]) -> Image:
@@ -164,21 +163,32 @@ def filter_smooth_array(array: np.ndarray, radius: int = 3) -> np.ndarray:
     return array
 
 
+def filter_remove_details(image: Union[str, Image], n: int = 20) -> Image:
+    image = handle_import_image(image)
+    array = np.array(image)
+    for _ in range(n):
+        array = ndimage.binary_dilation(array, iterations=4)
+        array = ndimage.binary_erosion(array, iterations=5)
+        array = filter_smooth_array(array, 2)
+        array = ndimage.binary_erosion(array, iterations=3)
+    image = Image.fromarray(array)
+    return image
+
+
 def highway_map() -> Image:
     smooth_sobel = filter_smooth("./data/sobelmap.png", 1)
-    inverse_sobel = filter_negative(smooth_sobel)
-    sobel_no_water = remove_water_from_map(inverse_sobel)
-    sobel_no_water.save("./data/negative_sobel_water_map.png")
-    array = np.array(sobel_no_water)
-    array = ndimage.binary_erosion(array, iterations=10)
-    array = ndimage.binary_dilation(array, iterations=5)
-    array = filter_smooth_array(array, 5)
-    array = ndimage.binary_erosion(array, iterations=17)
-    array = filter_smooth_array(array, 6)
-    array = ndimage.binary_dilation(array, iterations=3)
-    image = Image.fromarray(array)
-    image.save('./data/highwaymap.png')
-    return image
+    negative_smooth_sobel = filter_negative(smooth_sobel)
+    negative_smooth_sobel_water = subtract_map(negative_smooth_sobel, './data/watermap.png')
+    array_sobel_water = np.array(negative_smooth_sobel_water)
+    array_sobel_water = ndimage.binary_erosion(array_sobel_water, iterations=12)
+    array_sobel_water = ndimage.binary_dilation(array_sobel_water, iterations=5)
+    array_sobel_water = filter_smooth_array(array_sobel_water, 5)
+    array_sobel_water = ndimage.binary_erosion(array_sobel_water, iterations=20)
+    array_sobel_water = filter_smooth_array(array_sobel_water, 6)
+    image = Image.fromarray(array_sobel_water)
+    image_no_details = filter_remove_details(image, 15)
+    image_no_details.save('./data/highwaymap.png')
+    return image_no_details
 
 
 def create_volume(surface: np.ndarray, heightmap: np.ndarray, make_it_flat: bool = False) -> np.ndarray:
