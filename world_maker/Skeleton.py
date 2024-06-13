@@ -18,6 +18,7 @@ class Skeleton:
             self.set_skeleton(data)
 
     def set_skeleton(self, data: np.ndarray):
+        print("[Skeleton] Start skeletonization...")
         binary_skeleton = skeletonize(data, method="lee")
 
         graph, coordinates = skeleton_to_csgraph(binary_skeleton)
@@ -33,6 +34,7 @@ class Skeleton:
         for i in range(len(coordinates[0])):
             # print((coordinates[0][i], coordinates[1][i], coordinates[2][i]))
             self.coordinates.append((coordinates[0][i], coordinates[1][i], coordinates[2][i]))
+        print("[Skeleton] Skeletonization completed.")
 
     def find_next_elements(self, key: str) -> list:
         """Find the very nearest elements"""
@@ -85,6 +87,7 @@ class Skeleton:
             return line
 
     def parse_graph(self, parse_orphan: bool = False):
+        print("[Skeleton] Start parsing the graph", ("with orphans" if parse_orphan else "") + "...")
         for key, value in sorted(
                 Counter(self.graph.row).items(), key=lambda kv: kv[1], reverse=True
         ):
@@ -136,6 +139,7 @@ class Skeleton:
 
                 if not already_inside:
                     self.lines.append(line)
+        print("[Skeleton] Graph parsing completed.")
 
     def map(self) -> Image:
         """
@@ -145,6 +149,7 @@ class Skeleton:
         Returns:
             image: 2D path of the skeleton on top of the heightmap.
         """
+        print("[Skeleton] Start mapping the skeleton...")
         # editor = Editor()
 
         # buildArea = editor.getBuildArea()
@@ -206,5 +211,5 @@ class Skeleton:
         #             (int(self.intersections[i][2]), int(self.intersections[i][0])),
         #             (255, 0, 255),
         #         )
-
+        print("[Skeleton] Mapping completed.")
         return heightmap  # , roadsArea

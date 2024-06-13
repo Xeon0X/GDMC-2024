@@ -93,14 +93,12 @@ class City:
         """
         Loop the expansion of all districts in the city until all districts are fully expanded.
         """
-        loop_count = 0
+        print("[City] Start expanding districts...")
         while not self.is_expend_finished():
             self.update_expend_district()
-            loop_count += 1
-            if loop_count % 100 == 0:
-                print("[City] Loop count: ", loop_count)
+        print("[City] Finished expanding districts.")
 
-    def custom_district_draw_map(self):
+    def district_draw_map(self):
         """
         Draw the map of the city with different colors for each district.
         """
@@ -116,12 +114,13 @@ class City:
                 else:
                     img.putpixel((x, y), colors[self.map_data[y][x]])
 
-        img.save('./data/custom_district.png')
+        img.save('./data/district.png')
+        print("[City] District map created.")
 
 
 if __name__ == '__main__':
     city = City()
     for i in range(10):
-        city.add_district(Position(random.randint(0, 400), random.randint(0, 400)))
+        city.add_district(Position(random.randint(0, 800), random.randint(0, 800)))
     city.loop_expend_district()
-    city.custom_district_draw_map()
+    city.district_draw_map()

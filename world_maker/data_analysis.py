@@ -7,10 +7,12 @@ from typing import Union
 
 
 def get_data(world: World):
+    print("[Data Analysis] Generating data...")
     heightmap, watermap, treemap = world.getData()
     heightmap.save('./data/heightmap.png')
     watermap.save('./data/watermap.png')
     treemap.save('./data/treemap.png')
+    print("[Data Analysis] Data generated.")
     return heightmap, watermap, treemap
 
 
@@ -176,6 +178,7 @@ def filter_remove_details(image: Union[str, Image], n: int = 20) -> Image:
 
 
 def highway_map() -> Image:
+    print("[Data Analysis] Generating highway map...")
     smooth_sobel = filter_smooth("./data/sobelmap.png", 1)
     negative_smooth_sobel = filter_negative(smooth_sobel)
     negative_smooth_sobel_water = subtract_map(negative_smooth_sobel, './data/watermap.png')
@@ -188,6 +191,7 @@ def highway_map() -> Image:
     image = Image.fromarray(array_sobel_water)
     image_no_details = filter_remove_details(image, 15)
     image_no_details.save('./data/highwaymap.png')
+    print("[Data Analysis] Highway map generated.")
     return image_no_details
 
 
@@ -211,8 +215,8 @@ def convert_2D_to_3D(image: Union[str, Image], make_it_flat: bool = False) -> np
     return volume
 
 
-def skeleton_highway_map(map: Union[str, Image]):
-    image_array = convert_2D_to_3D(map, True)
+def skeleton_highway_map(image: Union[str, Image] = './data/highwaymap.png'):
+    image_array = convert_2D_to_3D(image, True)
     skeleton = Skeleton(image_array)
     skeleton.parse_graph(True)
     heightmap_skeleton = skeleton.map()

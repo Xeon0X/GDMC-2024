@@ -111,7 +111,7 @@ class World:
         buildRect = buildArea.toRect()
 
         xzStart = buildRect.begin
-        print(xzStart, "xzStart")
+        print("[World]", '('+str(xzStart[0])+', '+str(xzStart[1])+')',  "xzStart")
         xzDistance = (max(buildRect.end[0], buildRect.begin[0]) - min(buildRect.end[0], buildRect.begin[0]),
                       max(buildRect.end[1], buildRect.begin[1]) - min(buildRect.end[1], buildRect.begin[1]))
         watermap = Image.new("L", xzDistance, 0)
@@ -125,11 +125,8 @@ class World:
 
         for x in range(0, xzDistance[0]):
             for z in range(0, xzDistance[1]):
-
                 y = heightmapData[x][z] - 1
                 yTree = treesmapData[x][z] - 1
-
-                print('getData', xzStart[0] + x, y, xzStart[1] + z)
 
                 biome = slice.getBiome((x, y, z))
                 block = slice.getBlock((x, y, z))
@@ -149,7 +146,7 @@ class World:
                                 if (0 <= x + i < xzDistance[0]) and (0 <= z + j < xzDistance[1]):
                                     k = heightmapData[x + i][z + j] - 1
 
-                                    print('getData for tree', xzStart[0] + x + i, k, xzStart[1] + z + j)
+                                    # print('getData for tree', xzStart[0] + x + i, k, xzStart[1] + z + j)
 
                                     blockNeighbor = slice.getBlock((x + i, k, z + j))
                                     if blockNeighbor.id not in lookup.TREES:
@@ -157,7 +154,7 @@ class World:
                                         number += 1
                     if number != 0:
                         average = round(height / number)
-                        print(average, "average")
+                        # print(average, "average")
                         heightmap.putpixel((x, z), (average, average, average))
 
                 if (biome in waterBiomes) or (block.id in waterBlocks):
@@ -170,7 +167,6 @@ class World:
         return heightmap, watermap, treesmap
 
     def propagate(self, coordinates, scanned=[]):
-        print('propagate', coordinates)
         i = 0
         editor = Editor(buffering=True)
         if self.isInVolume(coordinates):
