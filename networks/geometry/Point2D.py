@@ -54,9 +54,6 @@ class Point2D:
         else:
             return (s_p <= 0) and (t_p <= 0) and (s_p + t_p) >= d
 
-    def distance(self, point: "Point2D") -> int:
-        return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
-
     def nearest(self, points: List["Point2D"]) -> "Point2D":
         """Return the nearest point. If multiple nearest point, returns the first in the list.
 
@@ -181,6 +178,9 @@ class Point2D:
         self.y = round(self.y, ndigits)
         self.coordinate = (self.x, self.y)
         return self
+
+    def distance(self, point: "Point2D") -> int:
+        return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
 
     @staticmethod
     def to_vectors(points: List["Point3D"]) -> List[np.array]:

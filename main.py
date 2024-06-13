@@ -323,7 +323,7 @@ for i in range(len(p.coordinates)-1):
     if p.coordinates[i] != None:
         s = Segment2D(Point2D(p.coordinates[i].x, p.coordinates[i].y), Point2D(
             p.coordinates[i+1].x, p.coordinates[i+1].y))
-        s.compute_thick_segment(ww, LINE_THICKNESS_MODE.MIDDLE)
+        s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
         print(s.coordinates)
         for j in range(len(s.coordinates)-1):
             # editor.placeBlock(

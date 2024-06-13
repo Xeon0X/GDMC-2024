@@ -4,33 +4,28 @@ from networks.geometry.Point3D import Point3D
 
 
 class Segment3D:
-    def __init__(self, start: Point3D, end: Point3D, overlap: bool = True):
+    def __init__(self, start: Point3D, end: Point3D):
         self.start = start
         self.end = end
         self.coordinates = []
-        self.overlap = overlap
-
-        self._compute_segment(self.start, self.end, self.overlap)
 
     def __repr__(self):
         return str(self.coordinates)
 
-    def _compute_segment(self, start: Point3D, end: Point3D, overlap: bool = False):
+    def discrete_coordinates(self, overlap: bool = False):
         """Calculate a segment between two points in 3D space. 3d Bresenham algorithm.
 
         From: https://www.geeksforgeeks.org/bresenhams-algorithm-for-3-d-line-drawing/
 
         Args:
-            start (Point3D): First coordinates.
-            end (Point3D): Second coordinates.
             overlap (bool, optional): If False, remove unnecessary coordinates connecting to other coordinates side by side, leaving only a diagonal connection. Defaults to False.
 
         >>> Segment3D(Point3D(0, 0, 0), Point3D(10, 10, 15))
         """
         self.coordinates.append(start.copy())
-        dx = abs(end.x - start.x)
-        dy = abs(end.y - start.y)
-        dz = abs(end.z - start.z)
+        dx = abs(self.end.x - self.start.x)
+        dy = abs(self.end.y - self.start.y)
+        dz = abs(self.end.z - self.start.z)
         if end.x > start.x:
             xs = 1
         else:
@@ -109,3 +104,10 @@ class Segment3D:
                     p2 -= 2 * dz
                 p1 += 2 * dy
                 p2 += 2 * dx
+        return self.coordinates
+
+    def middle_point(self):
+        return (np.round((self.start.x + self.end.x) / 2.0).astype(int),
+                np.round((self.start.y + self.end.y) / 2.0).astype(int),
+                np.round((self.start.z + self.end.z) / 2.0).astype(int),
+                )

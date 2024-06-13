@@ -13,14 +13,12 @@ class Point3D:
     def copy(self):
         return Point3D(self.x, self.y, self.z)
 
-    def coordinates(self):
-        return (self.x, self.y, self.z)
-
     def __repr__(self):
         return f"Point3D(x: {self.x}, y: {self.y}, z: {self.z})"
 
-    def distance(self, point: "Point3D"):
-        return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2 + (point.z - self.z) ** 2)
+    def __eq__(self, other):
+        if isinstance(other, Point3D):
+            return self.x == other.x and self.y == other.y and self.z == other.z
 
     def nearest(self, points: List["Point3D"]) -> "Point3D":
         """Return the nearest point. If multiple nearest point, returns the first in the list.
@@ -68,6 +66,9 @@ class Point3D:
         self.z = round(self.z, ndigits)
         self.coordinate = (self.x, self.y, self.z)
         return self
+
+    def distance(self, point: "Point3D"):
+        return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2 + (point.z - self.z) ** 2)
 
     @staticmethod
     def to_vectors(points: List["Point3D"]):

@@ -5,20 +5,20 @@ from math import sqrt
 
 
 class Segment2D:
-    def __init__(self, start: Point2D, end: Point2D, thickness_mode: LINE_THICKNESS_MODE = LINE_THICKNESS_MODE.MIDDLE):
+    def __init__(self, start: Point2D, end: Point2D):
         self.start = start
         self.end = end
         self.coordinates = []
+        self.coordinates_thick = []
         self.thickness = None
-        self.thickness_mode = thickness_mode
 
     def __repr__(self):
         return str(self.coordinates)
 
-    def compute_segment_overlap(self, start: Point2D, end: Point2D, overlap: LINE_OVERLAP):
+    def segment(self, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, is_computing_thickness: bool = False) -> List[Point2D]:
         """Modified Bresenham draw (line) with optional overlap.
 
-        From https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
+        From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
 
         Args:
             start (Point2D): Start point of the segment.
@@ -28,8 +28,8 @@ class Segment2D:
         >>> Segment2D(Point2D(0, 0), Point2D(10, 15))
         """
 
-        start = start.copy()
-        end = end.copy()
+        start = self.start.copy()
+        end = self.end.copy()
 
         # Direction
         delta_x = end.x - start.x
@@ -50,7 +50,7 @@ class Segment2D:
         delta_2x = 2*delta_x
         delta_2y = 2*delta_y
 
-        self.coordinates.append(start.copy())
+        self._add_coordinates(start, is_computing_thickness)
 
         if (delta_x > delta_y):
             error = delta_2y - delta_x
@@ -58,36 +58,39 @@ class Segment2D:
                 start.x += step_x
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self.coordinates.append(start.copy())
+                        self._add_coordinates(start, is_computing_thickness)
 
                     start.y += step_y
                     if (overlap == LINE_OVERLAP.MINOR):
-                        self.coordinates.append(
-                            Point2D(start.copy().x - step_x, start.copy().y))
+                        self._add_coordinates(
+                            Point2D(start.copy().x - step_x, start.copy().y), is_computing_thickness)
                     error -= delta_2x
                 error += delta_2y
-                self.coordinates.append(start.copy())
+                self._add_coordinates(start, is_computing_thickness)
         else:
             error = delta_2x - delta_y
             while (start.y != end.y):
                 start.y += step_y
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self.coordinates.append(start.copy())
+                        self._add_coordinates(start, is_computing_thickness)
 
                     start.x += step_x
                     if (overlap == LINE_OVERLAP.MINOR):
-                        self.coordinates.append(
-                            Point2D(start.copy().x, start.copy().y - step_y))
+                        self._add_coordinates(
+                            Point2D(start.copy().x, start.copy().y - step_y), is_computing_thickness)
                     error -= delta_2y
                 error += delta_2x
-                self.coordinates.append(start.copy())
+                self._add_coordinates(start, is_computing_thickness)
 
-    def compute_thick_segment(self, thickness: int, thickness_mode: LINE_THICKNESS_MODE):
+        if not is_computing_thickness:
+            return self.coordinates
+
+    def segment_thick(self, thickness: int, thickness_mode: LINE_THICKNESS_MODE) -> List[Point2D]:
         """Bresenham with thickness.
 
-        From https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
-        Probably inspired from Murphy's Modified Bresenham algorithm : http://zoo.co.uk/murphy/thickline/index.html
+        From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
+        Murphy's Modified Bresenham algorithm : http://zoo.co.uk/murphy/thickline/index.html
 
         Args:
             start (Point2D): Start point of the segment.
@@ -146,7 +149,8 @@ class Segment2D:
                     error -= delta_2x
                 error += delta_2x
 
-            self.compute_segment_overlap(start, end, LINE_OVERLAP.NONE)
+            self.segment(
+                start, end, LINE_OVERLAP.NONE, is_computing_thickness=True)
 
             error = delta_2x - delta_x
             for i in range(thickness, 1, -1):
@@ -160,7 +164,8 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2y
 
-                self.compute_segment_overlap(start, end, overlap)
+                self.segment(
+                    start, end, overlap, is_computing_thickness=True)
 
         else:
             if swap:
@@ -180,7 +185,8 @@ class Segment2D:
                     error -= delta_2y
                 error += delta_2x
 
-            self.compute_segment_overlap(start, end, LINE_OVERLAP.NONE)
+            self.segment(
+                start, end, LINE_OVERLAP.NONE, is_computing_thickness=True)
 
             error = delta_2x - delta_y
             for i in range(thickness, 1, -1):
@@ -194,7 +200,10 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2x
 
-                self.compute_segment_overlap(start, end, overlap)
+                self.segment(
+                    start, end, overlap, is_computing_thickness=True)
+
+        return self.coordinates
 
     def perpendicular(self, distance: int) -> List[Point2D]:
         """Compute perpendicular points from both side of the segment placed at start level.
@@ -217,3 +226,14 @@ class Segment2D:
         x4 = self.start.x - (distance / 2) * dy
         y4 = self.start.y + (distance / 2) * dx
         return Point2D(x3, y3).round(), Point2D(x4, y4).round()
+
+    def middle_point(self):
+        return (np.round((self.start.x + self.end.x) / 2.0).astype(int),
+                np.round((self.start.y + self.end.y) / 2.0).astype(int),
+                )
+
+    def _add_coordinates(self, coordinates, is_computing_thickness):
+        if is_computing_thickness:
+            self.coordinates_thick.append(coordinates.copy())
+        else:
+            self.coordinates.append(coordinates.copy())
