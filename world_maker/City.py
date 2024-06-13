@@ -1,4 +1,4 @@
-from District import District, CustomDistrict, VoronoiDistrict
+from District import District
 from Position import Position
 from PIL import Image
 import random
@@ -33,13 +33,14 @@ class City:
         watermap.close()
         heightmap.close()
 
-    def add_district(self, center: Position):
+    def add_district(self, center: Position, district_type: str = ""):
         """
         Add a new district to the city.
 
+        :param district_type:
         :param center: The center position of the new district.
         """
-        self.districts.append(CustomDistrict(len(self.districts) + 1, center))
+        self.districts.append(District(len(self.districts) + 1, center, district_type))
         self.map_data[center.y][center.x] = len(self.districts)
 
     def is_expend_finished(self):
@@ -62,15 +63,15 @@ class City:
         """
         min_distance = point.distance_to(self.districts[index_district].center_expend)
         index_district_chosen = index_district
-        for i in range(index_district + 1, len(self.districts)):
-            if point in self.districts[i].area_expend:
-                distance = point.distance_to(self.districts[i].center_expend)
+        for index in range(index_district + 1, len(self.districts)):
+            if point in self.districts[index].area_expend:
+                distance = point.distance_to(self.districts[index].center_expend)
                 if distance < min_distance:
                     min_distance = distance
                     self.districts[index_district_chosen].area_expend.remove(point)
-                    index_district_chosen = i
+                    index_district_chosen = index
                 else:
-                    self.districts[i].area_expend.remove(point)
+                    self.districts[index].area_expend.remove(point)
         self.districts[index_district_chosen].area.append(point)
         self.districts[index_district_chosen].area_expend_from_point.append(point)
         self.districts[index_district_chosen].area_expend.remove(point)
@@ -92,21 +93,19 @@ class City:
         """
         Loop the expansion of all districts in the city until all districts are fully expanded.
         """
-        loop_count = 0
+        print("[City] Start expanding districts...")
         while not self.is_expend_finished():
             self.update_expend_district()
-            loop_count += 1
-            if loop_count % 100 == 0:
-                print("[City] Loop count: ", loop_count)
+        print("[City] Finished expanding districts.")
 
-    def custom_district_draw_map(self):
+    def district_draw_map(self):
         """
         Draw the map of the city with different colors for each district.
         """
         width, height = len(self.map_data[0]), len(self.map_data)
         img = Image.new('RGB', (width, height))
-        colors = {i: (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
-                  for i in range(1, len(self.districts) + 1)}
+        colors = {id_district: (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+                  for id_district in range(1, len(self.districts) + 1)}
 
         for y in range(height):
             for x in range(width):
@@ -115,12 +114,13 @@ class City:
                 else:
                     img.putpixel((x, y), colors[self.map_data[y][x]])
 
-        img.save('./data/custom_district.png')
+        img.save('./data/district.png')
+        print("[City] District map created.")
 
 
 if __name__ == '__main__':
     city = City()
     for i in range(10):
-        city.add_district(Position(random.randint(0, 600), random.randint(0, 600)))
+        city.add_district(Position(random.randint(0, 800), random.randint(0, 800)))
     city.loop_expend_district()
-    city.custom_district_draw_map()
+    city.district_draw_map()
