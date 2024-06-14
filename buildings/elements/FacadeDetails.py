@@ -5,7 +5,7 @@ class FacadeDetails:
         self.zones = zones
         self.sizes = self.get_sizes()
         
-    def get_sizes(self) -> list[tuple[int]]:
+    def get_sizes(self) -> list[tuple[int,int,int]]:
         # foreach different zone sizes in self.zones, we will gen different details
         sizes = []
         center_for_symetry = len(self.zones) // 2

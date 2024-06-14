@@ -18,9 +18,10 @@ class Polygon:
                 rect.fill(editor, material, y2)
         
     def fill_vertice(self, editor : Editor, material : str, y : int, y2 : int = None):
-        if y2 == None: y2 = y
+        if y2 == None: y2 = 0
         for vertice in self.vertices:
-            vertice.fill(editor, Block(material), y, y2)
+            with editor.pushTransform(Transform((0,y,0))):
+                vertice.fill(editor, material, y2)
 
     def compress(self, tiles : list[Tile], vertices : list[Vertice]):
         remaining_tiles = tiles.copy()
@@ -58,9 +59,9 @@ class Polygon:
             has_next2 = self._has_next(neighbors[1], current.facing, remaining_vertices)
             
             if has_next1:
-                current = Vertice(has_next1.point1, current.point2, current.facing)
+                current = Vertice(has_next1.point1.copy(), current.point2.copy(), current.facing)
             elif has_next2:
-                current = Vertice(current.point1, has_next2.point2, current.facing)
+                current = Vertice(current.point1.copy(), has_next2.point2.copy(), current.facing)
             else:
                 self.vertices.append(current)
                 current = remaining_vertices.pop()
@@ -89,7 +90,7 @@ class Polygon:
             for tile in new_line: remaining_tiles.remove(tile)
             line = new_line
     
-    def _has_neighbor(self, target : tuple[int], tiles : list[Tile]) -> bool|Tile:
+    def _has_neighbor(self, target : Point, tiles : list[Tile]) -> bool|Tile:
         for tile in tiles:
             if tile.pos.position == target.position:
                 return tile

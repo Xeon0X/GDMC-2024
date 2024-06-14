@@ -21,25 +21,26 @@ random_data = y.data
 #     with editor.pushTransform(Transform(rotation = i)):
 #         geometry.placeCuboid(editor, (0,0,0), (0,3,5), Block("stone"))
 
-transform = Transform((0,-60,80),rotation = 0)
+transform = Transform((0,-60,110),rotation = 0)
 editor.transform.push(transform)
 
-geometry.placeCuboid(editor, (-5,0,-8), (170,25,25), Block("air"))
+geometry.placeCuboid(editor, (-5,0,-8), (60,10,70), Block("air"))
 
+buildings = []
+buildings.append(Building(random_data["buildings"], (0, 0), (20,20), shapes[0]['matrice'], 1))
+buildings.append(Building(random_data["buildings"], (25, 0), (30,30), shapes[5]['matrice'], 1))
+buildings.append(Building(random_data["buildings"], (0, 35), (30,30), shapes[6]['matrice'], 1))
+buildings.append(Building(random_data["buildings"], (35, 35), (20,20), shapes[7]['matrice'], 1))
 
-padd = 0
-for i in range(4,13):
-    building = Building(random_data["buildings"], (padd, 0), (i,i), shapes[0]['matrice'], 3)
-    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab"])
-    padd += i + 10
-
+for building in buildings :
+    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
 
 
 # # Get a block
 # block = editor.getBlock((0,48,0))
 
 # # Place a block
-#editor.placeBlock((0 , 5, 0), Block("stone"))
+# editor.placeBlock((0 , 5, 0), Block("stone"))
 
 # # Build a cube
 # geometry.placeCuboid(editor, (458, 92, 488), (468, 99, 471), Block("oak_planks"))
