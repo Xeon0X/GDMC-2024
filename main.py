@@ -9,31 +9,29 @@ from utils.functions import *
 
 editor = Editor(buffering=True)
 
+# get every differents buildings shapes
 f = JsonReader('buildings\shapes.json')
 shapes = f.data
 
+# get the random data for the buildings
 y = YamlReader('params.yml')
 random_data = y.data
 
-# transform = Transform((0,-60,-20),rotation = 0)
-# editor.transform.push(transform)
-# for i in range(4):
-#     with editor.pushTransform(Transform(rotation = i)):
-#         geometry.placeCuboid(editor, (0,0,0), (0,3,5), Block("stone"))
-
+#move your editor to the position you wanna build on
 transform = Transform((0,-60,110),rotation = 0)
 editor.transform.push(transform)
 
-geometry.placeCuboid(editor, (-5,0,-8), (60,10,70), Block("air"))
+# clear the area you build on
+geometry.placeCuboid(editor, (-5,0,-8), (25,100,25), Block("air"))
 
-buildings = []
-buildings.append(Building(random_data["buildings"], (0, 0), (20,20), shapes[0]['matrice'], 1))
-buildings.append(Building(random_data["buildings"], (25, 0), (30,30), shapes[5]['matrice'], 1))
-buildings.append(Building(random_data["buildings"], (0, 35), (30,30), shapes[6]['matrice'], 1))
-buildings.append(Building(random_data["buildings"], (35, 35), (20,20), shapes[7]['matrice'], 1))
+# create a building at the relative position 0,0 with 20 blocks length and 20 blocks width, with a normal shape and 10 floors
+building = Building(random_data["buildings"], (0, 0), (20,20), shapes[0]['matrice'], 10)
+# build it with your custom materials
+building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
 
-for building in buildings :
-    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
+
+
+
 
 
 # # Get a block
