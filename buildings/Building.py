@@ -4,6 +4,7 @@ from gdpc import Editor, Block, geometry
 from buildings.Foundations import Foundations
 from buildings.Facade import Facade
 from buildings.Entrance import Entrance
+from buildings.Roof import Roof
 
 class Building:
     def __init__(self,rdata, position : tuple[int,int], size : tuple[int, int], matrice : list[list[int]], floors : int):
@@ -18,10 +19,14 @@ class Building:
         self.foundations = Foundations(rdata["foundations"], size, matrice, tile_size,)
         self.facade = Facade(rdata["facade"], self.foundations.vertices, self.foundations.is_inner_or_outer)
         self.entrance = Entrance(rdata, self.foundations.vertices, DIRECTION.EAST, self.foundations.is_inner_or_outer)
+        self.roof = Roof(rdata["roof"], self.foundations.polygon)
         
     def build(self, editor : Editor, materials : list[str]):
-        for y in range(self.floors):      
-            with editor.pushTransform((self.position[0], y*(self.foundations.floor_height+1), self.position[1])):
+        for y in range(self.floors+1):      
+            with editor.pushTransform((self.position[0], y*(self.foundations.floor_height+1) -1, self.position[1])):
+                if y == self.floors: 
+                    self.roof.build(editor, materials)
+                    break
                 self.foundations.build(editor, materials)
                 if y == 0: self.entrance.build(editor, materials)
                 else : self.facade.build(editor, materials)

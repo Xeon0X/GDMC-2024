@@ -7,7 +7,11 @@ from buildings.geometry.Vertice import Vertice
 from buildings.elements.Window import Window
 
 class Balcony:
-    def __init__(self, rdata, max_width : int, windows : Window, collumn_style : COLLUMN_STYLE):
+    def __init__(self, 
+                 rdata, 
+                 max_width : int, 
+                 windows : Window, 
+                 collumn_style : COLLUMN_STYLE):
         self.rdata = rdata
         self.windows = windows
         self.max_width = max_width

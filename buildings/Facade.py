@@ -8,7 +8,10 @@ from buildings.elements.Window import Window
 from buildings.elements.Balcony import Balcony
 
 class Facade:
-    def __init__(self, rdata, vertices : list[Vertice], collumn_style : COLLUMN_STYLE):
+    def __init__(self, 
+                 rdata, 
+                 vertices : list[Vertice], 
+                 collumn_style : COLLUMN_STYLE):
         self.rdata = rdata
         self.vertices = vertices
         self.collumn_style = collumn_style
@@ -60,7 +63,7 @@ class Facade:
     def get_window(self) -> Window:
         if self.collumn_style.value >= 2: # collumn_style >= 2 = outer collumns
             self.padding = 1
-        
+            
         max_width = self.length-2*self.padding
         max_height = min(self.height, self.rdata["windows"]["size"]["max_height"])
             
@@ -81,6 +84,6 @@ class Facade:
     def has_inter_floor(self) -> bool:
         return (self.rdata["inter_floor"]["proba"] >= rd.random(), select_random(self.rdata["inter_floor"]["border_style"], INTER_FLOOR_BORDER))
     
-    def get_dimentions(self) -> tuple[int]:
+    def get_dimentions(self) -> tuple[int,int]:
         return ( self.vertices[0].get_height(), len(self.vertices[0]))
     

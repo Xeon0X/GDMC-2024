@@ -64,13 +64,13 @@ class Tile:
         # 0 = north, 1 = east, 2 = south, 3 = west
         match(vertice):
             case 0 :
-                return Vertice(self.north_west, self.north_east, DIRECTION.NORTH)
+                return Vertice(self.north_west.copy(), self.north_east.copy(), DIRECTION.NORTH)
             case 1 :
-                return Vertice(self.north_east, self.south_east, DIRECTION.EAST)
+                return Vertice(self.north_east.copy(), self.south_east.copy(), DIRECTION.EAST)
             case 2 :
-                return Vertice(self.south_west, self.south_east, DIRECTION.SOUTH)
+                return Vertice(self.south_west.copy(), self.south_east.copy(), DIRECTION.SOUTH)
             case 3 :
-                return Vertice(self.north_west, self.south_west, DIRECTION.WEST)
+                return Vertice(self.north_west.copy(), self.south_west.copy(), DIRECTION.WEST)
             case DIRECTION.WEST :
                 return self.west_vertice
             case DIRECTION.EAST :
@@ -82,7 +82,7 @@ class Tile:
             
     def set_vertice(self, direction : DIRECTION, vertice : Vertice, height : int):
         self.has_vertice = True
-        vertice.point2.y = height
+        vertice.point2.set_position(y = height)
         match(direction):
             case DIRECTION.WEST :
                 self.west_vertice = vertice

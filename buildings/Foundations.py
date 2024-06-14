@@ -45,7 +45,7 @@ class Foundations:
         for collumn in self.collumns:
             if collumn.is_outer and self.is_inner_or_outer == COLLUMN_STYLE.INNER: continue
             if not collumn.is_outer and self.is_inner_or_outer == COLLUMN_STYLE.OUTER: continue
-            collumn.fill(editor, materials[7], self.floor_height)
+            collumn.fill(editor, materials[7], self.floor_height+1)
     
     def add_tile(self, tile : Tile):
         self.tiles.append(tile)

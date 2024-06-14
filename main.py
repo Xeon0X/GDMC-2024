@@ -33,7 +33,7 @@ buildings.append(Building(random_data["buildings"], (0, 35), (30,30), shapes[6][
 buildings.append(Building(random_data["buildings"], (35, 35), (20,20), shapes[7]['matrice'], 1))
 
 for building in buildings :
-    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab"])
+    building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
 
 
 # # Get a block

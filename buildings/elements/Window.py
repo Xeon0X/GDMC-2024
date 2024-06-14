@@ -8,7 +8,12 @@ from buildings.geometry.Vertice import Vertice
 from buildings.elements.WindowElt.Glass import Glass
 
 class Window:
-    def __init__(self, rdata, max_width : int, max_height : int, facade_len : int, facade_height : int):
+    def __init__(self, 
+                 rdata, 
+                 max_width : int, 
+                 max_height : int, 
+                 facade_len : int, 
+                 facade_height : int):
         self.rdata = rdata
         self.width, self.height = self.get_size(max_width, max_height)
         self.is_grounded = self.is_grounded()
@@ -121,7 +126,7 @@ class Window:
                 rd.randint(self.rdata["size"]["min_height"],max_height)
             )
         
-    def get_padding(self, facade_len : int, facade_height : int) -> tuple[int]:
+    def get_padding(self, facade_len : int, facade_height : int) -> tuple[int,int]:
         padding,ypadding = 0,0
         if not self.is_grounded: ypadding = (facade_height - self.height)//2
         
