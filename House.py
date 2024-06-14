@@ -23,6 +23,8 @@ class House:
         
         self.direction = direction
         
+        self.entranceWall = None
+        
         
     def createHouseSkeleton(self):
         self.delete()
@@ -242,27 +244,33 @@ class House:
             print(width, depth, n)
             
             if width < depth:
-                if n==1:
+               
+                   
+                if n>1:
+                    for k in range(n-1):
+                        for i in range(-1, depth+1):
+                            for y in range(-1, width//2+1):
+                                self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+y+k+3), Block("blackstone"))
+                                self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+depth-y-4-k), Block("blackstone"))
+                    if width%2 == 0:
+                        for i in range(-1, depth+1):
+                            self.editor.placeBlock((x+width//2+1, self.coordinates_max[1]+n-1, z+i), Block("blackstone"))
                     for i in range(-1,depth+1):
-                        self.editor.placeBlock((x+width//2, self.coordinates_max[1], z+i), Block("blackstone"))
-                else:
-                    for k in range(n):
-                        for i in range(-1, width+1):
-                            for y in range(-1, depth//2+1):
-                                self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+y+k+2), Block("blackstone"))
-                                self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+depth-y-3-k), Block("blackstone"))
+                        self.editor.placeBlock((x+width//2, self.coordinates_max[1]+n-1, z+i), Block("blackstone"))
+                
             else:
-                if n==1:
-                    for i in range(-1,width+1):
-                        self.editor.placeBlock((x+i, self.coordinates_max[1], z+depth//2), Block("blackstone"))
-                else:
+                if n>1:
                     for k in range(n-1):
                         for i in range(-1, width+1):
                             for y in range(-1, depth//2+1):
                                 self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+y+k+2), Block("blackstone"))
                                 self.editor.placeBlock((x + i, self.coordinates_max[1]+k, z+depth-y-3-k), Block("blackstone"))
-            
-            
+                if depth%2 == 0:
+                    for i in range(-1, width+1):
+                        self.editor.placeBlock((x+i, self.coordinates_max[1]+n-1, z+depth//2+1), Block("blackstone"))
+                for i in range(-1,width+1):
+                        self.editor.placeBlock((x+i, self.coordinates_max[1]+n-1, z+depth//2), Block("blackstone"))
+                
             print('-----------------------------------')
            
             for i in range(-1, width+1):
@@ -528,10 +536,113 @@ class House:
                             self.editor.placeBlock((x + i, self.coordinates_min[1] +4*y, z + j), Block("quartz_block"))    
                             self.grid3d[ x_plan3d+i, 4*y, z_plan3d+j] = True
              
+    def getNonAdjacentWalls(self):
+        main_rect = self.skeleton[0]
+        x_main, z_main, width_main, depth_main, height_main = main_rect
+        non_adjacent_walls = []
 
+        for k in range(1, len(self.skeleton)):
+            x, z, width, depth, height = self.skeleton[k]
+            walls = [(x, z, x + width - 1, z), (x, z, x, z + depth - 1), (x, z + depth - 1, x + width - 1, z + depth - 1), (x + width - 1, z, x + width - 1, z + depth - 1)]
+            
+            for wall in walls:
+                x1, z1, x2, z2 = wall
+                if not ((x_main <= x1 <= x_main + width_main or x_main <= x2 <= x_main + width_main) and (z_main - 1 == z1 or z_main + depth_main + 1 == z1)) and not ((z_main <= z1 <= z_main + depth_main or z_main <= z2 <= z_main + depth_main) and (x_main - 1 == x1 or x_main + width_main + 1 == x1)):
+                    non_adjacent_walls.append((x1, z1, x2, z2))
+        print(non_adjacent_walls)
+        return non_adjacent_walls
+        
+    def getAllExterneWalls(self):
+        walls = []
+        adjacent_walls = self.getAdjacentWalls()
+        for k in range(0, len(self.skeleton)):
+            x, z, width, depth, height = self.skeleton[k]
+            if k == 0:
+                x -= 1
+                z -= 1
+                width += 2
+                depth += 2
+            
+            walls.append((x, z, x + width - 1, z))
+            walls.append((x, z, x, z + depth - 1))
+            walls.append((x, z + depth - 1, x + width - 1, z + depth - 1))
+            walls.append((x + width - 1, z, x + width - 1, z + depth - 1))
+      
+        walls_to_keep = []
+        for wall in walls:
+            remove_wall = False
+            for adj_wall in adjacent_walls:
+                if self.isInsideWall(wall, adj_wall):
+                    remove_wall = True
+                    break
+            if not remove_wall:
+                walls_to_keep.append(wall)
+        
+        return walls_to_keep
+    
+
+    def isInsideWall(self, big_wall, small_wall):
+        x1, z1, x2, z2 = big_wall
+        x3, z3, x4, z4 = small_wall
+        if x1 == x2 == x3 == x4:
+            return x1 == x3 and z1 <= z3 and z4 <= z2
+        elif z1 == z2 == z3 == z4:
+            return z1 == z3 and x1 <= x3 and x4 <= x2
+        
+    
+    def placeWindowOnWall(self,wall,axis, is_x):
+        for l in range(self.nbEtage):
+            if axis%2==0:
+                if axis == 4:
+                    if is_x:
+                        self.editor.placeBlock((wall[0]+2, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+                        self.editor.placeBlock((wall[0]+3, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+                    else:
+                        self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+3), Block("glass_pane"))
+                        self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+2), Block("glass_pane"))   
+                else:
+                    for i in range(0, math.ceil(axis/4)):
+                        if is_x:
+                            self.editor.placeBlock((wall[0]+1+i*4, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+                            self.editor.placeBlock((wall[0]+2+i*4, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+                        else:
+                            self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+1+i*4), Block("glass_pane"))
+                            self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+2+i*4), Block("glass_pane"))
+            else:
+                if axis<=5:
+                    for i in range(0, axis):
+                        if is_x:
+                            self.editor.placeBlock((wall[0]+1+i, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+                        else:
+                            self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+1+i), Block("glass_pane"))
+                else:
+                    for i in range(0, math.ceil(axis/2)):
+                        if is_x:
+                            self.editor.placeBlock((wall[0]+i*2+1, self.coordinates_min[1] + 2+l*4, wall[1]), Block("glass_pane"))
+            
+                        else:
+                            self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2+l*4, wall[1]+i*2+1), Block("glass_pane"))
     def placeWindow(self):
-        pass
-
+        walls = self.getAllExterneWalls()
+        
+        
+        for wall in walls:
+            
+            x1, z1, x2, z2 = wall
+           
+            
+            
+                
+            x = abs(x2-x1) -1
+            z = abs(z2-z1) -1
+            
+            if x1 == x2:
+                self.placeWindowOnWall(wall, z, False)
+            elif z1 == z2:
+                self.placeWindowOnWall(wall, x, True)
+        
+        
+    
     def placeStairs(self):
         pass
 
@@ -553,9 +664,11 @@ class House:
         else:
             return []
         
-        if wall != self.skeleton[0]:
+        if closest_wall != self.skeleton[0]:
      
             wall = (wall[0]+1, wall[1]+1,  wall[2]-2,  wall[3]-2)
+        else:
+            wall = (wall[0], wall[1],  wall[2]-1,  wall[3]-1)
              
         return wall
     
@@ -563,21 +676,40 @@ class House:
     def placeEntrance(self):
         wall = self.WallFacingDirection()
         
+        self.entranceWall = wall
         match self.direction:
             case "N":
                 if (wall[2] - wall[0]) % 2 != 0:
                     self.editor.placeBlock(((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+1, wall[1]-1), Block("air"))
                     self.editor.placeBlock(((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+2, wall[1]-1), Block("air"))
-                    print((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[1])
+                    print((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+1, wall[1]-1)
                 self.editor.placeBlock(((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[1]-1), Block("air"))                
                 self.editor.placeBlock(((wall[0] + wall[2]) // 2, self.coordinates_min[1]+2, wall[1]-1), Block("air"))
-                print((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[1]+1)
+                print((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[1]-1)
             case "S":
-                pass
+                if (wall[2] - wall[0]) % 2 != 0:
+                    self.editor.placeBlock(((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+1, wall[3]+1), Block("air"))
+                    self.editor.placeBlock(((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+2, wall[3]+1), Block("air"))
+                    print((wall[0] + wall[2]) // 2 +1, self.coordinates_min[1]+1, wall[3]+1)
+                self.editor.placeBlock(((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[3]+1), Block("air"))                
+                self.editor.placeBlock(((wall[0] + wall[2]) // 2, self.coordinates_min[1]+2, wall[3]+1), Block("air"))
+                print((wall[0] + wall[2]) // 2, self.coordinates_min[1]+1, wall[3]+1)
             case "E":
-                pass
+                if (wall[3] - wall[1]) % 2 != 0:
+                    self.editor.placeBlock((wall[2]+1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2 +1), Block("air"))
+                    self.editor.placeBlock((wall[2]+1, self.coordinates_min[1]+2, (wall[1] + wall[3]) // 2 +1), Block("air"))
+                    print(wall[2]+1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2 +1)
+                self.editor.placeBlock((wall[2]+1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2), Block("air"))                
+                self.editor.placeBlock((wall[2]+1, self.coordinates_min[1]+2, (wall[1] + wall[3]) // 2), Block("air"))
+                print(wall[2]+1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2)
             case "W":
-                pass
+                if (wall[3] - wall[1]) % 2 != 0:
+                    self.editor.placeBlock((wall[0]-1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2 +1), Block("air"))
+                    self.editor.placeBlock((wall[0]-1, self.coordinates_min[1]+2, (wall[1] + wall[3]) // 2 +1), Block("air"))
+                    print(wall[0]-1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2 +1)
+                self.editor.placeBlock((wall[0]-1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2), Block("air"))                
+                self.editor.placeBlock((wall[0]-1, self.coordinates_min[1]+2, (wall[1] + wall[3]) // 2), Block("air"))
+                print(wall[0]-1, self.coordinates_min[1]+1, (wall[1] + wall[3]) // 2)
             case _:
                 pass
     
@@ -599,8 +731,10 @@ if __name__ == "__main__":
         house.placeDoor()
         house.placeRoof()
         house.putCelling()
+        
+        house.placeWindow()
         house.placeEntrance()
-      
+        
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
         coordinates_min = new_coordinates_min
