@@ -1,5 +1,8 @@
 gdpc==7.1.0
-matplotlib==3.8.2
 numpy==1.26.4
-scipy==1.13.0
+Pillow==10.3.0
+pygame==2.5.2
+scipy==1.13.1
+skan==0.11.1
+skimage==0.0
 pyyaml==6.0.1
