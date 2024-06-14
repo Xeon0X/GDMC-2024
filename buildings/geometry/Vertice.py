@@ -1,9 +1,9 @@
-from Enums import DIRECTION
+from utils.Enums import DIRECTION
 from buildings.geometry.Point import Point
 from buildings.geometry.Rectangle import Rectangle
 
 class Vertice(Rectangle):
-    def __init__(self, point1 : Point, point2 : Point, facing : str):
+    def __init__(self, point1 : Point, point2 : Point, facing : DIRECTION = None):
         Rectangle.__init__(self, point1, point2)
         self.facing = facing
         
@@ -15,7 +15,10 @@ class Vertice(Rectangle):
             case DIRECTION.EAST | DIRECTION.WEST:
                 return [Point(x = self.point1.x, z = self.point1.z - 1), 
                         Point(x = self.point2.x, z = self.point2.z + 1)]
-                
-    def get_size(self):
-        return self.point2.x - self.point1.x + self.point2.z - self.point1.z
+
+    def __len__(self):
+        return self.point2.x - self.point1.x + self.point2.z - self.point1.z + 1
+    
+    def __repr__(self):
+        return super().__repr__() + f"\nFacing : {self.facing} \n\n"
         
