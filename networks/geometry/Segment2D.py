@@ -1,21 +1,23 @@
-from typing import List
+from typing import List, Union
+
+import numpy as np
+
 from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
 from networks.geometry.Point2D import Point2D
-from math import sqrt
 
 
 class Segment2D:
     def __init__(self, start: Point2D, end: Point2D):
         self.start = start
         self.end = end
-        self.points = []
-        self.points_thick = []
+        self.points: List[Point2D] = []
+        self.points_thick: List[Point2D] = []
         self.thickness = None
 
     def __repr__(self):
-        return str(self.points)
+        return str(f"Segment2D(start: {self.start}, end: {self.end}, points: {self.points})")
 
-    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: bool = False) -> List[Point2D]:
+    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: bool = False) -> Union[List[Point2D], None]:
         """Modified Bresenham draw (line) with optional overlap.
 
         From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -29,7 +31,7 @@ class Segment2D:
         >>> Segment2D(Point2D(0, 0), Point2D(10, 15))
         """
 
-        if start == None or end == None:
+        if start is None or end is None:
             start = self.start.copy()
             end = self.end.copy()
         else:
@@ -90,6 +92,7 @@ class Segment2D:
 
         if not _is_computing_thickness:
             return self.points
+        return None
 
     def segment_thick(self, thickness: int, thickness_mode: LINE_THICKNESS_MODE) -> List[Point2D]:
         """Bresenham with thickness.
@@ -208,7 +211,7 @@ class Segment2D:
                 self.segment(
                     start, end, overlap=overlap, _is_computing_thickness=True)
 
-        return self.points
+        return self.points_thick
 
     def perpendicular(self, distance: int) -> List[Point2D]:
         """Compute perpendicular points from both side of the segment placed at start level.

@@ -1,6 +1,8 @@
-import numpy as np
-from typing import List
 from math import atan2, sqrt
+from typing import List, Union
+
+import numpy as np
+
 from Enums import ROTATION
 
 
@@ -21,10 +23,26 @@ class Point2D:
             return self.x == other.x and self.y == other.y
         return False
 
+    def __add__(self, other):
+        if isinstance(other, np.ndarray) and other.shape == (2,):
+            return Point2D(self.x + other[0], self.y + other[1])
+        elif isinstance(other, Point2D):
+            return Point2D(self.x + other.x, self.y + other.y)
+        else:
+            raise TypeError(f"Unsupported type for addition: {type(other)}")
+
+    def __sub__(self, other):
+        if isinstance(other, np.ndarray) and other.shape == (2,):
+            return Point2D(self.x - other[0], self.y - other[1])
+        elif isinstance(other, Point2D):
+            return Point2D(self.x - other.x, self.y - other.y)
+        else:
+            raise TypeError(f"Unsupported type for subtraction: {type(other)}")
+
     def is_in_triangle(self, xy0: "Point2D", xy1: "Point2D", xy2: "Point2D"):
         """Returns True is the point is in a triangle defined by 3 others points.
 
-        From: https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle#:~:text=A%20simple%20way%20is%20to,point%20is%20inside%20the%20triangle.
+        From: https://stackoverflow.com/questions/2049582/how-to-determine-if-a-point-is-in-a-2d-triangle
 
         Args:
             xy0 (Type[Point2D]): Point of the triangle.
@@ -190,12 +208,21 @@ class Point2D:
         return abs(x1 * y2 - x2 * y1) < 1e-12
 
     @staticmethod
-    def to_vectors(points: List["Point3D"]) -> List[np.array]:
-        vectors = []
-        for point in points:
-            vectors.append(np.array(point.coordinates))
-
-        if (len(vectors) == 1):
-            return vectors[0]
-        else:
+    def to_arrays(points: Union[List["Point2D"], "Point2D"]) -> Union[List[np.array], "Point2D"]:
+        if isinstance(points, list):
+            vectors = []
+            for point in points:
+                vectors.append(np.array(point.coordinates))
             return vectors
+        else:
+            return np.array(points.coordinates)
+
+    @staticmethod
+    def from_arrays(vectors: Union[List[np.array], "Point2D"]) -> Union[List["Point2D"], "Point2D"]:
+        if isinstance(vectors, list):
+            points = []
+            for vector in vectors:
+                points.append(Point2D(vector[0], vector[1]))
+            return points
+        else:
+            return Point2D(vectors[0], vectors[1])

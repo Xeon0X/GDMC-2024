@@ -1,31 +1,33 @@
 
-from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE, ROTATION
-from PIL import Image, ImageDraw
-import matplotlib.pyplot as plt
-from networks.geometry.Point3D import Point3D
-from networks.geometry.Segment3D import Segment3D
-from networks.geometry.Segment2D import Segment2D
-from networks.geometry.Circle import Circle
-from networks.geometry.Polyline import Polyline
-from networks.geometry.Point2D import Point2D
-import networks.roads.lines.Line as Line
-import networks.roads.lanes.Lane as Lane
-from gdpc import Editor, Block, geometry
-import networks.geometry.curve_tools as curve_tools
-import networks.geometry.Strip as Strip
-import networks.geometry.segment_tools as segment_tools
-import numpy as np
 import json
-from buildings.Building import Building
 import random
 
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+from gdpc import Block, Editor, geometry
+from PIL import Image, ImageDraw
+
+import networks.geometry.curve_tools as curve_tools
+import networks.geometry.segment_tools as segment_tools
+import networks.geometry.Strip as Strip
+import networks.roads.lanes.Lane as Lane
+import networks.roads.lines.Line as Line
+from buildings.Building import Building
+from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE, ROTATION
+from networks.geometry.Circle import Circle
+from networks.geometry.Point2D import Point2D
+from networks.geometry.Point3D import Point3D
+from networks.geometry.point_tools import (
+    curved_corner_by_curvature,
+    curved_corner_by_distance,
+)
+from networks.geometry.Polyline import Polyline
+from networks.geometry.Segment2D import Segment2D
+from networks.geometry.Segment3D import Segment3D
 from networks.roads import Road as Road
 from networks.roads.intersections import Intersection as Intersection
 
-from networks.geometry.point_tools import curved_corner_by_curvature, curved_corner_by_distance
-
-
-import matplotlib
 matplotlib.use('Agg')
 
 
@@ -286,17 +288,25 @@ block_list = ["blue_concrete", "red_concrete", "green_concrete",
 # p = Polyline((Point2D(-1225, 468), Point2D(-1138, 481),
 #              Point2D(-1188, 451), Point2D(-1176, 409), Point2D(-1179, 399)))
 
-w = 200
+w = 100
 
-n_points = 20
+n_points = 8
 min_val, max_val = -w, w
 
 random_points = [Point2D(random.randint(min_val, max_val), random.randint(
     min_val, max_val)) for _ in range(n_points)]
 
+print(random_points)
+print("\n\n")
+
 
 # random_points = (Point2D(-75, -75), Point2D(0, -75), Point2D(75, 75),
 #                  Point2D(75, -50), Point2D(-50, 50), Point2D(0, 0))
+
+# random_points = random_points[0].optimized_path(random_points)
+
+# random_points = [Point2D(-40, -56), Point2D(-94, 92), Point2D(19, -47), Point2D(
+#     100, 59), Point2D(-85, -73), Point2D(-33, -9), Point2D(57, -25), Point2D(51, -34)]
 
 random_points = random_points[0].optimized_path(random_points)
 
@@ -316,10 +326,8 @@ image = Image.new('RGB', (width, height), 'black')
 
 draw = ImageDraw.Draw(image)
 
-print(p.output_points)
-
 for i in range(len(p.output_points)-1):
-    if p.output_points[i] != None:
+    if p.output_points[i] != 0:
         s = Segment2D(Point2D(p.output_points[i].x, p.output_points[i].y), Point2D(
             p.output_points[i+1].x, p.output_points[i+1].y))
         s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
@@ -331,40 +339,40 @@ for i in range(len(p.output_points)-1):
                         w-s.points_thick[j].y), fill='grey')
 
 
-for i in range(2, len(p.get_arcs_intersections())-2):
+# for i in range(2, len(p.get_arcs_intersections())-2):
 
-    s = Segment2D(Point2D(p.acrs_intersections[i][0].x, p.acrs_intersections[i][0].y), Point2D(
-        p.acrs_intersections[i-1][-1].x, p.acrs_intersections[i-1][-1].y))
-    s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
+#     s = Segment2D(Point2D(p.acrs_intersections[i][0].x, p.acrs_intersections[i][0].y), Point2D(
+#         p.acrs_intersections[i-1][-1].x, p.acrs_intersections[i-1][-1].y))
+#     s.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
 
-    for j in range(len(s.points_thick)-1):
-        # editor.placeBlock(
-        #     s.coordinates[j].coordinate, Block("cyan_concrete"))
-        draw.point((s.points_thick[j].x+w,
-                    w-s.points_thick[j].y), fill='white')
-    draw.point((p.acrs_intersections[i][0].x+w,
-                w-p.acrs_intersections[i][0].y), fill='blue')
-    draw.point((p.acrs_intersections[i][-1].x+w,
-                w-p.acrs_intersections[i][-1].y), fill='red')
+#     for j in range(len(s.points_thick)-1):
+#         # editor.placeBlock(
+#         #     s.coordinates[j].coordinate, Block("cyan_concrete"))
+#         draw.point((s.points_thick[j].x+w,
+#                     w-s.points_thick[j].y), fill='green')
+#     draw.point((p.acrs_intersections[i][0].x+w,
+#                 w-p.acrs_intersections[i][0].y), fill='green')
+#     draw.point((p.acrs_intersections[i][-1].x+w,
+#                 w-p.acrs_intersections[i][-1].y), fill='green')
 
 
-for i in range(len(center)):
-    if center[i]:
-        circle = Circle(center[i])
-        circle.circle_thick(round(radius[i]-ww/2), round(radius[i]+ww/2))
-        for j in range(len(circle.points_thick)-1):
-            if circle.points_thick[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
-                # editor.placeBlock(
-                #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
-                draw.point((circle.points_thick[j].x+w,
-                            w-circle.points_thick[j].y), fill='white')
-        circle.circle(radius[i])
-        for j in range(len(circle.points)-1):
-            if circle.points[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
-                # editor.placeBlock(
-                #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
-                draw.point((circle.points[j].x+w,
-                            w-circle.points[j].y), fill='purple')
+# for i in range(len(center)):
+#     if center[i]:
+#         circle = Circle(center[i])
+#         circle.circle_thick(round(radius[i]-ww/2), round(radius[i]+ww/2))
+#         for j in range(len(circle.points_thick)-1):
+#             if circle.points_thick[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
+#                 # editor.placeBlock(
+#                 #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+#                 draw.point((circle.points_thick[j].x+w,
+#                             w-circle.points_thick[j].y), fill='green')
+#         circle.circle(radius[i])
+#         for j in range(len(circle.points)-1):
+#             if circle.points[j].is_in_triangle(p.acrs_intersections[i][0], p.acrs_intersections[i][1], p.acrs_intersections[i][2]):
+#                 # editor.placeBlock(
+#                 #     (circle.coordinates[j].x, y, circle.coordinates[j].y), Block("white_concrete"))
+#                 draw.point(
+#                     (circle.points[j].x+w, w-circle.points[j].y), fill='green')
 
 s1 = Segment2D(Point2D(p.acrs_intersections[1][0].x, p.acrs_intersections[1][0].y), Point2D(
     p.output_points[0].x, p.output_points[0].y))
@@ -372,7 +380,7 @@ s1.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
 
 for j in range(len(s1.points_thick)-1):
     draw.point((s1.points_thick[j].x+w,
-                w-s1.points_thick[j].y), fill='white')
+                w-s1.points_thick[j].y), fill='grey')
 
 s1 = Segment2D(Point2D(p.acrs_intersections[-2][2].x, p.acrs_intersections[-2][2].y), Point2D(
     p.output_points[-1].x, p.output_points[-1].y))
@@ -380,9 +388,33 @@ s1.segment_thick(ww, LINE_THICKNESS_MODE.MIDDLE)
 
 for j in range(len(s1.points_thick)-1):
     draw.point((s1.points_thick[j].x+w,
-                w-s1.points_thick[j].y), fill='white')
+                w-s1.points_thick[j].y), fill='grey')
+
+for i in range(0, len(p.arcs)):
+    for j in range(len(p.arcs[i])):
+        draw.point((p.arcs[i][j].x+w, w-p.arcs[i][j].y), fill='white')
+
+
+for i in range(1, len(p.segments)-1):
+    for j in range(len(p.segments[i].segment())):
+        draw.point((p.segments[i].points[j].x+w,
+                    w-p.segments[i].points[j].y), fill='white')
+
+for i in range(1, len(p.centers)-1):
+    draw.point((p.centers[i].x+w, w-p.centers[i].y), fill='red')
+    draw.point((p.acrs_intersections[i][0].x+w,
+               w-p.acrs_intersections[i][0].y), fill='blue')
+    draw.point((p.acrs_intersections[i][1].x+w,
+               w-p.acrs_intersections[i][1].y), fill='purple')
+    draw.point((p.acrs_intersections[i][2].x+w,
+               w-p.acrs_intersections[i][2].y), fill='blue')
+
 
 image.save('output_image.png')
+
+# s = Segment2D(Point2D(-88, -12), Point2D(9, 75))
+# s.segment_thick(3, LINE_THICKNESS_MODE.MIDDLE)
+# print(s.points)
 
 # s = Segment2D(Point2D(0, 0), Point2D(10, 10)).perpendicular(10)
 # print(s)

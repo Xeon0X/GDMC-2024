@@ -1,5 +1,6 @@
+from math import sqrt
 from typing import List
-from math import atan2, sqrt
+
 import numpy as np
 
 
@@ -80,3 +81,14 @@ class Point3D:
             return vectors[0]
         else:
             return vectors
+
+    @staticmethod
+    def from_arrays(vectors: List[np.array]) -> List["Point3D"]:
+        points = []
+        for vector in vectors:
+            points.append(Point3D(vector[0], vector[1], vector[2]))
+
+        if (len(points) == 1):
+            return points[0]
+        else:
+            return points

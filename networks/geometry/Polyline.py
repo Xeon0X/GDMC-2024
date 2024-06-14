@@ -1,11 +1,17 @@
-from networks.geometry.Point2D import Point2D
+from math import inf, sqrt
+from typing import List, Tuple, Union
 
-from math import sqrt, inf
 import numpy as np
+
+from networks.geometry.Circle import Circle
+from networks.geometry.Point2D import Point2D
+from networks.geometry.Segment2D import Segment2D
+
+# from Enums import LINE_THICKNESS_MODE, LINE_OVERLAP
 
 
 class Polyline:
-    def __init__(self, points: list["Point2D"]):
+    def __init__(self, points: List[Point2D]):
         """A polyline with smooth corners, only composed of segments and circle arc.
 
         Mathematics and algorithms behind this can be found here: https://cdr.lib.unc.edu/concern/dissertations/pz50gw814?locale=en, E2 Construction of arc roads from polylines, page 210.
@@ -18,7 +24,8 @@ class Polyline:
 
         >>> Polyline((Point2D(0, 0), Point2D(0, 10), Point2D(50, 10), Point2D(20, 20)))
         """
-        self.points_array = Point2D.to_vectors(
+        self.output_points = points
+        self.points_array = Point2D.to_arrays(
             self._remove_collinear_points(points))
         self.length_polyline = len(self.points_array)
 
@@ -26,36 +33,46 @@ class Polyline:
             raise ValueError("The list must contain at least 4 elements.")
 
         self.vectors = [None] * self.length_polyline  # v
-        self.lengths = [None] * (self.length_polyline - 1)  # l
+        self.lengths = [0] * (self.length_polyline - 1)  # l
         self.unit_vectors = [None] * self.length_polyline  # n
         self.tangente = [0] * self.length_polyline  # f
 
         # alpha, maximum radius factor
-        self.alpha_radii = [None] * self.length_polyline
+        self.alpha_radii = [0] * self.length_polyline
 
-        self.radii = [None] * self.length_polyline  # r
-        self.centers = [None] * self.length_polyline  # c
+        # Useful outputs. In order to not break indexation, each list has the same length, even if for n points, there is n-2 radius.
+        # Lists will start and end with None.
+        self.radii = [0] * self.length_polyline  # r, list of points
+        self.centers = [None] * self.length_polyline  # c, list of points
+        # list of tuple of points (first intersection, corresponding corner, last intersection)
         self.acrs_intersections = [None] * self.length_polyline
+        self.arcs = [[]] * self.length_polyline  # list of points
+        # self.not_arcs = [[]] * self.length_polyline
 
+        # For n points, there is n-1 segments. Last element should stays None.
+        self.segments = [None] * \
+            self.length_polyline  # list of segments
+
+        # Run procedure
         self._compute_requirements()
         self._compute_alpha_radii()
 
         self._alpha_assign(0, self.length_polyline-1)
-
-        self.output_points = points
+        self.get_radii()
+        self.get_centers()
+        self.get_arcs_intersections()
+        self.get_arcs()
+        self.get_segments()
 
     def __repr__(self):
         return str(self.alpha_radii)
 
-    def get_radii(self):
+    def get_radii(self) -> List[Union[int]]:
         for i in range(1, self.length_polyline-1):
             self.radii[i] = round(self.alpha_radii[i] * self.tangente[i])
         return self.radii
 
-    def get_centers(self):
-        if self.radii == [None] * self.length_polyline:
-            raise ValueError("No radii found. Run get_radii before.")
-
+    def get_centers(self) -> List[Union[Point2D, None]]:
         for i in range(1, self.length_polyline-1):
             bisector = (self.unit_vectors[i] - self.unit_vectors[i-1]) / (
                 np.linalg.norm(self.unit_vectors[i] - self.unit_vectors[i-1]))
@@ -65,15 +82,67 @@ class Polyline:
             self.centers[i] = Point2D(array[0], array[1]).round()
         return self.centers
 
-    def get_arcs_intersections(self):
+    def get_arcs_intersections(self) -> List[Tuple[Point2D]]:
+        """Get arcs intersections points.
+
+        First and last elements elements of the list should be None. For n points, there are n-1 segments, and n-2 angle.
+
+        Returns:
+            list[tuple(Point2D)]: List of tuples composed - in order - of the first arc points, the corner points, the last arc points. The corresponding arc circle is inside this triangle.
+        """
         for i in range(1, self.length_polyline-1):
-            point_1 = self.points_array[i] - \
-                self.alpha_radii[i] * self.unit_vectors[i-1]
-            point_2 = self.points_array[i] + \
-                self.alpha_radii[i] * self.unit_vectors[i]
-            self.acrs_intersections[i] = Point2D(
-                point_1[0], point_1[1]).round(), Point2D(self.points_array[i][0], self.points_array[i][1]), Point2D(point_2[0], point_2[1]).round()
+            point_1 = Point2D.from_arrays(self.points_array[i] -
+                                          self.alpha_radii[i] * self.unit_vectors[i-1])
+            point_2 = Point2D.from_arrays(self.points_array[i] +
+                                          self.alpha_radii[i] * self.unit_vectors[i])
+            self.acrs_intersections[i] = point_1.round(), Point2D.from_arrays(
+                self.points_array[i]), point_2.round()
         return self.acrs_intersections
+
+    def get_arcs(self) -> List[Point2D]:
+        for i in range(1, self.length_polyline-1):
+            circle = Circle(self.centers[i])
+            circle.circle(self.radii[i])
+            for j in range(len(circle.points)):
+                if circle.points[j].is_in_triangle(self.acrs_intersections[i][0], self.acrs_intersections[i][1], self.acrs_intersections[i][2]):
+                    self.arcs[i].append(circle.points[j])
+            # for j in range(len(circle.points)):
+            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][0], self.acrs_intersections[i][1]).segment(LINE_OVERLAP.MINOR)):
+            #         self.not_arcs[i].append(circle.points[j])
+            #         print("hzeh")
+            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][1], self.acrs_intersections[i][2]).segment(LINE_OVERLAP.MINOR)):
+            #         self.not_arcs[i].append(circle.points[j])
+            #         print("hzeh")
+            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][2], self.acrs_intersections[i][0]).segment(LINE_OVERLAP.MINOR)):
+            #         self.not_arcs[i].append(circle.points[j])
+            #         print("hzeh")
+        return self.arcs
+
+    def get_segments(self) -> List[Segment2D]:
+        """Get the segments between the circle arcs and at the start and end.
+
+        Last list element should be None, and last usable index is -2 or self.length_polyline - 2. For n points, there are n-1 segments.
+
+        Returns:
+            list[Segment2D]: List of segments in order.
+        """
+        # Get first segment.
+        # segments index is 0, corresponding to the first points_array to the first point ([0]) of the first arc (acrs_intersections[1]).
+        # First arc index is 1 because index 0 is None due to fix list lenght.  Is it a good choice?
+        self.segments[1] = Segment2D(Point2D.from_arrays(
+            self.points_array[0]), self.acrs_intersections[1][0])
+
+        # Get segments between arcs
+        for i in range(2, self.length_polyline - 2):
+            self.segments[i] = Segment2D(Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y), Point2D(
+                self.acrs_intersections[i-1][-1].x, self.acrs_intersections[i-1][-1].y))
+
+        # Get last segment. Index is -2 because last index -1 should be None due to the same list lenght.
+        # For n points, there are n-1 segments.
+        self.segments[-2] = Segment2D(Point2D.from_arrays(
+            self.points_array[-1]), self.acrs_intersections[-2][2])
+
+        return self.segments
 
     def _alpha_assign(self, start_index: int, end_index: int):
         """
@@ -101,8 +170,8 @@ class Polyline:
                 minimum_radius, minimum_index = current_radius, i
                 alpha_low, alpha_high = alpha_a, alpha_b
 
-        alpha_a = min(self.lengths[end_index-2],
-                      self.lengths[end_index-1]-self.alpha_radii[end_index])
+        alpha_a = min(
+            self.lengths[end_index-2], self.lengths[end_index-1]-self.alpha_radii[end_index])
 
         current_radius = max(self.tangente[end_index-1]*alpha_a, self.tangente[end_index]
                              * self.alpha_radii[end_index])  # Radius at final segment
@@ -123,9 +192,8 @@ class Polyline:
         """
         Returns the radius that balances the radii on either end segement i.
         """
-
-        alpha_a = min(self.lengths[i-1], (self.lengths[i]*self.tangente[i+1]) /
-                      (self.tangente[i] + self.tangente[i+1]))
+        alpha_a = min(self.lengths[i-1], (self.lengths[i] *
+                      self.tangente[i+1])/(self.tangente[i] + self.tangente[i+1]))
         alpha_b = min(self.lengths[i+1], self.lengths[i]-alpha_a)
         return alpha_a, alpha_b, min(self.tangente[i]*alpha_a, self.tangente[i+1]*alpha_b)
 

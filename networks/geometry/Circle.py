@@ -1,6 +1,9 @@
-from networks.geometry.Point2D import Point2D
-from math import cos, sin, pi
+from math import cos, pi, sin
 from typing import List
+
+import numpy as np
+
+from networks.geometry.Point2D import Point2D
 
 
 class Circle:
@@ -8,14 +11,14 @@ class Circle:
         self.center = center
 
         self.radius = None
-        self.points = []
+        self.points: List[Point2D] = []
 
         self.inner = None
         self.outer = None
-        self.points_thick = []
+        self.points_thick: List[Point2D] = []
 
         self.spaced_radius = None
-        self.spaced_points = []
+        self.spaced_points: List[Point2D] = []
 
     def __repr__(self):
         return f"Circle(center: {self.center}, radius: {self.radius}, spaced_radius: {self.spaced_radius}, inner: {self.inner}, outer: {self.outer})"
@@ -43,6 +46,7 @@ class Circle:
                 continue
             else:
                 break
+        return self.points
 
     def circle_thick(self, inner: int, outer: int) -> List[Point2D]:
         """Compute discrete value of a 2d-circle with thickness. 
@@ -114,16 +118,17 @@ class Circle:
         center = self.center
 
         self.spaced_points = [
-            Point2D(cos(2 * pi / number * i) * radius,
-                    sin(2 * pi / number * i) * radius)
+            Point2D(round(cos(2 * pi / number * i) * radius),
+                    round(sin(2 * pi / number * i) * radius))
             for i in range(0, number + 1)
         ]
 
         for i in range(len(self.spaced_points)):
-            self.spaced_points[i] = Point2D(
+            current_point = Point2D(
                 self.spaced_points[i].x + center.x,
                 self.spaced_points[i].y + center.y
             ).round()
+            self.spaced_points[i] = current_point
         return self.spaced_points
 
     def _x_line(self, x1, x2, y):
