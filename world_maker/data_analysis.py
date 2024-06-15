@@ -232,6 +232,3 @@ def smooth_sobel_water() -> Image:
     group = filter_negative(group)
     group.save('./data/smooth_sobel_watermap.png')
     return group
-
-
-

@@ -17,6 +17,6 @@ if __name__ == '__main__':
     city.loop_expend_district()
     city.district_draw_map()
     city.district_generate_road()
-    road = city.draw_roads(Image.new('RGB', (401, 401)),3)
+    road = city.draw_roads(Image.new('RGB', (401, 401)), 4)
     road.save('./data/roadmap.png')
-    subtract_map(smooth_sobel_water,road).save('./data/roadmap2.png')
+    subtract_map(smooth_sobel_water, road).save('./data/roadmap2.png')

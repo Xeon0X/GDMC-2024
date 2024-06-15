@@ -149,5 +149,5 @@ if __name__ == '__main__':
     city.loop_expend_district()
     city.district_draw_map()
     city.district_generate_road()
-    image = city.draw_roads(Image.new('RGB', (401, 401)),3)
+    image = city.draw_roads(Image.new('RGB', (401, 401)),4)
     image.save('./data/roadmap.png')
