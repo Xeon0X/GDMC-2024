@@ -1,11 +1,18 @@
 import random
+
+import gdpc.exceptions
+
 from world_maker.world_maker import *
 from House import *
 
 def main():
+
     rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain = world_maker()
-    
-    editor = Editor()
+
+
+    editor = Editor(buffering=True)
+    buildArea = editor.getBuildArea()
+
     blocks = {
         "wall": "blackstone",
         "roof": "blackstone",
@@ -23,15 +30,18 @@ def main():
     }
     
     entranceDirection = ["N", "S", "E", "W"]
+
     
     for houses in rectangle_house_mountain:
-        house = House(editor, houses[0], houses[1], entranceDirection[random.randint(0, 3)], blocks)
+        start = (houses[0][0]+buildArea.begin[0], houses[0][1], houses[0][2]+buildArea.begin[2])
+        end = (houses[1][0]+buildArea.begin[0], houses[1][1], houses[1][2]+buildArea.begin[2])
+        house = House(editor, start, end, entranceDirection[random.randint(0, 3)], blocks)
         house.build()
 
 if __name__ == '__main__':
     main()
     
-
+"""
 from gdpc import Editor, Block, geometry, Transform
 import networks.curve as curve
 import numpy as np
@@ -64,3 +74,4 @@ geometry.placeCuboid(editor, (-5,0,-8), (25,100,25), Block("air"))
 building = Building(random_data["buildings"], [(0,0,0), (20,30,20)], baseShape, DIRECTION.EAST)
 # build it with your custom materials
 building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
+"""
