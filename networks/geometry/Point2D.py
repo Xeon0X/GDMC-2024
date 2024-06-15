@@ -72,7 +72,7 @@ class Point2D:
         else:
             return (s_p <= 0) and (t_p <= 0) and (s_p + t_p) >= d
 
-    def nearest(self, points: List["Point2D"]) -> "Point2D":
+    def nearest(self, points: List["Point2D"], return_index: bool = False) -> Union["Point2D", List[Union["Point2D", int]]]:
         """Return the nearest point. If multiple nearest point, returns the first in the list.
 
         Args:
@@ -81,6 +81,9 @@ class Point2D:
         Returns:
             Point2D: The nearest point, and if multiple, the first in the list.
         """
+        if return_index:
+            return min(
+                enumerate(points), key=lambda pair: self.distance(pair[1]))
         return min(points, key=lambda point: self.distance(point))
 
     def optimized_path(self, points: List["Point2D"]) -> List["Point2D"]:

@@ -61,7 +61,6 @@ class Polyline:
         self.get_arcs_intersections()
         self.get_arcs()
         self.get_segments()
-        print("\nlekj\n", self.segments, "\nklj\n")
 
         self.total_line_output = []
         for i in range(1, self.length_polyline-1):

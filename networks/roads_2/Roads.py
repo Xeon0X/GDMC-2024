@@ -52,9 +52,12 @@ class Road:
     def _projection(self):
         nearest_points_to_reference = []
         for i in range(len(self.coordinates)):
-            nearest_points_to_reference.append(Point3D.insert_3d([Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
-                self.polyline.total_line_output)], 'y', [self.coordinates[i].y])[0])
-        print(nearest_points_to_reference)
+            # nearest_points_to_reference.append(Point3D.insert_3d([Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
+            #     self.polyline.total_line_output, return_index=True)], 'y', [self.coordinates[i].y])[0])
+            index, point = Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
+                self.polyline.total_line_output, return_index=True)
+            nearest_points_to_reference.append(
+                Point2D(index, self.coordinates[i].y))
 
     def place(self):
         editor = Editor(buffering=True)
