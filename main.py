@@ -35,10 +35,7 @@ building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","
 
 
 # # Get a block
-# block = editor.getBlock((0,48,0))
-
-# # Place a block
-# editor.placeBlock((0 , 5, 0), Block("stone"))
+block = editor.getBlock((0,48,0))
 
 # # Build a cube
 # geometry.placeCuboid(editor, (458, 92, 488), (468, 99, 471), Block("oak_planks"))
@@ -46,7 +43,3 @@ building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","
 # curve = curve.Curve([(396, 132, 740), (435, 138, 730),
 #                     (443, 161, 758), (417, 73, 729)])
 # curve.compute_curve()
-
-# for point in curve.computed_points:
-#     print(point)
-#     editor.placeBlock(point, Block("stone"))
