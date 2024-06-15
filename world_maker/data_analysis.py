@@ -146,8 +146,8 @@ def subtract_map(image: Union[str, Image], substractImage: Union[str, Image]) ->
 
 
 def group_map(image1: Union[str, Image], image2: Union[str, Image]) -> Image:
-    image1 = handle_import_image(image1)
-    image2 = handle_import_image(image2)
+    image1 = handle_import_image(image1).convert('L')
+    image2 = handle_import_image(image2).convert('L')
 
     array1 = np.array(image1)
     array2 = np.array(image2)
@@ -221,3 +221,14 @@ def skeleton_highway_map(image: Union[str, Image] = './data/highwaymap.png'):
     skeleton.parse_graph(True)
     heightmap_skeleton = skeleton.map()
     heightmap_skeleton.save('./data/skeleton_highway.png')
+
+
+def smooth_sobel_water() -> Image:
+    watermap = handle_import_image("./data/watermap.png")
+    watermap = filter_negative(filter_remove_details(filter_negative(watermap), 5))
+    sobel = handle_import_image("./data/sobelmap.png")
+    sobel = filter_remove_details(filter_smooth(sobel, 1), 2)
+    group = group_map(watermap, sobel)
+    group = filter_negative(group)
+    group.save('./data/smooth_sobel_watermap.png')
+    return group
