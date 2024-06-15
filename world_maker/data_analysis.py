@@ -4,14 +4,16 @@ import numpy as np
 from scipy import ndimage
 from Skeleton import Skeleton
 from typing import Union
+from random import randint
+import cv2
 
 
 def get_data(world: World):
     print("[Data Analysis] Generating data...")
     heightmap, watermap, treemap = world.getData()
-    heightmap.save('./data/heightmap.png')
-    watermap.save('./data/watermap.png')
-    treemap.save('./data/treemap.png')
+    heightmap.save('./world_maker/data/heightmap.png')
+    watermap.save('./world_maker/data/watermap.png')
+    treemap.save('./world_maker/data/treemap.png')
     print("[Data Analysis] Data generated.")
     return heightmap, watermap, treemap
 
@@ -22,13 +24,14 @@ def handle_import_image(image: Union[str, Image]) -> Image:
     return image
 
 
-def filter_negative(image: Image) -> Image:
+def filter_negative(image: Union[str, Image]) -> Image:
     """
     Invert the colors of an image.
 
     Args:
         image (image): image to filter
     """
+    image = handle_import_image(image)
     return Image.fromarray(np.invert(np.array(image)))
 
 
@@ -179,9 +182,9 @@ def filter_remove_details(image: Union[str, Image], n: int = 20) -> Image:
 
 def highway_map() -> Image:
     print("[Data Analysis] Generating highway map...")
-    smooth_sobel = filter_smooth("./data/sobelmap.png", 1)
+    smooth_sobel = filter_smooth("./world_maker/data/sobelmap.png", 1)
     negative_smooth_sobel = filter_negative(smooth_sobel)
-    negative_smooth_sobel_water = subtract_map(negative_smooth_sobel, './data/watermap.png')
+    negative_smooth_sobel_water = subtract_map(negative_smooth_sobel, './world_maker/data/watermap.png')
     array_sobel_water = np.array(negative_smooth_sobel_water)
     array_sobel_water = ndimage.binary_erosion(array_sobel_water, iterations=12)
     array_sobel_water = ndimage.binary_dilation(array_sobel_water, iterations=5)
@@ -190,7 +193,7 @@ def highway_map() -> Image:
     array_sobel_water = filter_smooth_array(array_sobel_water, 6)
     image = Image.fromarray(array_sobel_water)
     image_no_details = filter_remove_details(image, 15)
-    image_no_details.save('./data/highwaymap.png')
+    image_no_details.save('./world_maker/data/highwaymap.png')
     print("[Data Analysis] Highway map generated.")
     return image_no_details
 
@@ -208,27 +211,82 @@ def create_volume(surface: np.ndarray, heightmap: np.ndarray, make_it_flat: bool
 
 def convert_2D_to_3D(image: Union[str, Image], make_it_flat: bool = False) -> np.ndarray:
     image = handle_import_image(image)
-    heightmap = Image.open('./data/heightmap.png').convert('L')
+    heightmap = Image.open('./world_maker/data/heightmap.png').convert('L')
     heightmap = np.array(heightmap)
     surface = np.array(image)
     volume = create_volume(surface, heightmap, make_it_flat)
     return volume
 
 
-def skeleton_highway_map(image: Union[str, Image] = './data/highwaymap.png'):
+def skeleton_highway_map(image: Union[str, Image] = './world_maker/data/highwaymap.png') -> Skeleton:
     image_array = convert_2D_to_3D(image, True)
     skeleton = Skeleton(image_array)
     skeleton.parse_graph(True)
     heightmap_skeleton = skeleton.map()
-    heightmap_skeleton.save('./data/skeleton_highway.png')
+    heightmap_skeleton.save('./world_maker/data/skeleton_highway.png')
+    skeleton.road_area('skeleton_highway_area.png', 10)
+    return skeleton
+
+
+def skeleton_mountain_map(image: Union[str, Image] = './world_maker/data/mountain_map.png') -> Skeleton:
+    image_array = convert_2D_to_3D(image, True)
+    skeleton = Skeleton(image_array)
+    skeleton.parse_graph()
+    heightmap_skeleton = skeleton.map()
+    heightmap_skeleton.save('./world_maker/data/skeleton_mountain.png')
+    skeleton.road_area('skeleton_mountain_area.png', 3)
+    return skeleton
 
 
 def smooth_sobel_water() -> Image:
-    watermap = handle_import_image("./data/watermap.png")
+    watermap = handle_import_image("./world_maker/data/watermap.png")
     watermap = filter_negative(filter_remove_details(filter_negative(watermap), 5))
-    sobel = handle_import_image("./data/sobelmap.png")
+    sobel = handle_import_image("./world_maker/data/sobelmap.png")
     sobel = filter_remove_details(filter_smooth(sobel, 1), 2)
     group = group_map(watermap, sobel)
     group = filter_negative(group)
-    group.save('./data/smooth_sobel_watermap.png')
+    group.save('./world_maker/data/smooth_sobel_watermap.png')
     return group
+
+
+def detect_mountain(image: Union[str, Image] = './world_maker/data/sobelmap.png') -> Image:
+    image = handle_import_image(image)
+    sobel = np.array(image)
+    pixels = sobel.reshape((-1, 1))
+    pixels = np.float32(pixels)
+
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    k = 3
+    _, labels, centers = cv2.kmeans(pixels, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+
+    centers = np.uint8(centers)
+    segmented_image = centers[labels.flatten()]
+    segmented_image = segmented_image.reshape(sobel.shape)
+    mountain = segmented_image == segmented_image.max()
+
+    contours, _ = cv2.findContours(mountain.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    max_contour = max(contours, key=cv2.contourArea)
+    M = cv2.moments(max_contour)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+
+    print(f"[Data Analysis] The center of the mountain is at ({cX}, {cY})")
+    return (cX, cY)
+
+
+def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
+                       height_min: int = 6, height_max: int = 10) \
+        -> list[tuple[tuple[int, int, int], tuple[int, int, int]]]:
+    image = handle_import_image('./world_maker/data/heightmap.png').convert('L')
+    new_rectangle = []
+    for rect in rectangle:
+        start, end = rect
+        avg_height = 0
+        for x in range(start[0], end[0]):
+            for y in range(start[1], end[1]):
+                avg_height += image.getpixel((x, y))
+        avg_height = int(avg_height / ((end[0] - start[0]) * (end[1] - start[1])))
+        new_rectangle.append(
+            ((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
+    return new_rectangle
