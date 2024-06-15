@@ -1,9 +1,7 @@
 
 from time import sleep
 from gdpc import Editor, Block, geometry
-from list_block import *
 import numpy as np
-from skimage.morphology import skeletonize
 import math
 import matplotlib.pyplot as plt
 
