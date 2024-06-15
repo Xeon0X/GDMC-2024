@@ -3,7 +3,7 @@ import numpy as np
 from skimage.morphology import skeletonize
 from skan.csr import skeleton_to_csgraph
 from collections import Counter
-from PIL import Image
+from PIL import Image, ImageDraw
 import random
 
 
@@ -213,3 +213,30 @@ class Skeleton:
         #         )
         print("[Skeleton] Mapping completed.")
         return heightmap  # , roadsArea
+
+    def road_area(self, name: str, radius: int = 10) -> Image:
+        print("[Skeleton] Start mapping the road area...")
+        heightmap = Image.open("data/heightmap.png")
+        width, height = heightmap.size
+        road_area_map = Image.new("L", (width, height), 0)
+        road_area_map_draw = ImageDraw.Draw(road_area_map)
+
+        # Lines
+        for i in range(len(self.lines)):
+            for j in range(len(self.lines[i])):
+                z = self.coordinates[self.lines[i][j]][0]
+                x = self.coordinates[self.lines[i][j]][2]
+                circle_coords = (z - radius, x - radius, z + radius, x + radius)
+                road_area_map_draw.ellipse(circle_coords, fill=255)
+
+        # Centers
+        for i in range(len(self.centers)):
+            z = self.coordinates[self.centers[i]][0]
+            x = self.coordinates[self.centers[i]][2]
+            circle_coords = (z - radius, x - radius, z + radius, x + radius)
+            road_area_map_draw.ellipse(circle_coords, fill=255)
+
+        road_area_map.save("data/"+name)
+
+        print("[Skeleton] Road area mapping completed.")
+        return road_area_map

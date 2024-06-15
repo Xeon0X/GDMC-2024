@@ -4,6 +4,7 @@ from PIL import Image
 import random
 from data_analysis import handle_import_image
 from typing import Union
+import numpy as np
 
 
 class City:
@@ -140,6 +141,31 @@ class City:
             district.generate_roads(self.map_data)
             roads.extend(district.roads)
         return roads
+
+    def point_in_which_district(self, point: Union[Position, tuple[int, int]]) -> int:
+        """
+        Get the index of the district in which the point is located.
+
+        :param point: The point to check.
+        :return: The index of the district in which the point is located.
+        """
+        if isinstance(point, Position):
+            point = (point.x, point.y)
+        return self.map_data[point[1]][point[0]]
+
+    def get_district_mountain_map(self) -> Image:
+        """
+        Get the map of a district.
+
+        :param district_id: The id of the district.
+        :return: The map of the district.
+        """
+        district_id = [district.tile_id for district in self.districts if district.type == "mountain"]
+        array = np.array([[True if self.map_data[y][x] in district_id else False for x in range(len(self.map_data[0]))]
+                          for y in range(len(self.map_data))])
+        image = Image.fromarray(array)
+        image.save('./data/mountain_map.png')
+        return image
 
 
 if __name__ == '__main__':

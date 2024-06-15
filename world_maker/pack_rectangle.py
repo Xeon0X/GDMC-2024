@@ -18,7 +18,7 @@ class Bin:
         best_spot = None
         best_spot_empty_area = float('inf')
 
-        for i in range(len(self.grid[0]) - rectangle.width + 1):  # Swap usage of x and y
+        for i in range(len(self.grid[0]) - rectangle.width + 1):
             for j in range(len(self.grid) - rectangle.height + 1):
                 if self.can_place(rectangle, i, j):
                     empty_area = self.calculate_empty_area(rectangle, i, j)
@@ -37,21 +37,21 @@ class Bin:
         empty_area = 0
         for rect_x in range(x, x + rectangle.width):
             for rect_y in range(y, y + rectangle.height):
-                if self.grid[rect_y][rect_x]:  # Swap usage of x and y
+                if self.grid[rect_y][rect_x]:
                     empty_area += 1
         return empty_area
 
     def can_place(self, rectangle, x, y):
         for rect_x in range(x, x + rectangle.width):
             for rect_y in range(y, y + rectangle.height):
-                if not self.grid[rect_y][rect_x]:  # Swap usage of x and y
+                if not self.grid[rect_y][rect_x]:
                     return False
         return True
 
     def update_grid(self, rectangle, x, y):
         for rect_x in range(x, x + rectangle.width):
             for rect_y in range(y, y + rectangle.height):
-                self.grid[rect_y][rect_x] = False  # Swap usage of x and y
+                self.grid[rect_y][rect_x] = False
 
 
 def pack_rectangles(rectangles, grid):
@@ -62,36 +62,33 @@ def pack_rectangles(rectangles, grid):
         for bin in bins:
             if bin.place_rectangle(rectangle):
                 break
-        else:  # No break, meaning rectangle couldn't be placed in any bin
+        else:
             new_bin = Bin(grid)
             if new_bin.place_rectangle(rectangle):
                 bins.append(new_bin)
             else:
-                return False  # If a rectangle can't be placed even in a new bin, return False
+                return False
 
-    return True  # If all rectangles can be placed, return True
+    return True
 
 
 import random
 
 
-def generate_rectangle(max_width, max_height):
-    width = random.randint(6, 20)
-    height = random.randint(6, 20)
+def generate_rectangle(max_width:int = 25):
+    width = random.randint(10, max_width)
+    height = random.randint(10, max_width)
     return Rectangle(width, height)
 
 
 def pack_rectangles(grid):
-    max_width = len(grid[0])
-    max_height = len(grid)
     bin = Bin(grid)
-
     while True:
-        rectangle = generate_rectangle(max_width // 2, max_height // 2)
+        rectangle = generate_rectangle()
         if not bin.place_rectangle(rectangle):
-            break  # Stop when a rectangle can't be placed
+            break
         print(len(bin.rectangles))
-    return bin.rectangles  # Return the list of rectangles that were placed
+    return bin.rectangles
 
 
 def draw_rectangles(rectangles, grid):

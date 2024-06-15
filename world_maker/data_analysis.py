@@ -4,6 +4,7 @@ import numpy as np
 from scipy import ndimage
 from Skeleton import Skeleton
 from typing import Union
+import cv2
 
 
 def get_data(world: World):
@@ -22,13 +23,14 @@ def handle_import_image(image: Union[str, Image]) -> Image:
     return image
 
 
-def filter_negative(image: Image) -> Image:
+def filter_negative(image: Union[str, Image]) -> Image:
     """
     Invert the colors of an image.
 
     Args:
         image (image): image to filter
     """
+    image = handle_import_image(image)
     return Image.fromarray(np.invert(np.array(image)))
 
 
@@ -215,12 +217,24 @@ def convert_2D_to_3D(image: Union[str, Image], make_it_flat: bool = False) -> np
     return volume
 
 
-def skeleton_highway_map(image: Union[str, Image] = './data/highwaymap.png'):
+def skeleton_highway_map(image: Union[str, Image] = './data/highwaymap.png') -> Skeleton:
     image_array = convert_2D_to_3D(image, True)
     skeleton = Skeleton(image_array)
     skeleton.parse_graph(True)
     heightmap_skeleton = skeleton.map()
     heightmap_skeleton.save('./data/skeleton_highway.png')
+    skeleton.road_area('skeleton_highway_area.png', 10)
+    return skeleton
+
+
+def skeleton_mountain_map(image: Union[str, Image] = './data/mountain_map.png') -> Skeleton:
+    image_array = convert_2D_to_3D(image, True)
+    skeleton = Skeleton(image_array)
+    skeleton.parse_graph()
+    heightmap_skeleton = skeleton.map()
+    heightmap_skeleton.save('./data/skeleton_mountain.png')
+    skeleton.road_area('skeleton_mountain_area.png',3)
+    return skeleton
 
 
 def smooth_sobel_water() -> Image:
@@ -232,3 +246,29 @@ def smooth_sobel_water() -> Image:
     group = filter_negative(group)
     group.save('./data/smooth_sobel_watermap.png')
     return group
+
+
+def detect_mountain(image: Union[str, Image] = './data/sobelmap.png') -> Image:
+    image = handle_import_image(image)
+    sobel = np.array(image)
+    pixels = sobel.reshape((-1, 1))
+    pixels = np.float32(pixels)
+
+    criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
+    k = 3
+    _, labels, centers = cv2.kmeans(pixels, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+
+    centers = np.uint8(centers)
+    segmented_image = centers[labels.flatten()]
+    segmented_image = segmented_image.reshape(sobel.shape)
+    mountain = segmented_image == segmented_image.max()
+
+    contours, _ = cv2.findContours(mountain.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    max_contour = max(contours, key=cv2.contourArea)
+    M = cv2.moments(max_contour)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+
+    print(f"[Data Analysis] The center of the mountain is at ({cX}, {cY})")
+    return (cX, cY)

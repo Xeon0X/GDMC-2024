@@ -3,6 +3,7 @@ from typing import Union
 from random import randint
 from PIL import Image
 
+
 class Road:
     def __init__(self, position: Position, id_height: int, id_width: int, border: bool = False):
         self.position: Position = position
@@ -58,7 +59,7 @@ class District:
         return (0 <= point_new.x < len(map_data[0]) and
                 0 <= point_new.y < len(map_data) and
                 map_data[point_new.y][point_new.x] == 0 and
-                (self.type == "Mountain" or
+                (self.type == "mountain" or
                  abs(height_map[point_new.y][point_new.x] - height_map[point.y][point.x]) < 2))
 
     def is_point_inside(self, point: Position, map_data) -> bool:
