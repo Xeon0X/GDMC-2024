@@ -20,21 +20,15 @@ class Road:
         self.width = width
 
         self.polyline = Polyline(Point3D.to_2d(coordinates, 'y'))
-        self.surface()
+        self._surface()
 
-        # for i in range(1, len(self.polyline.segments)-1):
-        # print(self._y_interpolation(self.polyline.segments[i].segment_thick(
-        #     self.width, LINE_THICKNESS_MODE.MIDDLE)))
-        # self._y_interpolation(self.polyline.segments[i].segment())
-
-    def surface(self):
+    def _surface(self):
         # Segments
         for i in range(1, len(self.polyline.segments)-1):
-            print()
             if len(self.polyline.segments[i].segment()) > 1:
                 for j in range(len(self.polyline.segments[i].segment_thick(self.width, LINE_THICKNESS_MODE.MIDDLE))):
                     self.output_block.append(
-                        (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [170])[0].coordinates, Block("stone")))
+                        (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [180])[0].coordinates, Block("stone")))
 
         for i in range(1, len(self.polyline.centers)-1):
             # Circle
@@ -53,24 +47,10 @@ class Road:
                 if circle.points_thick[j].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
                     self.output_block.append(
                         (Point3D.insert_3d([circle.points_thick[j]], 'y', [
-                            170+i])[0].coordinates, Block("white_concrete")))
+                            180+i])[0].coordinates, Block("black_concrete")))
 
-            # v = Point2D.to_arrays(
-            #     self.polyline.centers[i]) - self.polyline.bisectors[i]
-
-            # print(self.polyline.centers[i], Point2D.from_arrays(v).round())
-            # # s = Segment2D(
-            # #     self.polyline.centers[i], Point2D.from_arrays(v).round())
-            # # s.segment()
-            # arc = Point2D.to_arrays(self.polyline.acrs_intersections[i][0])
-            # s = Segment2D(
-            #     self.polyline.centers[i], Point2D.from_arrays(arc))
-            # s.segment()
-
-            # for j in range(len(s.points)):
-            #     self.output_block.append(
-            #         (Point3D.insert_3d([s.points[j]], 'y', [
-            #          162])[0].coordinates, Block("purple_concrete")))
+    def _projection(self):
+        pass
 
     def place(self):
         editor = Editor(buffering=True)

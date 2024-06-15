@@ -7,8 +7,6 @@ from networks.geometry.Circle import Circle
 from networks.geometry.Point2D import Point2D
 from networks.geometry.Segment2D import Segment2D
 
-# from Enums import LINE_THICKNESS_MODE, LINE_OVERLAP
-
 
 class Polyline:
     def __init__(self, points: List[Point2D]):
@@ -46,8 +44,8 @@ class Polyline:
         self.centers = [None] * self.length_polyline  # c, list of points
         # list of tuple of points (first intersection, corresponding corner, last intersection)
         self.acrs_intersections = [None] * self.length_polyline
-        self.arcs = [[]] * self.length_polyline  # list of points
-        self.bisectors = [None] * self.length_polyline
+        self.arcs = [[] for _ in range(self.length_polyline)]  # list of points
+        # self.bisectors = [None] * self.length_polyline
 
         # For n points, there is n-1 segments. Last element should stays None.
         self.segments = [None] * \
@@ -63,6 +61,13 @@ class Polyline:
         self.get_arcs_intersections()
         self.get_arcs()
         self.get_segments()
+
+        self.total_line_output = []
+        # for i in range(1, self.length_polyline-1):
+        #     self.total_line_output.extend(self.segments[i].segment())
+        #     self.total_line_output.extend(self.arcs[i])
+        self.total_line_output.extend(self.segments[1].segment())
+        self.total_line_output.extend(self.arcs[2])
 
     def __repr__(self):
         return str(self.alpha_radii)
@@ -101,16 +106,19 @@ class Polyline:
 
     def get_arcs(self) -> List[Point2D]:
         for i in range(1, self.length_polyline-1):
-            circle = Circle(self.centers[i])
-            circle.circle(self.radii[i])
-            for j in range(len(circle.points)):
-                if circle.points[j].is_in_triangle(self.acrs_intersections[i][0], self.acrs_intersections[i][1], self.acrs_intersections[i][2]):
-                    self.arcs[i].append(circle.points[j])
-            self.bisectors[i] = Point2D.to_arrays(
-                self.centers[i]) + (self.unit_vectors[i-1] - self.points_array[i])
+            points = Circle(self.centers[i]).circle(self.radii[i])
 
-            (self.unit_vectors[i]+self.unit_vectors[i-1]) / \
-                np.linalg.norm(self.unit_vectors[i]-self.unit_vectors[i-1])
+            # Better to do here than drawing circle arc inside big triangle!
+            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
+                self.acrs_intersections[i][0]) - Point2D.to_arrays(self.centers[i])))
+            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
+                self.acrs_intersections[i][2]) - Point2D.to_arrays(self.centers[i])))
+            input("---")
+            for j in range(len(points)):
+                print(points[j], i, j, len(points))
+                print(len(self.arcs[i]), len(self.arcs[i-1]))
+                if points[j].is_in_triangle(double_point_a, self.centers[i], double_point_b):
+                    self.arcs[i].append(points[j])
         return self.arcs
 
     def get_segments(self) -> List[Segment2D]:
@@ -134,8 +142,8 @@ class Polyline:
 
         # Get last segment. Index is -2 because last index -1 should be None due to the same list lenght.
         # For n points, there are n-1 segments.
-        self.segments[-2] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
-            self.points_array[-1]))
+        # self.segments[-2] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
+        #     self.points_array[-1]))
 
         return self.segments
 

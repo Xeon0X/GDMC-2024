@@ -308,10 +308,13 @@ random_points = [Point2D(random.randint(min_val, max_val), random.randint(
 
 random_points = random_points[0].optimized_path(random_points)
 
+print(random_points)
+
+# random_points = [Point2D(94, 71), Point2D(-12, 54), Point2D(-28, 10), Point2D(
+#     0, -33), Point2D(80, -50), Point2D(73, -89), Point2D(-86, -3), Point2D(-82, 92)]
+
 p = Polyline(random_points)
 
-# Point2D(-1156, 378), Point2D(-1220, 359), Point2D(-1265, 290)
-# print(p.alpha_radii)
 
 radius = p.get_radii()
 center = p.get_centers()
@@ -388,15 +391,21 @@ for j in range(len(s1.points_thick)-1):
     draw.point((s1.points_thick[j].x+w,
                 w-s1.points_thick[j].y), fill='grey')
 
-for i in range(0, len(p.arcs)):
-    for j in range(len(p.arcs[i])):
-        draw.point((p.arcs[i][j].x+w, w-p.arcs[i][j].y), fill='white')
+# for i in range(0, len(p.arcs)):
+#     for j in range(len(p.arcs[i])):
+#         draw.point((p.arcs[i][j].x+w, w-p.arcs[i][j].y), fill='green')
 
 
 for i in range(1, len(p.segments)-1):
     for j in range(len(p.segments[i].segment_thick(5, LINE_THICKNESS_MODE.MIDDLE))):
         draw.point((p.segments[i].points_thick[j].x+w,
                     w-p.segments[i].points_thick[j].y), fill='white')
+
+
+def get_color(i):
+    color = (50+round(i), 50+round(i/5), 50+round(i/3))
+    return color
+
 
 for i in range(1, len(p.centers)-1):
     draw.point((p.centers[i].x+w, w-p.centers[i].y), fill='red')
@@ -406,6 +415,10 @@ for i in range(1, len(p.centers)-1):
                w-p.acrs_intersections[i][1].y), fill='purple')
     draw.point((p.acrs_intersections[i][2].x+w,
                w-p.acrs_intersections[i][2].y), fill='blue')
+
+for i in range(len(p.total_line_output)):
+    draw.point((p.total_line_output[i].x+w,
+               w-p.total_line_output[i].y), fill=get_color(i))
 
 image.save('output_image.png')
 
