@@ -69,6 +69,9 @@ class Polyline:
         self.total_line_output.extend(
             self.segments[self.length_polyline-1].segment())
 
+        self.total_line_output = self.total_line_output[0].optimized_path(
+            self.total_line_output)
+
     def __repr__(self):
         return str(self.alpha_radii)
 

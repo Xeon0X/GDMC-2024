@@ -27,10 +27,9 @@ class Road:
         self._projection()
         self._surface()
 
-        print(self.polyline_total_line_output)
-
     def _surface(self):
         # Segments
+
         for i in range(1, len(self.polyline.segments)):
             if len(self.polyline.segments[i].segment()) > 1:
                 for j in range(len(self.polyline.segments[i].segment_thick(self.width, LINE_THICKNESS_MODE.MIDDLE))):

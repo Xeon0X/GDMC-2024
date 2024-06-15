@@ -450,7 +450,10 @@ image.save('output_image.png')
 # road = Road([Point3D(-454, 130, 1046), Point3D(-497, 127, 1070),
 #             Point3D(-545, 85, 1019), Point3D(-545, 85, 970), Point3D(-457, 87, 865)], 9)
 
-# road.place()
+road = Road(Point3D.insert_3d(random_points, 'y', [random.randint(
+    200, 250) for _ in range(n_points)]), 15)
+
+road.place()
 
 # s = Segment2D(Point2D(-88, -12), Point2D(9, 75))
 # s.segment_thick(3, LINE_THICKNESS_MODE.MIDDLE)
