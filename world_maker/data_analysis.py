@@ -286,7 +286,7 @@ def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
         for x in range(start[0], end[0]):
             for y in range(start[1], end[1]):
                 avg_height += image.getpixel((x, y))
-        avg_height = int(avg_height / ((end[0] - start[0]) * (end[1] - start[1])))
+        avg_height = int(avg_height / ((end[0] - start[0]) * (end[1] - start[1]))) + 1
         new_rectangle.append(
             ((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
     return new_rectangle
