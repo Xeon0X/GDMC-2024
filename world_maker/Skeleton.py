@@ -7,6 +7,8 @@ from PIL import Image, ImageDraw
 import random
 
 
+
+
 class Skeleton:
     def __init__(self, data: np.ndarray = None):
         self.lines = []
