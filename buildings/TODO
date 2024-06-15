@@ -3,10 +3,9 @@ toit de balcon avec/sans pilliers
 collumn style
 rembard object
 détails facade
-rdc
+Entrance style
 toit (clim, chateau deau, pubs)
 tiles 3d
-textures object
 opti textures
 opti géométrique
 opti gdpc
@@ -18,3 +17,4 @@ angles 270
 bug entrée au milieu du O
 bug entrée dans le pillier
 center le building dans son area (ou pas)
+position building
