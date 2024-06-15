@@ -31,7 +31,7 @@ class Road:
         # Segments
 
         for i in range(1, len(self.polyline.segments)):
-            if len(self.polyline.segments[i].segment()) > 1:
+            if len(self.polyline.segments[i].segment()) > 2:
                 for j in range(len(self.polyline.segments[i].segment_thick(self.width, LINE_THICKNESS_MODE.MIDDLE))):
                     # Get nearest in x,z projection
                     nearest = self.polyline.segments[i].points_thick[j].nearest(
