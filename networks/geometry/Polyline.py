@@ -61,11 +61,14 @@ class Polyline:
         self.get_arcs_intersections()
         self.get_arcs()
         self.get_segments()
+        print("\nlekj\n", self.segments, "\nklj\n")
 
         self.total_line_output = []
         for i in range(1, self.length_polyline-1):
             self.total_line_output.extend(self.segments[i].segment())
             self.total_line_output.extend(self.arcs[i])
+        self.total_line_output.extend(
+            self.segments[self.length_polyline-1].segment())
 
     def __repr__(self):
         return str(self.alpha_radii)
@@ -137,7 +140,7 @@ class Polyline:
 
         # Why -3?
         # For n points, there are n-1 segments.
-        self.segments[-3] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
+        self.segments[-1] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
             self.points_array[-1]))
 
         return self.segments

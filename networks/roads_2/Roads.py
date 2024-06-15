@@ -53,7 +53,7 @@ class Road:
         nearest_points_to_reference = []
         for i in range(len(self.coordinates)):
             nearest_points_to_reference.append(Point3D.insert_3d([Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
-                self.polyline.total_line_output)], 'y', [self.coordinates[i].y]))
+                self.polyline.total_line_output)], 'y', [self.coordinates[i].y])[0])
         print(nearest_points_to_reference)
 
     def place(self):

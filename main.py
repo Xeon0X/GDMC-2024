@@ -306,12 +306,15 @@ random_points = [Point2D(random.randint(min_val, max_val), random.randint(
 # random_points = [Point2D(-40, -56), Point2D(-94, 92), Point2D(19, -47), Point2D(
 #     100, 59), Point2D(-85, -73), Point2D(-33, -9), Point2D(57, -25), Point2D(51, -34)]
 
-random_points = random_points[0].optimized_path(random_points)
+# random_points = random_points[0].optimized_path(random_points)
 
-print(random_points)
+# print(random_points)
 
 # random_points = [Point2D(94, 71), Point2D(-12, 54), Point2D(-28, 10), Point2D(
 #     0, -33), Point2D(80, -50), Point2D(73, -89), Point2D(-86, -3), Point2D(-82, 92)]
+
+random_points = [Point2D(-59, -21), Point2D(-43, -19), Point2D(-61, 19), Point2D(
+    45, 19), Point2D(80, -4), Point2D(99, 2), Point2D(47, 63), Point2D(100, -91)]
 
 p = Polyline(random_points)
 
