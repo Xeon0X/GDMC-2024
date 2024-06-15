@@ -63,11 +63,9 @@ class Polyline:
         self.get_segments()
 
         self.total_line_output = []
-        # for i in range(1, self.length_polyline-1):
-        #     self.total_line_output.extend(self.segments[i].segment())
-        #     self.total_line_output.extend(self.arcs[i])
-        self.total_line_output.extend(self.segments[1].segment())
-        self.total_line_output.extend(self.arcs[2])
+        for i in range(1, self.length_polyline-1):
+            self.total_line_output.extend(self.segments[i].segment())
+            self.total_line_output.extend(self.arcs[i])
 
     def __repr__(self):
         return str(self.alpha_radii)
@@ -113,10 +111,8 @@ class Polyline:
                 self.acrs_intersections[i][0]) - Point2D.to_arrays(self.centers[i])))
             double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
                 self.acrs_intersections[i][2]) - Point2D.to_arrays(self.centers[i])))
-            input("---")
+
             for j in range(len(points)):
-                print(points[j], i, j, len(points))
-                print(len(self.arcs[i]), len(self.arcs[i-1]))
                 if points[j].is_in_triangle(double_point_a, self.centers[i], double_point_b):
                     self.arcs[i].append(points[j])
         return self.arcs

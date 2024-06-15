@@ -1,13 +1,12 @@
 import json
 from typing import List
 from networks.geometry.Polyline import Polyline
-from networks.geometry.Segment2D import Segment2D
-from networks.geometry.Segment3D import Segment3D
+
 from networks.geometry.Point3D import Point3D
 from networks.geometry.Point2D import Point2D
 from networks.geometry.Circle import Circle
 from Enums import LINE_THICKNESS_MODE
-from gdpc import Block, Editor, geometry
+from gdpc import Block, Editor
 
 
 class Road:
