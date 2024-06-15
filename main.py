@@ -5,6 +5,8 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
+
 from gdpc import Editor, Block, geometry, Transform
 import networks.curve as curve
 import numpy as np
@@ -37,25 +39,3 @@ geometry.placeCuboid(editor, (-5,0,-8), (25,100,25), Block("air"))
 building = Building(random_data["buildings"], [(0,0,0), (20,30,20)], baseShape, DIRECTION.EAST)
 # build it with your custom materials
 building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
-
-
-
-
-
-
-# # Get a block
-# block = editor.getBlock((0,48,0))
-
-# # Place a block
-# editor.placeBlock((0 , 5, 0), Block("stone"))
-
-# # Build a cube
-# geometry.placeCuboid(editor, (458, 92, 488), (468, 99, 471), Block("oak_planks"))
-
-# curve = curve.Curve([(396, 132, 740), (435, 138, 730),
-#                     (443, 161, 758), (417, 73, 729)])
-# curve.compute_curve()
-
-# for point in curve.computed_points:
-#     print(point)
-#     editor.placeBlock(point, Block("stone"))
