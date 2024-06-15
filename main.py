@@ -441,10 +441,16 @@ image.save('output_image.png')
 # road = Road([Point3D(-984, 97, 811), Point3D(-984, 97, 847),
 #              Point3D(-962, 97, 860), Point3D(-970, 97, 900), Point3D(-953, 97, 920)], 10)
 
-road = Road([Point3D(-1024, 106, 1000), Point3D(-1024, 101, 972),
-             Point3D(-1001, 100, 966), Point3D(-977, 98, 984), Point3D(-966, 102, 1011), Point3D(-905, 97, 1013), Point3D(-774, 99, 998), Point3D(-694, 99, 1047)], 9)
+# road = Road([Point3D(-1024, 106, 1000), Point3D(-1024, 101, 972),
+#              Point3D(-1001, 100, 966), Point3D(-977, 98, 984), Point3D(-966, 102, 1011), Point3D(-905, 97, 1013), Point3D(-774, 99, 998), Point3D(-694, 99, 1047)], 9)
 
-road.place()
+# road = Road([Point3D(-745, 125, 899), Point3D(-744, 117, 944),
+#             Point3D(-696, 112, 941), Point3D(-645, 112, 979)], 9)
+
+# road = Road([Point3D(-454, 130, 1046), Point3D(-497, 127, 1070),
+#             Point3D(-545, 85, 1019), Point3D(-545, 85, 970), Point3D(-457, 87, 865)], 9)
+
+# road.place()
 
 # s = Segment2D(Point2D(-88, -12), Point2D(9, 75))
 # s.segment_thick(3, LINE_THICKNESS_MODE.MIDDLE)

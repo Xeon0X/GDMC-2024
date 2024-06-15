@@ -17,18 +17,28 @@ class Road:
         #     self.road_configuration = json.load(f)
         #     self.width = self.road_configuration["width"]
         self.width = width
+        self.polyline_height = None
 
         self.polyline = Polyline(Point3D.to_2d(coordinates, 'y'))
-        self._surface()
+        self.polyline_total_line_output = [
+            [] for _ in range(len(self.polyline.total_line_output))]
+        self.index_factor = 0
+
         self._projection()
+        self._surface()
+
+        print(self.polyline_total_line_output)
 
     def _surface(self):
         # Segments
-        for i in range(1, len(self.polyline.segments)-1):
+        for i in range(1, len(self.polyline.segments)):
             if len(self.polyline.segments[i].segment()) > 1:
                 for j in range(len(self.polyline.segments[i].segment_thick(self.width, LINE_THICKNESS_MODE.MIDDLE))):
+                    # Get nearest in x,z projection
+                    nearest = self.polyline.segments[i].points_thick[j].nearest(
+                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
                     self.output_block.append(
-                        (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [180])[0].coordinates, Block("stone")))
+                        (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("stone")))
 
         for i in range(1, len(self.polyline.centers)-1):
             # Circle
@@ -45,9 +55,11 @@ class Road:
 
             for j in range(len(circle.points_thick)):
                 if circle.points_thick[j].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                    nearest = circle.points_thick[j].nearest(
+                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
                     self.output_block.append(
                         (Point3D.insert_3d([circle.points_thick[j]], 'y', [
-                            180+i])[0].coordinates, Block("black_concrete")))
+                            self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
 
     def _projection(self):
         nearest_points_to_reference = []
@@ -58,6 +70,18 @@ class Road:
                 self.polyline.total_line_output, return_index=True)
             nearest_points_to_reference.append(
                 Point2D(index, self.coordinates[i].y))
+
+        self.polyline_height = Polyline(nearest_points_to_reference)
+
+        self.index_factor = len(
+            self.polyline_height.total_line_output)/len(self.polyline.total_line_output)
+
+        for i in range(len(self.polyline.total_line_output)):
+            self.polyline_total_line_output[i] = Point3D(
+                self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y, self.polyline.total_line_output[i].y)
+
+        self.polyline_total_line_output = self.polyline_total_line_output[0].optimized_path(
+            self.polyline_total_line_output)
 
     def place(self):
         editor = Editor(buffering=True)
