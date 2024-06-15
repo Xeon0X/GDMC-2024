@@ -630,9 +630,29 @@ class House:
                 self.placeWindowOnWall(wall, x, True)
 
     def placeStairs(self):
-        pass
+        x, z, width, depth, height = self.skeleton[0]
+        x_moy = x + width//2
+        z_moy = z + depth//2
+        slab_up = Block(self.blocks["stairs_slab"], { "type": "top"})
+        slab_down = Block(self.blocks["stairs_slab"], { "type": "bottom"})
+        for i in range(0, self.nbEtage-1):
+            for k in range(3):
+                for l in range(3):
+                    self.editor.placeBlock((x_moy-1+k, self.coordinates_min[1] + 4*(i+1), z_moy-1+l),Block("air"))
 
-    
+            for j in range(1, 5):
+                self.editor.placeBlock((x_moy, self.coordinates_min[1] + 4*i+j, z_moy), self.floor)
+            
+            self.editor.placeBlock((x_moy-1, self.coordinates_min[1] +1+ 4*i, z_moy-1), slab_down)
+            self.editor.placeBlock((x_moy, self.coordinates_min[1] +1+ 4*i, z_moy-1), slab_up)
+            self.editor.placeBlock((x_moy+1, self.coordinates_min[1] +2+ 4*i, z_moy-1), slab_down)
+            self.editor.placeBlock((x_moy+1, self.coordinates_min[1] +2+ 4*i, z_moy), slab_up)
+            self.editor.placeBlock((x_moy+1, self.coordinates_min[1] +3+ 4*i, z_moy+1), slab_down)
+            
+            self.editor.placeBlock((x_moy, self.coordinates_min[1] +3+ 4*i, z_moy+1), slab_up)
+            self.editor.placeBlock((x_moy-1, self.coordinates_min[1] +4+ 4*i, z_moy+1), slab_down)
+            self.editor.placeBlock((x_moy-1, self.coordinates_min[1] +4+ 4*i, z_moy), slab_up)
+            
     def WallFacingDirection(self):
         
         if self.direction == "N":
@@ -867,6 +887,7 @@ if __name__ == "__main__":
         "window": "glass_pane",
         "entrance": "oak_door",
         "stairs": "quartz_stairs",
+        "stairs_slab": "quartz_slab",
         "celling": "quartz_block",
         "floor": "quartz_block",
         "celling_slab": "quartz_slab",
@@ -889,6 +910,9 @@ if __name__ == "__main__":
         house.placeWindow()
         house.placeEntrance()
         house.placeGardenOutline()
+        
+        if house.nbEtage > 1:
+            house.placeStairs()
         
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
