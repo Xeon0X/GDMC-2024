@@ -1,4 +1,5 @@
 
+from networks.roads_2.Roads import Road
 import json
 import random
 
@@ -25,7 +26,7 @@ from networks.geometry.point_tools import (
 from networks.geometry.Polyline import Polyline
 from networks.geometry.Segment2D import Segment2D
 from networks.geometry.Segment3D import Segment3D
-from networks.roads import Road as Road
+# from networks.roads import Road as Road
 from networks.roads.intersections import Intersection as Intersection
 
 matplotlib.use('Agg')
@@ -296,9 +297,6 @@ min_val, max_val = -w, w
 random_points = [Point2D(random.randint(min_val, max_val), random.randint(
     min_val, max_val)) for _ in range(n_points)]
 
-print(random_points)
-print("\n\n")
-
 
 # random_points = (Point2D(-75, -75), Point2D(0, -75), Point2D(75, 75),
 #                  Point2D(75, -50), Point2D(-50, 50), Point2D(0, 0))
@@ -396,9 +394,9 @@ for i in range(0, len(p.arcs)):
 
 
 for i in range(1, len(p.segments)-1):
-    for j in range(len(p.segments[i].segment())):
-        draw.point((p.segments[i].points[j].x+w,
-                    w-p.segments[i].points[j].y), fill='white')
+    for j in range(len(p.segments[i].segment_thick(5, LINE_THICKNESS_MODE.MIDDLE))):
+        draw.point((p.segments[i].points_thick[j].x+w,
+                    w-p.segments[i].points_thick[j].y), fill='white')
 
 for i in range(1, len(p.centers)-1):
     draw.point((p.centers[i].x+w, w-p.centers[i].y), fill='red')
@@ -409,8 +407,28 @@ for i in range(1, len(p.centers)-1):
     draw.point((p.acrs_intersections[i][2].x+w,
                w-p.acrs_intersections[i][2].y), fill='blue')
 
-
 image.save('output_image.png')
+
+
+# road = Road([Point3D(-1201, 75, 705), Point3D(-1162, 69, 687),
+#              Point3D(-1149, 71, 647), Point3D(-1191, 68, 611)], 5)
+
+# road = Road([Point3D(-1359, 75, 696), Point3D(-1389, 126, 697),
+#              Point3D(-1401, 126, 714), Point3D(-1426, 126, 707), Point3D(-1452, 126, 714), Point3D(-1430, 126, 765)], 5)
+
+# road = Road([Point3D(-1203, 73, 718), Point3D(-1157, 76, 719),
+#              Point3D(-1119, 76, 763), Point3D(-1101, 76, 827), Point3D(-1088, 76, 879), Point3D(-1095, 76, 944)], 10)
+
+# road = Road([Point3D(-986, 83, 602), Point3D(-1000, 83, 647),
+#              Point3D(-993, 83, 680), Point3D(-965, 83, 712)], 10)
+
+# road = Road([Point3D(-984, 97, 811), Point3D(-984, 97, 847),
+#              Point3D(-962, 97, 860), Point3D(-970, 97, 900), Point3D(-953, 97, 920)], 10)
+
+road = Road([Point3D(-1024, 106, 1000), Point3D(-1024, 101, 972),
+             Point3D(-1001, 100, 966), Point3D(-977, 98, 984), Point3D(-966, 102, 1011), Point3D(-905, 97, 1013), Point3D(-774, 99, 998), Point3D(-694, 99, 1047)], 9)
+
+road.place()
 
 # s = Segment2D(Point2D(-88, -12), Point2D(9, 75))
 # s.segment_thick(3, LINE_THICKNESS_MODE.MIDDLE)

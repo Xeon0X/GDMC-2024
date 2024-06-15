@@ -47,7 +47,7 @@ class Polyline:
         # list of tuple of points (first intersection, corresponding corner, last intersection)
         self.acrs_intersections = [None] * self.length_polyline
         self.arcs = [[]] * self.length_polyline  # list of points
-        # self.not_arcs = [[]] * self.length_polyline
+        self.bisectors = [None] * self.length_polyline
 
         # For n points, there is n-1 segments. Last element should stays None.
         self.segments = [None] * \
@@ -106,16 +106,11 @@ class Polyline:
             for j in range(len(circle.points)):
                 if circle.points[j].is_in_triangle(self.acrs_intersections[i][0], self.acrs_intersections[i][1], self.acrs_intersections[i][2]):
                     self.arcs[i].append(circle.points[j])
-            # for j in range(len(circle.points)):
-            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][0], self.acrs_intersections[i][1]).segment(LINE_OVERLAP.MINOR)):
-            #         self.not_arcs[i].append(circle.points[j])
-            #         print("hzeh")
-            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][1], self.acrs_intersections[i][2]).segment(LINE_OVERLAP.MINOR)):
-            #         self.not_arcs[i].append(circle.points[j])
-            #         print("hzeh")
-            #     if (circle.points[j] in Segment2D(self.acrs_intersections[i][2], self.acrs_intersections[i][0]).segment(LINE_OVERLAP.MINOR)):
-            #         self.not_arcs[i].append(circle.points[j])
-            #         print("hzeh")
+            self.bisectors[i] = Point2D.to_arrays(
+                self.centers[i]) + (self.unit_vectors[i-1] - self.points_array[i])
+
+            (self.unit_vectors[i]+self.unit_vectors[i-1]) / \
+                np.linalg.norm(self.unit_vectors[i]-self.unit_vectors[i-1])
         return self.arcs
 
     def get_segments(self) -> List[Segment2D]:
@@ -133,14 +128,14 @@ class Polyline:
             self.points_array[0]), self.acrs_intersections[1][0])
 
         # Get segments between arcs
-        for i in range(2, self.length_polyline - 2):
+        for i in range(2, self.length_polyline - 1):
             self.segments[i] = Segment2D(Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y), Point2D(
                 self.acrs_intersections[i-1][-1].x, self.acrs_intersections[i-1][-1].y))
 
         # Get last segment. Index is -2 because last index -1 should be None due to the same list lenght.
         # For n points, there are n-1 segments.
-        self.segments[-2] = Segment2D(Point2D.from_arrays(
-            self.points_array[-1]), self.acrs_intersections[-2][2])
+        self.segments[-2] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
+            self.points_array[-1]))
 
         return self.segments
 
@@ -205,9 +200,11 @@ class Polyline:
             self.unit_vectors[j] = self.vectors[j]/self.lengths[j]
 
         # Between two segments, there is only one angle
-        for k in range(1, self.length_polyline-1):
-            dot = np.dot(self.unit_vectors[k], self.unit_vectors[k-1])
-            self.tangente[k] = sqrt((1+dot)/(1-dot))
+        for i in range(1, self.length_polyline-1):
+            dot = np.dot(self.unit_vectors[i], self.unit_vectors[i-1])
+            self.tangente[i] = sqrt((1+dot)/(1-dot))
+            # self.bisectors[i] = (self.unit_vectors[i]+self.unit_vectors[i-1]) / \
+            #     np.linalg.norm(self.unit_vectors[i]-self.unit_vectors[i-1])
 
     def _compute_alpha_radii(self):
         self.alpha_radii[0] = 0

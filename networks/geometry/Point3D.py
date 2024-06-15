@@ -1,5 +1,6 @@
 from math import sqrt
-from typing import List
+from typing import List, Union
+from networks.geometry.Point2D import Point2D
 
 import numpy as np
 
@@ -72,23 +73,52 @@ class Point3D:
         return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2 + (point.z - self.z) ** 2)
 
     @staticmethod
-    def to_vectors(points: List["Point3D"]):
-        vectors = []
-        for point in points:
-            vectors.append(np.array(point.coordinates))
-
-        if (len(vectors) == 1):
-            return vectors[0]
-        else:
+    def to_arrays(points: Union[List["Point3D"], "Point3D"]) -> Union[List[np.array], "Point3D"]:
+        if isinstance(points, list):
+            vectors = []
+            for point in points:
+                vectors.append(np.array(point.coordinates))
             return vectors
+        else:
+            return np.array(points.coordinates)
 
     @staticmethod
-    def from_arrays(vectors: List[np.array]) -> List["Point3D"]:
-        points = []
-        for vector in vectors:
-            points.append(Point3D(vector[0], vector[1], vector[2]))
-
-        if (len(points) == 1):
-            return points[0]
-        else:
+    def from_arrays(vectors: Union[List[np.array], "Point3D"]) -> Union[List["Point3D"], "Point3D"]:
+        if isinstance(vectors, list):
+            points = []
+            for vector in vectors:
+                points.append(Point3D(vector[0], vector[1], vector[2]))
             return points
+        else:
+            return Point3D(vectors[0], vectors[1], vectors[2])
+
+    @staticmethod
+    def to_2d(points: List["Point3D"], removed_axis: str) -> List[Point2D]:
+        points_2d = []
+        if removed_axis == 'x':
+            for i in range(len(points)):
+                points_2d.append(Point2D(points[i].y, points[i].z))
+        if removed_axis == 'y':
+            for i in range(len(points)):
+                points_2d.append(Point2D(points[i].x, points[i].z))
+        if removed_axis == 'z':
+            for i in range(len(points)):
+                points_2d.append(Point2D(points[i].x, points[i].y))
+        return points_2d
+
+    @staticmethod
+    def insert_3d(points: List[Point2D], position: str, to_insert: List[int]) -> List["Point3D"]:
+        points_3d = []
+        if position == 'x':
+            for i in range(len(points)):
+                points_3d.append(
+                    Point3D(to_insert[i], points[i].x, points[i].y))
+        if position == 'y':
+            for i in range(len(points)):
+                points_3d.append(
+                    Point3D(points[i].x, to_insert[i], points[i].y))
+        if position == 'z':
+            for i in range(len(points)):
+                points_3d.append(
+                    Point3D(points[i].x, points[i].y, to_insert[i]))
+        return points_3d

@@ -197,8 +197,32 @@ class Point2D:
         self.coordinates = (self.x, self.y)
         return self
 
-    def distance(self, point: "Point2D") -> int:
+    def distance(self, point: "Point2D") -> float:
         return sqrt((point.x - self.x) ** 2 + (point.y - self.y) ** 2)
+
+    # def slope(self, point: "Point2D") -> int:
+    #     try:
+    #         slope = (point.y - self.y) / (point.x - self.x)
+    #         return slope
+    #     except ZeroDivisionError:
+    #         return float('inf')
+
+    # def is_between_slopes(self, lower_slope: int, upper_slope: int) -> bool:
+    #     slope = self.slope(Point2D(0, 0))
+    #     print("sole", slope, (slope <= upper_slope), (slope >= lower_slope),
+    #           ((slope <= upper_slope) and (slope >= lower_slope)))
+    #     return ((slope <= upper_slope) and (slope >= lower_slope))
+
+    # def is_between_lines(self, point_1: "Point2D", point_2: "Point2D", point_a: "Point2D", point_b: "Point2D") -> bool:
+    #     slope_1, slope_a = point_1.slope(point_2), point_a.slope(point_b)
+    #     lower_slope, upper_slope = min(slope_1, slope_a), max(slope_1, slope_a)
+    #     print(self.is_between_slopes(lower_slope, upper_slope), "slope",
+    #           lower_slope, upper_slope, self.slope(Point2D(0, 0)))
+    #     print(self.x <= max(point_1.x, point_2.x, point_a.x, point_b.x), "x max")
+    #     print(self.x >= min(point_1.x, point_2.x, point_a.x, point_b.x), "x min")
+    #     print(self.y <= max(point_1.y, point_2.y, point_a.y, point_b.y), "y max")
+    #     print(self.y >= min(point_1.y, point_2.y, point_a.y, point_b.y), "y min")
+    #     return self.is_between_slopes(lower_slope, upper_slope) and self.x <= max(point_1.x, point_2.x, point_a.x, point_b.x) and self.x >= min(point_1.x, point_2.x, point_a.x, point_b.x) and self.y <= max(point_1.y, point_2.y, point_a.y, point_b.y) and self.y >= min(point_1.y, point_2.y, point_a.y, point_b.y)
 
     @staticmethod
     def collinear(p0: "Point2D", p1: "Point2D", p2: "Point2D") -> bool:
