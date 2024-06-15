@@ -1,1 +1,91 @@
-// contains all random variables
+#  contains all random variables
+buildings:
+  tile_size:
+    min_tile_size: 3
+    max_tile_size: 12
+
+  foundations:
+    collumn_style :
+    # proportion of each style
+      none: 1
+      inner: 5
+      outer: 1
+      both: 1
+    floor:
+      min_height: 4
+      max_height: 7
+
+  facade:
+
+    windows:
+      size:
+        min_height: 2
+        max_height: 6
+        min_width: 1
+        max_width: 12
+      crossbars:
+        min_height_for_vertical_crossbar: 3
+        vertical_crossbar: 0.25
+        min_width_for_horizontal_crossbar: 3
+        horizontal_crossbar: 0.25
+      grounded: 0.5
+      # alternate between block and pane
+      alternate: 0.5
+      multiple: 
+        # min size and probability of multiple windows on the same vertice
+        min_width: 5
+        proba: 0.5
+      border_radius:
+        # proportion of each style
+        none: 2
+        top: 1
+        top_and_bottom: 1
+    
+    balcony: 
+      proba : 0.25
+      growth: 0.5 # [growth]% chance to have min_width + 1 balcony length, [growth**2]% chance to have min_width + 2 balcony length, etc
+      size:
+        min_len : 1
+        max_len : 3
+        min_width : 3
+      multiple:
+      # probability to have multiple balcony IF POSSIBLE
+      # this feature need a very large facade
+        proba: 1
+        min_width: 5
+        min_gap: 1
+      details: 0.35
+      border_radius:
+        # proportion of each style
+        none: 6
+        # no difference if there is no details
+        medium: 1
+        full: 1
+
+    inter_floor: 
+      proba: 0.5
+      border_style:
+        # bloc used to fill the corner of the interfloor
+        none: 1
+        slab: 2
+        stairs: 2
+
+  entrance:
+    centered: 0.8
+    different_facade: 0.75
+    size:
+      min_height: 5
+      max_height: 9
+    door:
+      size:
+        min_height: 2
+        max_height: 4
+        min_width: 1
+        max_width: 3
+      padding:
+        max: 2
+        max_top: 2
+
+  roof:
+    rembard: 0.5
+      

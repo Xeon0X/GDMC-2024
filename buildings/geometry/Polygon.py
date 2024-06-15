@@ -1,26 +1,27 @@
-from Enums import DIRECTION
-from gdpc import Editor, Block, geometry
+from utils.Enums import DIRECTION
+from gdpc import Editor, Block, geometry, Transform
 from buildings.geometry.Tile import Tile
 from buildings.geometry.Point import Point
 from buildings.geometry.Rectangle import Rectangle
 from buildings.geometry.Vertice import Vertice
 
 class Polygon:
-    def __init__(self, position : Point, size: tuple[int,int]):
-        self.position = position
+    def __init__(self, size: tuple[int,int]):
         self.size = size
         self.shape = []
         self.vertices = []
         
-    def fill_polygon(self, editor : Editor, material : str, y : int, y2 : int = None):
-        if y2 == None: y2 = y
+    def fill(self, editor : Editor, material : str, y : int = 0, y2 : int = None):
+        if y2 == None: y2 = 0
         for rect in self.shape:
-            rect.fill(editor, material, y, y2)
+            with editor.pushTransform(Transform((0,y,0))):
+                rect.fill(editor, material, y2)
         
     def fill_vertice(self, editor : Editor, material : str, y : int, y2 : int = None):
-        if y2 == None: y2 = y
+        if y2 == None: y2 = 0
         for vertice in self.vertices:
-            vertice.fill(editor, Block(material), y, y2)
+            with editor.pushTransform(Transform((0,y,0))):
+                vertice.fill(editor, material, y2)
 
     def compress(self, tiles : list[Tile], vertices : list[Vertice]):
         remaining_tiles = tiles.copy()
@@ -58,16 +59,16 @@ class Polygon:
             has_next2 = self._has_next(neighbors[1], current.facing, remaining_vertices)
             
             if has_next1:
-                current = Vertice(has_next1.point1, current.point2, current.facing)
+                current = Vertice(has_next1.point1.copy(), current.point2.copy(), current.facing)
             elif has_next2:
-                current = Vertice(current.point1, has_next2.point2, current.facing)
+                current = Vertice(current.point1.copy(), has_next2.point2.copy(), current.facing)
             else:
                 self.vertices.append(current)
                 current = remaining_vertices.pop()
             
             if len(remaining_vertices) == 0: self.vertices.append(current)     
                     
-    def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice]):
+    def set_vertices_and_neighbors(self, tiles : list[Tile], vertices : list[Vertice], height : int):
         for tile in tiles:
             targets = tile.get_neighbors_coords()
             for vertice_num,target in enumerate(targets):
@@ -75,7 +76,7 @@ class Polygon:
                 if not has_neighbor:
                     vertice = tile.get_vertice(vertice_num)
                     vertices.append(vertice)
-                    tile.set_vertice(DIRECTION(vertice_num), vertice)
+                    tile.set_vertice(DIRECTION(vertice_num), vertice, height)
                 else :
                     tile.set_neighbor(vertice_num, has_neighbor)
     
@@ -89,7 +90,7 @@ class Polygon:
             for tile in new_line: remaining_tiles.remove(tile)
             line = new_line
     
-    def _has_neighbor(self, target : tuple[int], tiles : list[Tile]) -> bool|Tile:
+    def _has_neighbor(self, target : Point, tiles : list[Tile]) -> bool|Tile:
         for tile in tiles:
             if tile.pos.position == target.position:
                 return tile
