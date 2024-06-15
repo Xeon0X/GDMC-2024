@@ -158,7 +158,7 @@ class Skeleton:
         # xzDistance = (max(buildRect.end[0], buildRect.begin[0]) - min(buildRect.end[0], buildRect.begin[0]),
         #              max(buildRect.end[1], buildRect.begin[1]) - min(buildRect.end[1], buildRect.begin[1]))
 
-        heightmap = Image.open("data/heightmap.png").convert('RGB')
+        heightmap = Image.open("./world_maker/data/heightmap.png").convert('RGB')
         # roadsArea = Image.new("L", xzDistance, 0)
         # width, height = heightmap.size
 
@@ -216,7 +216,7 @@ class Skeleton:
 
     def road_area(self, name: str, radius: int = 10) -> Image:
         print("[Skeleton] Start mapping the road area...")
-        heightmap = Image.open("data/heightmap.png")
+        heightmap = Image.open("./world_maker/data/heightmap.png")
         width, height = heightmap.size
         road_area_map = Image.new("L", (width, height), 0)
         road_area_map_draw = ImageDraw.Draw(road_area_map)
@@ -236,7 +236,7 @@ class Skeleton:
             circle_coords = (z - radius, x - radius, z + radius, x + radius)
             road_area_map_draw.ellipse(circle_coords, fill=255)
 
-        road_area_map.save("data/"+name)
+        road_area_map.save("./world_maker/data/"+name)
 
         print("[Skeleton] Road area mapping completed.")
         return road_area_map

@@ -2,6 +2,8 @@ from PIL import Image
 import numpy as np
 from typing import Union
 from data_analysis import handle_import_image
+from random import randint
+
 
 class Rectangle:
     def __init__(self, width, height):
@@ -27,7 +29,7 @@ class Bin:
                         best_spot_empty_area = empty_area
 
         if best_spot is not None:
-            self.rectangles.append((best_spot, (best_spot[0]+rectangle.width, best_spot[1]+rectangle.height)))
+            self.rectangles.append((best_spot, (best_spot[0] + rectangle.width, best_spot[1] + rectangle.height)))
             self.update_grid(rectangle, *best_spot)
             return True
 
@@ -72,19 +74,16 @@ def pack_rectangles(rectangles, grid):
     return True
 
 
-import random
-
-
-def generate_rectangle(max_width:int = 25):
-    width = random.randint(10, max_width)
-    height = random.randint(10, max_width)
+def generate_rectangle(min_width: int = 10, max_width: int = 25):
+    width = randint(min_width, max_width)
+    height = randint(min_width, max_width)
     return Rectangle(width, height)
 
 
-def pack_rectangles(grid):
+def pack_rectangles(grid, min_width: int = 10, max_width: int = 25):
     bin = Bin(grid)
     while True:
-        rectangle = generate_rectangle()
+        rectangle = generate_rectangle(min_width, max_width)
         if not bin.place_rectangle(rectangle):
             break
         print(len(bin.rectangles))
@@ -101,12 +100,13 @@ def draw_rectangles(rectangles, grid):
     return image
 
 
-def generate_building(image: Union[str, Image] = './data/roadmap2.png'):
+def generate_building(image: Union[str, Image], min_width: int = 10, max_width: int = 25):
     image = handle_import_image(image).convert('L')
     grid = np.array(image)
-    rectangles = pack_rectangles(grid)
-    draw_rectangles(rectangles, grid).save('./data/building.png')
+    rectangles = pack_rectangles(grid, min_width, max_width)
+    draw_rectangles(rectangles, grid).save('./world_maker/data/building.png')
     return rectangles
+
 
 if __name__ == '__main__':
     generate_building()

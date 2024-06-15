@@ -1,8 +1,8 @@
 from District import District, Road
 from Position import Position
 from PIL import Image
-import random
-from data_analysis import handle_import_image
+from random import randint
+from data_analysis import handle_import_image, detect_mountain
 from typing import Union
 import numpy as np
 
@@ -28,8 +28,8 @@ class City:
         """
         Initialize the maps of the city. It reads the heightmap and watermap images and converts them into 2D lists.
         """
-        heightmap = Image.open('./data/heightmap.png').convert('L')
-        watermap = Image.open('./data/watermap.png').convert('L')
+        heightmap = Image.open('./world_maker/data/heightmap.png').convert('L')
+        watermap = Image.open('./world_maker/data/watermap.png').convert('L')
         width, height = heightmap.size
         self.map_data = [[-1 if watermap.getpixel((x, y)) > 0 else 0 for x in range(width)] for y in range(height)]
         self.height_map = [[heightmap.getpixel((x, y)) for x in range(width)] for y in range(height)]
@@ -105,7 +105,7 @@ class City:
         """
         width, height = len(self.map_data[0]), len(self.map_data)
         img = Image.new('RGB', (width, height))
-        colors = {id_district: (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+        colors = {id_district: (randint(0, 255), randint(0, 255), randint(0, 255))
                   for id_district in range(1, len(self.districts) + 1)}
 
         for y in range(height):
@@ -115,19 +115,18 @@ class City:
                 else:
                     img.putpixel((x, y), colors[self.map_data[y][x]])
 
-        img.save('./data/district.png')
+        img.save('./world_maker/data/district.png')
         print("[City] District map created.")
 
-    def draw_roads(self, image: Union[str, Image], size: int = 1) -> Image:
+    def draw_roads(self, size_road: int = 1) -> Image:
         """
         Draw the roads of the city on the image.
 
         :param size:
-        :param image: The image to draw the roads on.
         """
-        image = handle_import_image(image)
+        image = Image.new('RGB', Image.open('./world_maker/data/heightmap.png').size)
         for district in self.districts:
-            district.draw_roads(image, size)
+            district.draw_roads(image, size_road)
         return image
 
     def district_generate_road(self) -> list[Road]:
@@ -138,8 +137,9 @@ class City:
         """
         roads = []
         for district in self.districts:
-            district.generate_roads(self.map_data)
-            roads.extend(district.roads)
+            if district.type != "mountain":
+                district.generate_roads(self.map_data)
+                roads.extend(district.roads)
         return roads
 
     def point_in_which_district(self, point: Union[Position, tuple[int, int]]) -> int:
@@ -164,16 +164,44 @@ class City:
         array = np.array([[True if self.map_data[y][x] in district_id else False for x in range(len(self.map_data[0]))]
                           for y in range(len(self.map_data))])
         image = Image.fromarray(array)
-        image.save('./data/mountain_map.png')
+        image.save('./world_maker/data/mountain_map.png')
         return image
+
+    def generate_district(self):
+        image = handle_import_image('./world_maker/data/smooth_sobel_watermap.png').convert('L')
+        array = np.array(image)
+        mountain_coo = detect_mountain()
+        self.add_district(Position(mountain_coo[0], mountain_coo[1]), "mountain")
+        print("[City] District added.")
+        remove_circle_data(array, mountain_coo)
+        area = get_area_array(array)
+        sizeX, sizeY = len(array[0]), len(array)
+        while area > sizeX * sizeY * 0.1:
+            x, y = randint(0, sizeX - 1), randint(0, sizeY - 1)
+            if array[y][x]:
+                self.add_district(Position(x, y))
+                remove_circle_data(array, (x, y))
+                area = get_area_array(array)
+                print("[City] District added.")
+
+
+def remove_circle_data(array, center, radius=100):
+    y_indices, x_indices = np.indices(array.shape)
+    dist_sq = (y_indices - center[1]) ** 2 + (x_indices - center[0]) ** 2
+    mask = dist_sq <= radius ** 2
+    array[mask] = False
+
+
+def get_area_array(array) -> int:
+    return np.sum(array)
 
 
 if __name__ == '__main__':
     city = City()
     for i in range(10):
-        city.add_district(Position(random.randint(0, 400), random.randint(0, 400)))
+        city.add_district(Position(randint(0, 400), randint(0, 400)))
     city.loop_expend_district()
     city.district_draw_map()
     city.district_generate_road()
-    image = city.draw_roads(Image.new('RGB', (401, 401)),4)
-    image.save('./data/roadmap.png')
+    image = city.draw_roads(Image.new('RGB', (401, 401)), 4)
+    image.save('./world_maker/data/roadmap.png')
