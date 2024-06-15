@@ -1,8 +1,8 @@
-import World
+from world_maker.World import World
 from PIL import Image, ImageFilter
 import numpy as np
 from scipy import ndimage
-from Skeleton import Skeleton
+from world_maker.Skeleton import Skeleton
 from typing import Union
 from random import randint
 import cv2

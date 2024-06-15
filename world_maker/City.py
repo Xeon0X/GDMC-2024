@@ -1,8 +1,8 @@
-from District import District, Road
-from Position import Position
+from world_maker.District import District, Road
+from world_maker.Position import Position
 from PIL import Image
 from random import randint
-from data_analysis import handle_import_image, detect_mountain
+from world_maker.data_analysis import handle_import_image, detect_mountain
 from typing import Union
 import numpy as np
 
