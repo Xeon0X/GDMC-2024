@@ -126,7 +126,6 @@ class Polyline:
             list[Segment2D]: List of segments in order.
         """
         # Get first segment.
-        # segments index is 0, corresponding to the first points_array to the first point ([0]) of the first arc (acrs_intersections[1]).
         # First arc index is 1 because index 0 is None due to fix list lenght.  Is it a good choice?
         self.segments[1] = Segment2D(Point2D.from_arrays(
             self.points_array[0]), self.acrs_intersections[1][0])
@@ -136,10 +135,10 @@ class Polyline:
             self.segments[i] = Segment2D(Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y), Point2D(
                 self.acrs_intersections[i-1][-1].x, self.acrs_intersections[i-1][-1].y))
 
-        # Get last segment. Index is -2 because last index -1 should be None due to the same list lenght.
+        # Why -3?
         # For n points, there are n-1 segments.
-        # self.segments[-2] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
-        #     self.points_array[-1]))
+        self.segments[-3] = Segment2D(self.acrs_intersections[-2][2], Point2D.from_arrays(
+            self.points_array[-1]))
 
         return self.segments
 

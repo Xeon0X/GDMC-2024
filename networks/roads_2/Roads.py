@@ -20,6 +20,7 @@ class Road:
 
         self.polyline = Polyline(Point3D.to_2d(coordinates, 'y'))
         self._surface()
+        self._projection()
 
     def _surface(self):
         # Segments
@@ -49,7 +50,11 @@ class Road:
                             180+i])[0].coordinates, Block("black_concrete")))
 
     def _projection(self):
-        pass
+        nearest_points_to_reference = []
+        for i in range(len(self.coordinates)):
+            nearest_points_to_reference.append(Point3D.insert_3d([Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
+                self.polyline.total_line_output)], 'y', [self.coordinates[i].y]))
+        print(nearest_points_to_reference)
 
     def place(self):
         editor = Editor(buffering=True)
