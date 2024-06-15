@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 from typing import Union
-from data_analysis import handle_import_image
+from world_maker.data_analysis import handle_import_image
 from random import randint
 
 

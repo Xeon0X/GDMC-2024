@@ -1,4 +1,4 @@
-from Position import Position
+from world_maker.Position import Position
 from typing import Union
 from random import randint
 from PIL import Image
