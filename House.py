@@ -10,7 +10,6 @@ class House:
         self.editor = editor
         self.coordinates_min = coordinates_min
         self.coordinates_max = coordinates_max
-        self.grid = np.zeros((coordinates_max[0], coordinates_max[2]), dtype=[('bool', bool), ('int', int)])
         self.skeleton = []
         
         size = [(coordinates_max[i] - coordinates_min[i]) + 10 for i in range(3)]
@@ -73,10 +72,11 @@ class House:
         for i in range(0, width-1):
             for j in range(0, depth-1):
                 self.editor.placeBlock((x + i, y_min, z + j), self.floor)
-                self.grid[x+i,z+j] = True,1
                 self.grid3d[x_plan3d+i,0,z_plan3d+j] = True,1
         self.skeleton.append((x, z, width-1, depth-1, height))
         print("Coordinates of the corners: ", (x, z), (x, z+depth-1), (x+width-1, z), (x+width-1, z+depth-1))
+        
+        
         
         
         x_min -= 1
@@ -95,23 +95,23 @@ class House:
                 new_x = np.random.randint(max(x_min+1, x - new_width ), min(x_max-new_width - 1, x + width ))
                 new_z = np.random.randint(max(z_min+1, z - new_depth), min(z_max-new_depth - 1, z + depth ))
 
-                
+                new_x_plan3d = new_x - x_min -1
+                new_z_plan3d = new_z - z_min +1
                 
                 adjacent_blocks = 0
-                for i in range(new_x, new_x + new_width):
-                    for j in range(new_z, new_z + new_depth):
-                        if self.grid[i-1,j]['bool'] and self.grid[i-1,j]['int']==1  or self.grid[i+1,j]['bool'] and self.grid[i+1,j]['int']==1 or self.grid[i,j-1]['bool'] and self.grid[i,j-1]['int']==1 or self.grid[i,j+1]['bool'] and self.grid[i,j+1]['int']==1:   
+                for i in range(new_x_plan3d, new_x_plan3d + new_width):
+                    for j in range(new_z_plan3d, new_z_plan3d + new_depth):
+                        if self.grid3d[i-1,0,j]['bool'] and self.grid3d[i-1,0,j]['int']==1  or self.grid3d[i+1,0,j]['bool'] and self.grid3d[i+1,0,j]['int']==1 or self.grid3d[i,0,j-1]['bool'] and self.grid3d[i,0,j-1]['int']==1 or self.grid3d[i,0,j+1]['bool'] and self.grid3d[i,0,j+1]['int']==1:   
                             adjacent_blocks += 1
 
                 if adjacent_blocks < 3:
                     continue
 
-                if not np.any(self.grid[new_x:new_x+new_width, new_z:new_z+new_depth]['bool']):
+                if not np.any(self.grid3d[new_x_plan3d:new_x_plan3d+new_width,0, new_z_plan3d:new_z_plan3d+new_depth]['bool']):
                     new_x_plan3d = new_x - x_min
                     new_z_plan3d = new_z - z_min
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
-                            self.grid[new_x + i, new_z + j] = True,2
                             self.grid3d[new_x_plan3d + i,0, new_z_plan3d + j] = True,2
 
                             if i == 0 or i == new_width-1 or j == 0 or j == new_depth-1:
@@ -147,10 +147,9 @@ class House:
                 for j in range(-1, depth+1):
                     for y in range(0, height):
                         if i == -1 or i == width or j == -1 or j == depth:
-                            if not (self.grid[x + i, z + j]['bool']) and not (self.grid[x + i, z + j]['int'] == 1) or (self.grid[x + i, z + j]['bool'] and self.grid[x + i, z + j]['int'] == 2):
+                            if not (self.grid3d[x_plan3d + i,y, z_plan3d + j]['bool']) and not (self.grid3d[x_plan3d + i,y, z_plan3d + j]['int'] == 1) or (self.grid3d[x_plan3d + i,y, z_plan3d + j]['bool'] and self.grid3d[x_plan3d + i,y, z_plan3d + j]['int'] == 2) or y==0:
                                 self.editor.placeBlock((x + i, self.coordinates_min[1] + y, z + j), self.wall)
                                 self.grid3d[ x_plan3d+i, y, z_plan3d+j] = True
-                                #print( i, y,  j, self.grid[x + i, z + j]['bool'],self.grid[x + i, z + j]['int'])
     
         
     def getAdjacentWalls(self):
