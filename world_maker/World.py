@@ -1,7 +1,7 @@
 from gdpc import Editor, geometry, lookup
 import numpy as np
 from PIL import Image
-from Block import Block
+from world_maker.Block import Block
 
 waterBiomes = [
     "minecraft:ocean",

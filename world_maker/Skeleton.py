@@ -3,7 +3,7 @@ import numpy as np
 from skimage.morphology import skeletonize
 from skan.csr import skeleton_to_csgraph
 from collections import Counter
-from PIL import Image
+from PIL import Image, ImageDraw
 import random
 
 
@@ -158,7 +158,7 @@ class Skeleton:
         # xzDistance = (max(buildRect.end[0], buildRect.begin[0]) - min(buildRect.end[0], buildRect.begin[0]),
         #              max(buildRect.end[1], buildRect.begin[1]) - min(buildRect.end[1], buildRect.begin[1]))
 
-        heightmap = Image.open("data/heightmap.png").convert('RGB')
+        heightmap = Image.open("./world_maker/data/heightmap.png").convert('RGB')
         # roadsArea = Image.new("L", xzDistance, 0)
         # width, height = heightmap.size
 
@@ -213,3 +213,30 @@ class Skeleton:
         #         )
         print("[Skeleton] Mapping completed.")
         return heightmap  # , roadsArea
+
+    def road_area(self, name: str, radius: int = 10) -> Image:
+        print("[Skeleton] Start mapping the road area...")
+        heightmap = Image.open("./world_maker/data/heightmap.png")
+        width, height = heightmap.size
+        road_area_map = Image.new("L", (width, height), 0)
+        road_area_map_draw = ImageDraw.Draw(road_area_map)
+
+        # Lines
+        for i in range(len(self.lines)):
+            for j in range(len(self.lines[i])):
+                z = self.coordinates[self.lines[i][j]][0]
+                x = self.coordinates[self.lines[i][j]][2]
+                circle_coords = (z - radius, x - radius, z + radius, x + radius)
+                road_area_map_draw.ellipse(circle_coords, fill=255)
+
+        # Centers
+        for i in range(len(self.centers)):
+            z = self.coordinates[self.centers[i]][0]
+            x = self.coordinates[self.centers[i]][2]
+            circle_coords = (z - radius, x - radius, z + radius, x + radius)
+            road_area_map_draw.ellipse(circle_coords, fill=255)
+
+        road_area_map.save("./world_maker/data/"+name)
+
+        print("[Skeleton] Road area mapping completed.")
+        return road_area_map
