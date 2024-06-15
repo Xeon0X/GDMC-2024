@@ -873,6 +873,21 @@ class House:
                 else:
                     self.editor.placeBlock((i, y_min-1, y), self.garden_floor)
     
+    
+    
+    def build(self):
+        house.createHouseSkeleton()
+        house.putWallOnSkeleton()
+        house.placeDoor()
+        house.placeRoof()
+        house.putCelling()
+        house.placeWindow()
+        house.placeEntrance()
+        house.placeGardenOutline()
+        if house.nbEtage > 1:
+            house.placeStairs()
+            
+            
 if __name__ == "__main__":
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()    
@@ -898,21 +913,7 @@ if __name__ == "__main__":
     for i in range(1):
         house = House(editor, coordinates_min, coordinates_max,"W", blocks)
         
-        house.createHouseSkeleton()
-        house.putWallOnSkeleton()
-        print("House n°", i+1, "created")
-        print('-----------------------------------')
-        print(house.getAdjacentWalls())
-        house.placeDoor()
-        house.placeRoof()
-        house.putCelling()
-        
-        house.placeWindow()
-        house.placeEntrance()
-        house.placeGardenOutline()
-        
-        if house.nbEtage > 1:
-            house.placeStairs()
+        house.build()
         
         new_coordinates_min =(coordinates_max[0] + 10, coordinates_min[1], coordinates_min[2])
         new_coordinates_max = (coordinates_max[0] + 10 +24, coordinates_max[1], coordinates_max[2])
