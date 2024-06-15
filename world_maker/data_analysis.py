@@ -234,7 +234,7 @@ def skeleton_mountain_map(image: Union[str, Image] = './world_maker/data/mountai
     skeleton.parse_graph()
     heightmap_skeleton = skeleton.map()
     heightmap_skeleton.save('./world_maker/data/skeleton_mountain.png')
-    skeleton.road_area('skeleton_mountain_area.png',3)
+    skeleton.road_area('skeleton_mountain_area.png', 3)
     return skeleton
 
 
@@ -275,18 +275,18 @@ def detect_mountain(image: Union[str, Image] = './world_maker/data/sobelmap.png'
     return (cX, cY)
 
 
-def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int],tuple[int, int]]],
-                       height_min:int = 6, height_max:int = 10) \
+def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
+                       height_min: int = 6, height_max: int = 10) \
         -> list[tuple[tuple[int, int, int], tuple[int, int, int]]]:
-    image = handle_import_image('./world_maker/data/heightmap.png')
+    image = handle_import_image('./world_maker/data/heightmap.png').convert('L')
     new_rectangle = []
     for rect in rectangle:
         start, end = rect
         avg_height = 0
         for x in range(start[0], end[0]):
             for y in range(start[1], end[1]):
-                avg_height += np.array(image.getpixel((x, y)))
+                avg_height += image.getpixel((x, y))
         avg_height = int(avg_height / ((end[0] - start[0]) * (end[1] - start[1])))
-        new_rectangle.append(((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
+        new_rectangle.append(
+            ((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
     return new_rectangle
-
