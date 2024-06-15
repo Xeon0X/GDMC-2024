@@ -1,7 +1,9 @@
-from District import District
+from District import District, Road
 from Position import Position
 from PIL import Image
 import random
+from data_analysis import handle_import_image
+from typing import Union
 
 
 class City:
@@ -72,7 +74,6 @@ class City:
                     index_district_chosen = index
                 else:
                     self.districts[index].area_expend.remove(point)
-        self.districts[index_district_chosen].area.append(point)
         self.districts[index_district_chosen].area_expend_from_point.append(point)
         self.districts[index_district_chosen].area_expend.remove(point)
         self.map_data[point.y][point.x] = index_district_chosen + 1
@@ -81,7 +82,6 @@ class City:
         """
         Update the expansion points of all districts in the city.
         """
-
         for district in self.districts:
             if len(district.area_expend_from_point) > 0:
                 district.update_expend_points(district.area_expend_from_point[0], self.map_data, self.height_map)
@@ -117,10 +117,37 @@ class City:
         img.save('./data/district.png')
         print("[City] District map created.")
 
+    def draw_roads(self, image: Union[str, Image], size: int = 1) -> Image:
+        """
+        Draw the roads of the city on the image.
+
+        :param size:
+        :param image: The image to draw the roads on.
+        """
+        image = handle_import_image(image)
+        for district in self.districts:
+            district.draw_roads(image, size)
+        return image
+
+    def district_generate_road(self) -> list[Road]:
+        """
+        Generate the roads of the city for each district.
+
+        :return: The list of roads of the city.
+        """
+        roads = []
+        for district in self.districts:
+            district.generate_roads(self.map_data)
+            roads.extend(district.roads)
+        return roads
+
 
 if __name__ == '__main__':
     city = City()
     for i in range(10):
-        city.add_district(Position(random.randint(0, 800), random.randint(0, 800)))
+        city.add_district(Position(random.randint(0, 400), random.randint(0, 400)))
     city.loop_expend_district()
     city.district_draw_map()
+    city.district_generate_road()
+    image = city.draw_roads(Image.new('RGB', (401, 401)),3)
+    image.save('./data/roadmap.png')
