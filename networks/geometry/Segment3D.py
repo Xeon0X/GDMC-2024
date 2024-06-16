@@ -22,6 +22,8 @@ class Segment3D:
 
         >>> Segment3D(Point3D(0, 0, 0), Point3D(10, 10, 15))
         """
+        start = self.start.copy()
+        end = self.end.copy()
         self.output_points.append(start.copy())
         dx = abs(self.end.x - self.start.x)
         dy = abs(self.end.y - self.start.y)

@@ -28,6 +28,9 @@ class Polyline:
         self.length_polyline = len(self.points_array)
 
         if self.length_polyline < 4:
+            print(self.length_polyline)
+            print(self.points_array)
+            print(self.output_points)
             raise ValueError("The list must contain at least 4 elements.")
 
         self.vectors = [None] * self.length_polyline  # v

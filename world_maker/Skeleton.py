@@ -3,17 +3,62 @@ from collections import Counter
 from typing import List, Union
 
 import numpy as np
+from gdpc import Editor
 from PIL import Image, ImageDraw
 from skan.csr import skeleton_to_csgraph
 from skimage.morphology import skeletonize
-
-from gdpc import Editor
+from networks.geometry.Point3D import Point3D
 
 
 def handle_import_image(image: Union[str, Image]) -> Image:
     if isinstance(image, str):
         return Image.open(image)
     return image
+
+
+def transpose_form_heightmap(heightmap: Union[str, Image], coordinates):
+    heightmap = handle_import_image(heightmap).convert('L')
+
+    editor = Editor()
+    xMin = (editor.getBuildArea().begin).x
+    zMin = (editor.getBuildArea().begin).z
+
+    return (coordinates[0] + xMin, heightmap.getpixel(
+        (coordinates[0], coordinates[-1])), coordinates[-1] + zMin)
+
+
+def simplify_coordinates(coordinates, epsilon):
+    if len(coordinates) < 3:
+        return coordinates
+
+    # Find the point with the maximum distance
+    max_distance = 0
+    max_index = 0
+    end_index = len(coordinates) - 1
+
+    for i in range(1, end_index):
+        distance = Point3D(coordinates[i][0], coordinates[i][1], coordinates[i][2]).distance(
+            Point3D(coordinates[0][0], coordinates[0][1], coordinates[0][2]))
+        if distance > max_distance:
+            max_distance = distance
+            max_index = i
+
+    simplified_coordinates = []
+
+    # If the maximum distance is greater than epsilon, recursively simplify
+    if max_distance > epsilon:
+        rec_results1 = simplify_coordinates(coordinates[:max_index+1], epsilon)
+        rec_results2 = simplify_coordinates(coordinates[max_index:], epsilon)
+
+        # Combine the simplified sub-results
+        simplified_coordinates.extend(rec_results1[:-1])
+        simplified_coordinates.extend(rec_results2)
+    else:
+        # The maximum distance is less than epsilon, retain the endpoints
+        simplified_coordinates.append(coordinates[0])
+        simplified_coordinates.append(coordinates[end_index])
+
+    return simplified_coordinates
 
 
 class Skeleton:
@@ -25,19 +70,6 @@ class Skeleton:
         self.graph = None
         if data is not None:
             self.set_skeleton(data)
-
-    def transpose_form_heightmap(heightmap: Union[str, Image], coordinates):
-
-        heightmap = handle_import_image(heightmap).convert('L')
-
-        editor = Editor()
-        xMin = (editor.getBuildArea().begin).x
-        zMin = (editor.getBuildArea().begin).z
-
-        coordinates_final = []
-
-        return coordinates_final(coordinates[0] + xMin, heightmap.getpixel(
-            (coordinates[0], coordinates[2]))[0], coordinates[2] + zMin)
 
     def set_skeleton(self, data: np.ndarray):
         print("[Skeleton] Start skeletonization...")
