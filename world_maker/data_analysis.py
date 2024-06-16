@@ -156,6 +156,30 @@ def subtract_map(image: Union[str, Image], substractImage: Union[str, Image]) ->
     return Image.fromarray(array_heightmap)
 
 
+def overide_map(base: Image, top: Image) -> Image:
+    base = handle_import_image(base).convert('L')
+    top = handle_import_image(top).convert('L')
+
+    width, height = base.size
+
+    if top.size != (width, height):
+        raise ValueError("Mismatching images sizes")
+
+    result_image = Image.new('L', (width, height))
+
+    for x in range(width):
+        for y in range(height):
+            pixel1 = base.getpixel((x, y))
+            pixel2 = top.getpixel((x, y))
+
+            if pixel1 != 0:
+                result_image.putpixel((x, y), pixel1)
+            else:
+                result_image.putpixel((x, y), pixel2)
+
+    return result_image
+
+
 def group_map(image1: Union[str, Image], image2: Union[str, Image]) -> Image:
     image1 = handle_import_image(image1).convert('L')
     image2 = handle_import_image(image2).convert('L')

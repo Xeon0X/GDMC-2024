@@ -29,7 +29,8 @@ class Bin:
                         best_spot_empty_area = empty_area
 
         if best_spot is not None:
-            self.rectangles.append((best_spot, (best_spot[0] + rectangle.width, best_spot[1] + rectangle.height)))
+            self.rectangles.append(
+                (best_spot, (best_spot[0] + rectangle.width, best_spot[1] + rectangle.height)))
             self.update_grid(rectangle, *best_spot)
             return True
 
@@ -57,7 +58,8 @@ class Bin:
 
 
 def pack_rectangles(rectangles, grid):
-    rectangles = sorted(rectangles, key=lambda r: r.width * r.height, reverse=True)
+    rectangles = sorted(
+        rectangles, key=lambda r: r.width * r.height, reverse=True)
     bins = [Bin(grid)]
 
     for rectangle in rectangles:
@@ -90,21 +92,23 @@ def pack_rectangles(grid, min_width: int = 10, max_width: int = 25):
     return bin.rectangles
 
 
-def draw_rectangles(rectangles, grid):
-    image = Image.new('RGB', (len(grid[0]), len(grid)), (0, 0, 0))
+def draw_rectangles(rectangles, grid, heightmap):
+    heightmap = handle_import_image(heightmap).convert('L')
+    image = Image.new('L', (len(grid[0]), len(grid)), (0))
     for rectangle in rectangles:
         start, end = rectangle
         for x in range(start[0], end[0]):
             for y in range(start[1], end[1]):
-                image.putpixel((x, y), (144, 255, 144))
+                image.putpixel((x, y), heightmap.getpixel((x, y)))
     return image
 
 
-def generate_building(image: Union[str, Image], min_width: int = 10, max_width: int = 25):
+def generate_building(image: Union[str, Image], heightmap: Union[str, Image], output: str = './world_maker/data/building.png', min_width: int = 10, max_width: int = 25):
     image = handle_import_image(image).convert('L')
     grid = np.array(image)
     rectangles = pack_rectangles(grid, min_width, max_width)
-    draw_rectangles(rectangles, grid).save('./world_maker/data/building.png')
+    draw_rectangles(rectangles, grid, heightmap).save(
+        output)
     return rectangles
 
 
