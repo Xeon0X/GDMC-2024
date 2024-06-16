@@ -16,17 +16,6 @@ def handle_import_image(image: Union[str, Image]) -> Image:
     return image
 
 
-def transpose_form_heightmap(heightmap: Union[str, Image], coordinates):
-    heightmap = handle_import_image(heightmap).convert('L')
-
-    editor = Editor()
-    xMin = (editor.getBuildArea().begin).x
-    zMin = (editor.getBuildArea().begin).z
-
-    return (coordinates[0] + xMin, heightmap.getpixel(
-        (coordinates[0], coordinates[-1])), coordinates[-1] + zMin)
-
-
 def simplify_coordinates(coordinates, epsilon):
     if len(coordinates) < 3:
         return coordinates

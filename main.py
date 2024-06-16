@@ -3,7 +3,8 @@ import random
 import gdpc.exceptions
 
 from world_maker.world_maker import *
-from world_maker.Skeleton import Skeleton, transpose_form_heightmap, simplify_coordinates
+from world_maker.data_analysis import transpose_form_heightmap
+from world_maker.Skeleton import Skeleton, simplify_coordinates
 from networks.geometry.Point3D import Point3D
 from networks.roads_2.Road import Road
 from networks.legacy_roads import roads
@@ -17,12 +18,13 @@ def main():
 
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
+    origin = ((buildArea.begin).x, (buildArea.begin).z)
 
-    # set_roads(skeleton_mountain)
-    # set_roads(skeleton_highway)
-    # set_roads_grids(road_grid)
-    roads.setRoads(skeleton_mountain)
-    roads.setRoads(skeleton_highway)
+    set_roads(skeleton_mountain, origin)
+    set_roads(skeleton_highway, origin)
+    set_roads_grids(road_grid, origin)
+    # roads.setRoads(skeleton_mountain)
+    # roads.setRoads(skeleton_highway)
 
     blocks = {
         "wall": "blackstone",
@@ -61,28 +63,28 @@ def main():
         house.build()
 
 
-def set_roads_grids(road_grid: Road_grid):
+def set_roads_grids(road_grid: Road_grid, origin):
     for i in range(len(road_grid)):
         if road_grid[i].border:
             for j in range(len(road_grid)):
                 # Same line
                 if (road_grid[i].position.x == road_grid[j].position.x and road_grid[i].position.y != road_grid[j].position.y) or (road_grid[i].position.x != road_grid[j].position.x and road_grid[i].position.y == road_grid[j].position.y):
                     point_1 = transpose_form_heightmap(
-                        './world_maker/data/heightmap.png', (road_grid[i].position.x, road_grid[i].position.y))
+                        './world_maker/data/heightmap.png', (road_grid[i].position.x, road_grid[i].position.y), origin)
                     point_2 = transpose_form_heightmap(
-                        './world_maker/data/heightmap.png', (road_grid[j].position.x, road_grid[j].position.y))
+                        './world_maker/data/heightmap.png', (road_grid[j].position.x, road_grid[j].position.y), origin)
                     Road(
                         [Point3D(point_1[0], point_1[1], point_1[2]), Point3D(point_2[0], point_2[1], point_2[2])], 9)
 
 
-def set_roads(skeleton: Skeleton):
+def set_roads(skeleton: Skeleton, origin):
     # Parsing
     print("[Roads] Start parsing...")
     for i in range(len(skeleton.lines)):
         print(f"[Roads] Parsing skeleton {i+1}/{len(skeleton.lines)}.")
         for j in range(len(skeleton.lines[i])):
             xyz = transpose_form_heightmap('./world_maker/data/heightmap.png',
-                                           skeleton.coordinates[skeleton.lines[i][j]])
+                                           skeleton.coordinates[skeleton.lines[i][j]], origin)
             skeleton.lines[i][j] = xyz
 
     print("[Roads] Start simplification...")

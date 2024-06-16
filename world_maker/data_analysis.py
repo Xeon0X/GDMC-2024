@@ -299,3 +299,12 @@ def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
         new_rectangle.append(
             ((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
     return new_rectangle
+
+
+def transpose_form_heightmap(heightmap: Union[str, Image], coordinates, origin: tuple[int, int]) -> tuple[int, int, int]:
+    heightmap = handle_import_image(heightmap).convert('L')
+
+    xMin, zMin = origin
+
+    return (coordinates[0] + xMin, heightmap.getpixel(
+        (coordinates[0], coordinates[-1])), coordinates[-1] + zMin)
