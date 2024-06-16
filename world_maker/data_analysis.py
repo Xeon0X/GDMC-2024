@@ -105,7 +105,7 @@ def filter_sobel(image: Union[str, Image]) -> Image:
     return image
 
 
-def filter_smooth(image: Union[str, Image], radius: int = 3):
+def filter_smooth_theshold(image: Union[str, Image], radius: int = 3):
     """
     :param image: white and black image representing the derivative of the terrain (sobel), where black is flat and white is very steep.
     :param radius: Radius of the Gaussian blur.
@@ -133,6 +133,14 @@ def filter_smooth(image: Union[str, Image], radius: int = 3):
     # bool_array = ndimage.binary_closing(bool_array, structure=np.ones((7,7)), iterations=1)
 
     return Image.fromarray(bool_array)
+
+
+def filter_smooth(image: Union[str, Image], radius: int = 3):
+
+    image = handle_import_image(image)
+    image = image.convert('L')
+    image = image.filter(ImageFilter.GaussianBlur(radius))
+    return image
 
 
 def subtract_map(image: Union[str, Image], substractImage: Union[str, Image]) -> Image:
@@ -163,7 +171,7 @@ def group_map(image1: Union[str, Image], image2: Union[str, Image]) -> Image:
 
 def filter_smooth_array(array: np.ndarray, radius: int = 3) -> np.ndarray:
     image = Image.fromarray(array)
-    smooth_image = filter_smooth(image, radius)
+    smooth_image = filter_smooth_theshold(image, radius)
     array = np.array(smooth_image)
     return array
 
@@ -182,7 +190,7 @@ def filter_remove_details(image: Union[str, Image], n: int = 20) -> Image:
 
 def highway_map() -> Image:
     print("[Data Analysis] Generating highway map...")
-    smooth_sobel = filter_smooth("./world_maker/data/sobelmap.png", 1)
+    smooth_sobel = filter_smooth_theshold("./world_maker/data/sobelmap.png", 1)
     negative_smooth_sobel = filter_negative(smooth_sobel)
     negative_smooth_sobel_water = subtract_map(
         negative_smooth_sobel, './world_maker/data/watermap.png')
@@ -247,7 +255,7 @@ def smooth_sobel_water() -> Image:
     watermap = filter_negative(
         filter_remove_details(filter_negative(watermap), 5))
     sobel = handle_import_image("./world_maker/data/sobelmap.png")
-    sobel = filter_remove_details(filter_smooth(sobel, 1), 2)
+    sobel = filter_remove_details(filter_smooth_theshold(sobel, 1), 2)
     group = group_map(watermap, sobel)
     group = filter_negative(group)
     group.save('./world_maker/data/smooth_sobel_watermap.png')

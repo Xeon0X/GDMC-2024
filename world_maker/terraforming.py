@@ -1,14 +1,14 @@
 from typing import Union
 
 import numpy as np
-from gdpc import Editor, Block, geometry
+from gdpc import Editor, Block, geometry, lookup
 from PIL import Image
 from skimage import morphology
 
 from world_maker.data_analysis import handle_import_image
 
 
-def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask: Union[str, Image], ):
+def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask: Union[str, Image]):
 
     editor = Editor(buffering=True)
     build_area = editor.getBuildArea()
@@ -29,7 +29,7 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
     for x in range(0, distance[0]):
         for z in range(0, distance[1]):
 
-            if mask.getpixel((x, z)) == 255 and treesmap.getpixel((x, z)) > 0 and (x, z) not in removed:
+            if mask.getpixel((x, z)) != 0 and treesmap.getpixel((x, z)) > 0 and (x, z) not in removed:
 
                 treeArea = morphology.flood(treesmap, (z, x), tolerance=1)
                 blend = Image.blend(Image.fromarray(treeArea).convert(
@@ -52,3 +52,48 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
                 y_top = removed_treesmap.getpixel((x, z))
                 geometry.placeLine(
                     editor, (start[0] + x, y+1, start[1] + z), (start[0] + x, y_top, start[1] + z), Block('air'))
+
+
+def smooth_terrain(heightmap: Union[str, Image], heightmap_smooth: Union[str, Image], mask: Union[str, Image]):
+
+    editor = Editor()
+    build_area = editor.getBuildArea()
+    build_rectangle = build_area.toRect()
+
+    start = build_rectangle.begin
+
+    distance = (max(build_rectangle.end[0], build_rectangle.begin[0]) - min(build_rectangle.end[0], build_rectangle.begin[0]), max(
+        build_rectangle.end[1], build_rectangle.begin[1]) - min(build_rectangle.end[1], build_rectangle.begin[1]))
+
+    heightmap = handle_import_image(heightmap).convert('L')
+    heightmap_smooth = handle_import_image(heightmap_smooth).convert('L')
+    mask = handle_import_image(mask).convert('L')
+
+    smooth_terrain_delta = Image.new("RGB", distance, 0)
+
+    slice = editor.loadWorldSlice(build_rectangle)
+    smoothable_blocks = lookup.OVERWORLD_SOILS | lookup.OVERWORLD_STONES | lookup.SNOWS
+
+    for x in range(0, distance[0]):
+        for z in range(0, distance[1]):
+
+            if mask.getpixel((x, z)) != 0:
+                y = heightmap.getpixel((x, z))
+                y_smooth = heightmap_smooth.getpixel((x, z))
+                delta = y - y_smooth
+                smooth_terrain_delta.putpixel((x, z), delta)
+
+                if delta != 0:
+                    block = slice.getBlock((x, y, z))
+                    if block.id in smoothable_blocks:
+                        if delta > 0:
+                            geometry.placeLine(
+                                editor, (start[0] + x, y, start[1] + z), (start[0] + x, y_smooth, start[1] + z), Block('air'))
+                            editor.placeBlock(
+                                (start[0] + x, y_smooth, start[1] + z), block)
+
+                        else:
+                            geometry.placeLine(
+                                editor, (start[0] + x, y, start[1] + z), (start[0] + x, y_smooth, start[1] + z), block)
+
+    smooth_terrain_delta.save('./world_maker/data/smooth_terrain_delta.png')
