@@ -98,5 +98,3 @@ def generate_building(image: Union[str, Image], heightmap: Union[str, Image], ou
     return rectangles
 
 
-if __name__ == '__main__':
-    generate_building()
