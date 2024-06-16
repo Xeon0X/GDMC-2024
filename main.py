@@ -5,6 +5,7 @@ import gdpc.exceptions
 from world_maker.world_maker import *
 from world_maker.data_analysis import transpose_form_heightmap
 from world_maker.Skeleton import Skeleton, simplify_coordinates
+from world_maker.terraforming import remove_trees
 from networks.geometry.Point3D import Point3D
 from networks.roads_2.Road import Road
 from networks.legacy_roads import roads
@@ -20,9 +21,12 @@ def main():
     buildArea = editor.getBuildArea()
     origin = ((buildArea.begin).x, (buildArea.begin).z)
 
-    set_roads(skeleton_mountain, origin)
-    set_roads(skeleton_highway, origin)
-    set_roads_grids(road_grid, origin)
+    remove_trees('./world_maker/data/heightmap.png',
+                 './world_maker/data/treemap.png', './world_maker/data/smooth_sobel_watermap.png')
+
+    # set_roads(skeleton_mountain, origin)
+    # set_roads(skeleton_highway, origin)
+    # set_roads_grids(road_grid, origin)
     # roads.setRoads(skeleton_mountain)
     # roads.setRoads(skeleton_highway)
 
