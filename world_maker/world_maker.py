@@ -12,9 +12,6 @@ def world_maker():
     world = World()
     heightmap, watermap, treemap = get_data(world)
 
-    filter_smooth(
-        './world_maker/data/heightmap.png', 4).save('./world_maker/data/heightmap_smooth.png')
-
     filter_sobel(
         "./world_maker/data/heightmap.png").save('./world_maker/data/sobelmap.png')
 
@@ -53,4 +50,18 @@ def world_maker():
                 './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
     overide_map('./world_maker/data/heightmap_with_building.png',
                 './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
+    filter_smooth(
+        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+    overide_map('./world_maker/data/heightmap_with_building.png',
+                './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
+    overide_map('./world_maker/data/heightmap_with_building.png',
+                './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
+    filter_smooth(
+        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+    overide_map('./world_maker/data/heightmap_with_building.png',
+                './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
+    overide_map('./world_maker/data/heightmap_with_building.png',
+                './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
+    filter_smooth(
+        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
     return rectangle_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid

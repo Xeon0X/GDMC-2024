@@ -169,13 +169,13 @@ def overide_map(base: Image, top: Image) -> Image:
 
     for x in range(width):
         for y in range(height):
-            pixel1 = base.getpixel((x, y))
-            pixel2 = top.getpixel((x, y))
+            base_pixel = base.getpixel((x, y))
+            top_pixel = top.getpixel((x, y))
 
-            if pixel1 != 0:
-                result_image.putpixel((x, y), pixel1)
+            if top_pixel != 0:
+                result_image.putpixel((x, y), top_pixel)
             else:
-                result_image.putpixel((x, y), pixel2)
+                result_image.putpixel((x, y), base_pixel)
 
     return result_image
 
@@ -247,7 +247,8 @@ def create_volume(surface: np.ndarray, heightmap: np.ndarray, make_it_flat: bool
 
 def convert_2D_to_3D(image: Union[str, Image], make_it_flat: bool = False) -> np.ndarray:
     image = handle_import_image(image)
-    heightmap = Image.open('./world_maker/data/heightmap.png').convert('L')
+    heightmap = Image.open(
+        './world_maker/data/heightmap_smooth.png').convert('L')
     heightmap = np.array(heightmap)
     surface = np.array(image)
     volume = create_volume(surface, heightmap, make_it_flat)

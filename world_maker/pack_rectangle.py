@@ -97,9 +97,14 @@ def draw_rectangles(rectangles, grid, heightmap):
     image = Image.new('L', (len(grid[0]), len(grid)), (0))
     for rectangle in rectangles:
         start, end = rectangle
+        height = []
         for x in range(start[0], end[0]):
             for y in range(start[1], end[1]):
-                image.putpixel((x, y), heightmap.getpixel((x, y)))
+                height.append(heightmap.getpixel((x, y)))
+        height_average = sum(height)/len(height)
+        for x in range(start[0], end[0]):
+            for y in range(start[1], end[1]):
+                image.putpixel((x, y), round(height_average))
     return image
 
 
