@@ -13,6 +13,8 @@ def main():
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
 
+    print(skeleton_mountain.lines)
+
     blocks = {
         "wall": "blackstone",
         "roof": "blackstone",

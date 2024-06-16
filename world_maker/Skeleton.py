@@ -1,12 +1,19 @@
-import numpy as np
-#import skan
-from skimage.morphology import skeletonize
-from skan.csr import skeleton_to_csgraph
-from collections import Counter
-from PIL import Image, ImageDraw
 import random
+from collections import Counter
+from typing import List, Union
+
+import numpy as np
+from PIL import Image, ImageDraw
+from skan.csr import skeleton_to_csgraph
+from skimage.morphology import skeletonize
+
+from gdpc import Editor
 
 
+def handle_import_image(image: Union[str, Image]) -> Image:
+    if isinstance(image, str):
+        return Image.open(image)
+    return image
 
 
 class Skeleton:
@@ -18,6 +25,19 @@ class Skeleton:
         self.graph = None
         if data is not None:
             self.set_skeleton(data)
+
+    def transpose_form_heightmap(heightmap: Union[str, Image], coordinates):
+
+        heightmap = handle_import_image(heightmap).convert('L')
+
+        editor = Editor()
+        xMin = (editor.getBuildArea().begin).x
+        zMin = (editor.getBuildArea().begin).z
+
+        coordinates_final = []
+
+        return coordinates_final(coordinates[0] + xMin, heightmap.getpixel(
+            (coordinates[0], coordinates[2]))[0], coordinates[2] + zMin)
 
     def set_skeleton(self, data: np.ndarray):
         print("[Skeleton] Start skeletonization...")
@@ -35,7 +55,8 @@ class Skeleton:
 
         for i in range(len(coordinates[0])):
             # print((coordinates[0][i], coordinates[1][i], coordinates[2][i]))
-            self.coordinates.append((coordinates[0][i], coordinates[1][i], coordinates[2][i]))
+            self.coordinates.append(
+                (coordinates[0][i], coordinates[1][i], coordinates[2][i]))
         print("[Skeleton] Skeletonization completed.")
 
     def find_next_elements(self, key: str) -> list:
@@ -89,7 +110,8 @@ class Skeleton:
             return line
 
     def parse_graph(self, parse_orphan: bool = False):
-        print("[Skeleton] Start parsing the graph", ("with orphans" if parse_orphan else "") + "...")
+        print("[Skeleton] Start parsing the graph",
+              ("with orphans" if parse_orphan else "") + "...")
         for key, value in sorted(
                 Counter(self.graph.row).items(), key=lambda kv: kv[1], reverse=True
         ):
@@ -160,13 +182,15 @@ class Skeleton:
         # xzDistance = (max(buildRect.end[0], buildRect.begin[0]) - min(buildRect.end[0], buildRect.begin[0]),
         #              max(buildRect.end[1], buildRect.begin[1]) - min(buildRect.end[1], buildRect.begin[1]))
 
-        heightmap = Image.open("./world_maker/data/heightmap.png").convert('RGB')
+        heightmap = Image.open(
+            "./world_maker/data/heightmap.png").convert('RGB')
         # roadsArea = Image.new("L", xzDistance, 0)
         # width, height = heightmap.size
 
         # Lines
         for i in range(len(self.lines)):
-            r, g, b = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+            r, g, b = (random.randint(0, 255), random.randint(
+                0, 255), random.randint(0, 255))
 
             for j in range(len(self.lines[i])):
                 z = self.coordinates[self.lines[i][j]][0]
@@ -193,7 +217,8 @@ class Skeleton:
         for i in range(len(self.centers)):
             # print(self.coordinates[self.centers[i]])
             heightmap.putpixel(
-                (int(self.coordinates[self.centers[i]][0]), int(self.coordinates[self.centers[i]][2])),
+                (int(self.coordinates[self.centers[i]][0]), int(
+                    self.coordinates[self.centers[i]][2])),
                 (255, 255, 0),
             )
 
@@ -228,7 +253,8 @@ class Skeleton:
             for j in range(len(self.lines[i])):
                 z = self.coordinates[self.lines[i][j]][0]
                 x = self.coordinates[self.lines[i][j]][2]
-                circle_coords = (z - radius, x - radius, z + radius, x + radius)
+                circle_coords = (z - radius, x - radius,
+                                 z + radius, x + radius)
                 road_area_map_draw.ellipse(circle_coords, fill=255)
 
         # Centers

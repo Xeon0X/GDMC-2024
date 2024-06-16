@@ -68,29 +68,29 @@ def filter_sobel(image: Union[str, Image]) -> Image:
     for i in range(1, h - 1):
         for j in range(1, w - 1):
             horizontalGrad = (
-                    (horizontal[0, 0] * gray_img[i - 1, j - 1])
-                    + (horizontal[0, 1] * gray_img[i - 1, j])
-                    + (horizontal[0, 2] * gray_img[i - 1, j + 1])
-                    + (horizontal[1, 0] * gray_img[i, j - 1])
-                    + (horizontal[1, 1] * gray_img[i, j])
-                    + (horizontal[1, 2] * gray_img[i, j + 1])
-                    + (horizontal[2, 0] * gray_img[i + 1, j - 1])
-                    + (horizontal[2, 1] * gray_img[i + 1, j])
-                    + (horizontal[2, 2] * gray_img[i + 1, j + 1])
+                (horizontal[0, 0] * gray_img[i - 1, j - 1])
+                + (horizontal[0, 1] * gray_img[i - 1, j])
+                + (horizontal[0, 2] * gray_img[i - 1, j + 1])
+                + (horizontal[1, 0] * gray_img[i, j - 1])
+                + (horizontal[1, 1] * gray_img[i, j])
+                + (horizontal[1, 2] * gray_img[i, j + 1])
+                + (horizontal[2, 0] * gray_img[i + 1, j - 1])
+                + (horizontal[2, 1] * gray_img[i + 1, j])
+                + (horizontal[2, 2] * gray_img[i + 1, j + 1])
             )
 
             newhorizontalImage[i - 1, j - 1] = abs(horizontalGrad)
 
             verticalGrad = (
-                    (vertical[0, 0] * gray_img[i - 1, j - 1])
-                    + (vertical[0, 1] * gray_img[i - 1, j])
-                    + (vertical[0, 2] * gray_img[i - 1, j + 1])
-                    + (vertical[1, 0] * gray_img[i, j - 1])
-                    + (vertical[1, 1] * gray_img[i, j])
-                    + (vertical[1, 2] * gray_img[i, j + 1])
-                    + (vertical[2, 0] * gray_img[i + 1, j - 1])
-                    + (vertical[2, 1] * gray_img[i + 1, j])
-                    + (vertical[2, 2] * gray_img[i + 1, j + 1])
+                (vertical[0, 0] * gray_img[i - 1, j - 1])
+                + (vertical[0, 1] * gray_img[i - 1, j])
+                + (vertical[0, 2] * gray_img[i - 1, j + 1])
+                + (vertical[1, 0] * gray_img[i, j - 1])
+                + (vertical[1, 1] * gray_img[i, j])
+                + (vertical[1, 2] * gray_img[i, j + 1])
+                + (vertical[2, 0] * gray_img[i + 1, j - 1])
+                + (vertical[2, 1] * gray_img[i + 1, j])
+                + (vertical[2, 2] * gray_img[i + 1, j + 1])
             )
 
             newverticalImage[i - 1, j - 1] = abs(verticalGrad)
@@ -184,12 +184,16 @@ def highway_map() -> Image:
     print("[Data Analysis] Generating highway map...")
     smooth_sobel = filter_smooth("./world_maker/data/sobelmap.png", 1)
     negative_smooth_sobel = filter_negative(smooth_sobel)
-    negative_smooth_sobel_water = subtract_map(negative_smooth_sobel, './world_maker/data/watermap.png')
+    negative_smooth_sobel_water = subtract_map(
+        negative_smooth_sobel, './world_maker/data/watermap.png')
     array_sobel_water = np.array(negative_smooth_sobel_water)
-    array_sobel_water = ndimage.binary_erosion(array_sobel_water, iterations=12)
-    array_sobel_water = ndimage.binary_dilation(array_sobel_water, iterations=5)
+    array_sobel_water = ndimage.binary_erosion(
+        array_sobel_water, iterations=12)
+    array_sobel_water = ndimage.binary_dilation(
+        array_sobel_water, iterations=5)
     array_sobel_water = filter_smooth_array(array_sobel_water, 5)
-    array_sobel_water = ndimage.binary_erosion(array_sobel_water, iterations=20)
+    array_sobel_water = ndimage.binary_erosion(
+        array_sobel_water, iterations=20)
     array_sobel_water = filter_smooth_array(array_sobel_water, 6)
     image = Image.fromarray(array_sobel_water)
     image_no_details = filter_remove_details(image, 15)
@@ -240,7 +244,8 @@ def skeleton_mountain_map(image: Union[str, Image] = './world_maker/data/mountai
 
 def smooth_sobel_water() -> Image:
     watermap = handle_import_image("./world_maker/data/watermap.png")
-    watermap = filter_negative(filter_remove_details(filter_negative(watermap), 5))
+    watermap = filter_negative(
+        filter_remove_details(filter_negative(watermap), 5))
     sobel = handle_import_image("./world_maker/data/sobelmap.png")
     sobel = filter_remove_details(filter_smooth(sobel, 1), 2)
     group = group_map(watermap, sobel)
@@ -257,14 +262,16 @@ def detect_mountain(image: Union[str, Image] = './world_maker/data/sobelmap.png'
 
     criteria = (cv2.TERM_CRITERIA_EPS + cv2.TERM_CRITERIA_MAX_ITER, 100, 0.2)
     k = 3
-    _, labels, centers = cv2.kmeans(pixels, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
+    _, labels, centers = cv2.kmeans(
+        pixels, k, None, criteria, 10, cv2.KMEANS_RANDOM_CENTERS)
 
     centers = np.uint8(centers)
     segmented_image = centers[labels.flatten()]
     segmented_image = segmented_image.reshape(sobel.shape)
     mountain = segmented_image == segmented_image.max()
 
-    contours, _ = cv2.findContours(mountain.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    contours, _ = cv2.findContours(mountain.astype(
+        np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     max_contour = max(contours, key=cv2.contourArea)
     M = cv2.moments(max_contour)
@@ -278,7 +285,8 @@ def detect_mountain(image: Union[str, Image] = './world_maker/data/sobelmap.png'
 def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
                        height_min: int = 6, height_max: int = 10) \
         -> list[tuple[tuple[int, int, int], tuple[int, int, int]]]:
-    image = handle_import_image('./world_maker/data/heightmap.png').convert('L')
+    image = handle_import_image(
+        './world_maker/data/heightmap.png').convert('L')
     new_rectangle = []
     for rect in rectangle:
         start, end = rect
@@ -286,7 +294,8 @@ def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
         for x in range(start[0], end[0]):
             for y in range(start[1], end[1]):
                 avg_height += image.getpixel((x, y))
-        avg_height = int(avg_height / ((end[0] - start[0]) * (end[1] - start[1]))) + 1
+        avg_height = int(
+            avg_height / ((end[0] - start[0]) * (end[1] - start[1]))) + 1
         new_rectangle.append(
             ((start[0], avg_height, start[1]), (end[0], avg_height + randint(height_min, height_max), end[1])))
     return new_rectangle
