@@ -1,0 +1,7 @@
+{
+    "classic_lane": {"stone": 3, "andesite": 1},
+    "modern_lane": {"black_concrete": 3, "black_concrete_powder": 1},
+
+    "bike_lane_green": {"green_concrete": 3, "green_concrete_powder": 1},
+    "bike_lane_red": {"red_concrete": 3, "red_concrete_powder": 1}
+}

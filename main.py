@@ -5,10 +5,10 @@ import gdpc.exceptions
 from world_maker.world_maker import *
 from House import *
 
+
 def main():
 
     rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain = world_maker()
-
 
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
@@ -28,19 +28,22 @@ def main():
         "garden_outline": "oak_leaves",
         "garden_floor": "grass_block"
     }
-    
+
     entranceDirection = ["N", "S", "E", "W"]
 
-    
     for houses in rectangle_house_mountain:
-        start = (houses[0][0]+buildArea.begin[0], houses[0][1], houses[0][2]+buildArea.begin[2])
-        end = (houses[1][0]+buildArea.begin[0], houses[1][1], houses[1][2]+buildArea.begin[2])
-        house = House(editor, start, end, entranceDirection[random.randint(0, 3)], blocks)
+        start = (houses[0][0]+buildArea.begin[0], houses[0]
+                 [1], houses[0][2]+buildArea.begin[2])
+        end = (houses[1][0]+buildArea.begin[0], houses[1]
+               [1], houses[1][2]+buildArea.begin[2])
+        house = House(editor, start, end,
+                      entranceDirection[random.randint(0, 3)], blocks)
         house.build()
+
 
 if __name__ == '__main__':
     main()
-    
+
 """
 from gdpc import Editor, Block, geometry, Transform
 import networks.curve as curve
