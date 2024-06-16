@@ -57,25 +57,6 @@ class Bin:
                 self.grid[rect_y][rect_x] = False
 
 
-def pack_rectangles(rectangles, grid):
-    rectangles = sorted(
-        rectangles, key=lambda r: r.width * r.height, reverse=True)
-    bins = [Bin(grid)]
-
-    for rectangle in rectangles:
-        for bin in bins:
-            if bin.place_rectangle(rectangle):
-                break
-        else:
-            new_bin = Bin(grid)
-            if new_bin.place_rectangle(rectangle):
-                bins.append(new_bin)
-            else:
-                return False
-
-    return True
-
-
 def generate_rectangle(min_width: int = 10, max_width: int = 25):
     width = randint(min_width, max_width)
     height = randint(min_width, max_width)

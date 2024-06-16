@@ -54,7 +54,7 @@ def world_maker():
     filter_smooth(
         './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
 
-    for i in range(5):
+    for i in range(10):
         overide_map('./world_maker/data/heightmap_with_building.png',
                     './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
         overide_map('./world_maker/data/heightmap_with_building.png',
