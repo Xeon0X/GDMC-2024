@@ -9,7 +9,7 @@ from world_maker.data_analysis import handle_import_image
 
 
 def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask: Union[str, Image]):
-
+    print(["Remove tree"] Starting...)
     editor = Editor(buffering=True)
     build_area = editor.getBuildArea()
     build_rectangle = build_area.toRect()
@@ -42,8 +42,6 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
                 removed.append((x, z))
                 print(x, z)
 
-    removed_treesmap.save('./world_maker/data/removed_treesmap.png')
-
     for x in range(0, distance[0]):
         for z in range(0, distance[1]):
             print("removing tree in ", start[0] + x, start[1] + z)
@@ -53,9 +51,13 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
                 geometry.placeLine(
                     editor, (start[0] + x, y+1, start[1] + z), (start[0] + x, y_top, start[1] + z), Block('air'))
 
+    removed_treesmap.save('./world_maker/data/removed_treesmap.png')
+    print(["Remove tree"] Done.)
+
 
 def smooth_terrain(heightmap: Union[str, Image], heightmap_smooth: Union[str, Image], mask: Union[str, Image]):
 
+    print(["Smooth terrain"] Starting...)
     editor = Editor()
     build_area = editor.getBuildArea()
     build_rectangle = build_area.toRect()
@@ -97,3 +99,4 @@ def smooth_terrain(heightmap: Union[str, Image], heightmap_smooth: Union[str, Im
                                 editor, (start[0] + x, y, start[1] + z), (start[0] + x, y_smooth, start[1] + z), block)
 
     smooth_terrain_delta.save('./world_maker/data/smooth_terrain_delta.png')
+    print(["Smoothing terrain"] Done.)
