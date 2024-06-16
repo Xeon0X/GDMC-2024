@@ -6,6 +6,7 @@ from world_maker.world_maker import *
 from world_maker.Skeleton import Skeleton, transpose_form_heightmap, simplify_coordinates
 from networks.geometry.Point3D import Point3D
 from networks.roads_2.Road import Road
+from networks.legacy_roads import roads
 from world_maker.District import Road as Road_grid
 from House import *
 
@@ -17,9 +18,11 @@ def main():
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
 
-    set_roads(skeleton_mountain)
-    set_roads(skeleton_highway)
-    set_roads_grids(road_grid)
+    # set_roads(skeleton_mountain)
+    # set_roads(skeleton_highway)
+    # set_roads_grids(road_grid)
+    roads.setRoads(skeleton_mountain)
+    roads.setRoads(skeleton_highway)
 
     blocks = {
         "wall": "blackstone",
@@ -38,6 +41,15 @@ def main():
     }
 
     entranceDirection = ["N", "S", "E", "W"]
+
+    for houses in rectangle_building:
+        start = (houses[0][0]+buildArea.begin[0], houses[0]
+                 [1], houses[0][2]+buildArea.begin[2])
+        end = (houses[1][0]+buildArea.begin[0], houses[1]
+               [1], houses[1][2]+buildArea.begin[2])
+        house = House(editor, start, end,
+                      entranceDirection[random.randint(0, 3)], blocks)
+        house.build()
 
     for houses in rectangle_house_mountain:
         start = (houses[0][0]+buildArea.begin[0], houses[0]
