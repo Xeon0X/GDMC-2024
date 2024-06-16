@@ -46,22 +46,20 @@ def world_maker():
     rectangle_mountain = rectangle_2D_to_3D(rectangle_mountain)
 
     # Terraforming
+    # Smooth initialization
     overide_map('./world_maker/data/heightmap.png',
                 './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
     overide_map('./world_maker/data/heightmap_with_building.png',
                 './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
     filter_smooth(
         './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
-    overide_map('./world_maker/data/heightmap_with_building.png',
-                './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
-    overide_map('./world_maker/data/heightmap_with_building.png',
-                './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
-    filter_smooth(
-        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
-    overide_map('./world_maker/data/heightmap_with_building.png',
-                './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
-    overide_map('./world_maker/data/heightmap_with_building.png',
-                './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
-    filter_smooth(
-        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+
+    for i in range(5):
+        overide_map('./world_maker/data/heightmap_with_building.png',
+                    './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
+        overide_map('./world_maker/data/heightmap_with_building.png',
+                    './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
+        filter_smooth(
+            './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+
     return rectangle_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid

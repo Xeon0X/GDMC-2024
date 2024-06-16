@@ -23,7 +23,7 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
     treesmap = handle_import_image(treesmap).convert('L')
     mask = handle_import_image(mask)
 
-    removed_treesmap = Image.new("RGB", distance, 0)
+    removed_treesmap = Image.new("L", distance, 0)
 
     removed = []
     for x in range(0, distance[0]):
@@ -31,16 +31,15 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
 
             if mask.getpixel((x, z)) != 0 and treesmap.getpixel((x, z)) > 0 and (x, z) not in removed:
 
-                treeArea = morphology.flood(treesmap, (z, x), tolerance=1)
-                blend = Image.blend(Image.fromarray(treeArea).convert(
-                    'RGB'), removed_treesmap.convert('RGB'), 0.5)
+                tree_area = morphology.flood(treesmap, (z, x), tolerance=1)
+                blend = Image.blend(Image.fromarray(tree_area).convert(
+                    'L'), removed_treesmap.convert('L'), 0.5)
 
                 array = np.array(blend.convert('L'))
                 bool_array = array > 1
                 removed_treesmap = Image.fromarray(bool_array)
 
                 removed.append((x, z))
-                print(x, z)
 
     for x in range(0, distance[0]):
         for z in range(0, distance[1]):
