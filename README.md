@@ -19,4 +19,4 @@ Install `pipreqs`:
 pip install pipreqs
 ```
 
-Run `pipreqs --ignore .venv --force` to generate an updated list of dependencies for the project in requirements file.
+Run `pipreqs --ignore .venv --force` to generate an updated list of dependencies for the project in requirements file. Note that you should then change `skimage==...` by `scikit-image==0.23.2`.
