@@ -1,5 +1,5 @@
 from math import cos, pi, sin
-from typing import List
+from typing import List, Dict
 
 import numpy as np
 
@@ -17,6 +17,9 @@ class Circle:
         self.outer = None
         self.points_thick: List[Point2D] = []
 
+        self.points_thick_by_line: List[List[Point2D]] = []
+        self.gaps: List[Point2D] = []
+
         self.spaced_radius = None
         self.spaced_points: List[Point2D] = []
 
@@ -24,6 +27,7 @@ class Circle:
         return f"Circle(center: {self.center}, radius: {self.radius}, spaced_radius: {self.spaced_radius}, inner: {self.inner}, outer: {self.outer})"
 
     def circle(self, radius: int) -> List[Point2D]:
+        self.points = []
         self.radius = radius
         center = self.center.copy()
 
@@ -48,8 +52,59 @@ class Circle:
                 break
         return self.points
 
+    def circle_thick_by_line(self, inner: int, outter: int) -> List[List[Point2D]]:
+        width = outter - inner
+        self.circle_thick_by_line = [[] for _ in range(width)]
+        for i in range(width):
+            self.circle_thick_by_line[i] = self.circle(inner + i)
+            if i > 0:
+                self.gaps.append(Circle._remove_gaps(
+                    self.circle_thick_by_line[i], self.circle_thick_by_line[i-1]))
+        return self.circle_thick_by_line, self.gaps
+
+    @staticmethod
+    def _remove_gaps(outter_line: List[Point2D], inner_line: List[Point2D]) -> List[Point2D]:
+        gaps = []
+        for i in range(len(outter_line)):
+            if Circle._count_neighbors(outter_line[i], inner_line) == 0:
+                if Circle._count_neighbors(Point2D(outter_line[i].x-1, outter_line[i].y), inner_line) > 1:
+                    if Point2D(outter_line[i].x-1, outter_line[i].y) not in outter_line:
+                        gaps.append(
+                            Point2D(outter_line[i].x-1, outter_line[i].y))
+                if Circle._count_neighbors(Point2D(outter_line[i].x+1, outter_line[i].y), inner_line) > 1:
+                    if Point2D(outter_line[i].x+1, outter_line[i].y) not in outter_line:
+                        gaps.append(
+                            Point2D(outter_line[i].x+1, outter_line[i].y))
+                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y-1), inner_line) > 1:
+                    if Point2D(outter_line[i].x, outter_line[i].y-1) not in outter_line:
+                        gaps.append(
+                            Point2D(outter_line[i].x, outter_line[i].y-1))
+                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y+1), inner_line) > 1:
+                    if Point2D(outter_line[i].x, outter_line[i].y+1) not in outter_line:
+                        gaps.append(
+                            Point2D(outter_line[i].x, outter_line[i].y+1))
+        return gaps
+
+    @ staticmethod
+    def _count_neighbors(point: Point2D, line: List[Point2D]) -> int:
+        neighbors = 0
+        for i in range(len(line)):
+            if point.x == line[i].x:
+                if point.y == line[i].y:
+                    return 0
+                if point.y-1 == line[i].y:
+                    neighbors += 1
+                if point.y+1 == line[i].y:
+                    neighbors += 1
+            if point.y == line[i].y:
+                if point.x-1 == line[i].x:
+                    neighbors += 1
+                if point.x+1 == line[i].x:
+                    neighbors += 1
+        return neighbors
+
     def circle_thick(self, inner: int, outer: int) -> List[Point2D]:
-        """Compute discrete value of a 2d-circle with thickness. 
+        """Compute discrete value of a 2d-circle with thickness.
 
         From: https://stackoverflow.com/questions/27755514/circle-with-thickness-drawing-algorithm
 
@@ -108,7 +163,7 @@ class Circle:
         From: https://stackoverflow.com/questions/8487893/generate-all-the-points-on-the-circumference-of-a-circle
 
         Args:
-            number (int): Number of coordinates to be returned. 
+            number (int): Number of coordinates to be returned.
             radius (int): Radius of the circle.
 
         Returns:

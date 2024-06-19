@@ -62,8 +62,30 @@ class Road:
                     # Get nearest in x,z projection
                     nearest = self.polyline.segments[i].points_thick[j].nearest(
                         Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
-                    self.output_block.append(
-                        (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("stone")))
+                    # self.output_block.append(
+                    #     (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("stone")))
+                for k in range(len(self.polyline.segments[i].points_thick_by_line)):
+                    match k:
+                        case 0:
+                            blob = 'black_concrete'
+                        case 1:
+                            blob = 'red_concrete'
+                        case 2:
+                            blob = 'orange_concrete'
+                        case 3:
+                            blob = 'yellow_concrete'
+                        case 4:
+                            blob = 'green_concrete'
+                        case 5:
+                            blob = 'blue_concrete'
+                        case 6:
+                            blob = 'purple_concrete'
+
+                    for m in range(len(self.polyline.segments[i].points_thick_by_line[k])):
+                        nearest = self.polyline.segments[i].points_thick_by_line[k][m].nearest(
+                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        self.output_block.append(
+                            (Point3D.insert_3d([self.polyline.segments[i].points_thick_by_line[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
 
         for i in range(1, len(self.polyline.centers)-1):
             # Circle

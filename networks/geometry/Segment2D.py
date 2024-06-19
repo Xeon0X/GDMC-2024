@@ -12,12 +12,13 @@ class Segment2D:
         self.end = end
         self.points: List[Point2D] = []
         self.points_thick: List[Point2D] = []
+        self.points_thick_by_line: List[Union[Point2D, int]] = []
         self.thickness = None
 
     def __repr__(self):
         return str(f"Segment2D(start: {self.start}, end: {self.end}, points: {self.points})")
 
-    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: bool = False) -> Union[List[Point2D], None]:
+    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: int = 0) -> Union[List[Point2D], None]:
         """Modified Bresenham draw (line) with optional overlap.
 
         From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -108,6 +109,8 @@ class Segment2D:
 
         >>> self.compute_thick_segment(self.start, self.end, self.thickness, self.thickness_mode)
         """
+        self.points_thick_by_line = [[] for _ in range(thickness+1)]
+
         start = self.start.copy()
         end = self.end.copy()
 
@@ -158,7 +161,7 @@ class Segment2D:
                 error += delta_2x
 
             self.segment(
-                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=True)
+                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=1)
 
             error = delta_2x - delta_x
             for i in range(thickness, 1, -1):
@@ -173,7 +176,7 @@ class Segment2D:
                 error += delta_2y
 
                 self.segment(
-                    start, end, overlap=overlap, _is_computing_thickness=True)
+                    start, end, overlap=overlap, _is_computing_thickness=i)
 
         else:
             if swap:
@@ -194,7 +197,7 @@ class Segment2D:
                 error += delta_2x
 
             self.segment(
-                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=True)
+                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=1)
 
             error = delta_2x - delta_y
             for i in range(thickness, 1, -1):
@@ -209,7 +212,7 @@ class Segment2D:
                 error += delta_2x
 
                 self.segment(
-                    start, end, overlap=overlap, _is_computing_thickness=True)
+                    start, end, overlap=overlap, _is_computing_thickness=i)
 
         return self.points_thick
 
@@ -241,7 +244,9 @@ class Segment2D:
                 )
 
     def _add_points(self, points, is_computing_thickness):
-        if is_computing_thickness:
+        if is_computing_thickness > 0:
             self.points_thick.append(points.copy())
+            self.points_thick_by_line[is_computing_thickness].append(
+                (points.copy()))
         else:
             self.points.append(points.copy())
