@@ -18,20 +18,23 @@ from gdpc import Editor, Block
 
 def main():
     editor = Editor(buffering=True)
-    c = Circle(Point2D(400, -75)).circle_thick_by_line(5, 32)
-    for i in range(len(c[0])):
-        for j in range(len(c[0][i])):
-            if i % 2 == 0:
-                editor.placeBlock(
-                    (c[0][i][j].x, 110, c[0][i][j].y), Block("white_concrete"))
-            else:
-                editor.placeBlock(
-                    (c[0][i][j].x, 110, c[0][i][j].y), Block("black_concrete"))
-    print(c[1])
-    for i in range(len(c[1])):
-        for j in range(len(c[1][i])):
-            editor.placeBlock(
-                (c[1][i][j].x, 110, c[1][i][j].y), Block("red_concrete"))
+    # c = Circle(Point2D(400, -75)).circle_thick_by_line(5, 32)
+    # for i in range(len(c[0])):
+    #     for j in range(len(c[0][i])):
+    #         if i % 2 == 0:
+    #             editor.placeBlock(
+    #                 (c[0][i][j].x, 110, c[0][i][j].y), Block("white_concrete"))
+    #         else:
+    #             editor.placeBlock(
+    #                 (c[0][i][j].x, 110, c[0][i][j].y), Block("black_concrete"))
+    # print(c[1])
+    # for i in range(len(c[1])):
+    #     for j in range(len(c[1][i])):
+    #         editor.placeBlock(
+    #             (c[1][i][j].x, 110, c[1][i][j].y), Block("red_concrete"))
+
+    Road([Point3D(464, 85, -225), Point3D(408, 105, -224),
+         Point3D(368, 104, -249), Point3D(368, 85, -296), Point3D(457, 79, -292)], 15)
     # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
 
     # editor = Editor(buffering=True)
@@ -128,38 +131,3 @@ def set_roads(skeleton: Skeleton, origin):
 
 if __name__ == '__main__':
     main()
-
-"""
-from gdpc import Editor, Block, geometry, Transform
-import networks.curve as curve
-import numpy as np
-from utils.JsonReader import JsonReader
-from utils.YamlReader import YamlReader
-from buildings.Building import Building
-
-from utils.functions import *
-from utils.Enums import DIRECTION
-
-editor = Editor(buffering=True)
-
-# get every differents buildings shapes
-f = JsonReader('buildings\shapes.json')
-shapes = f.data
-baseShape = shapes[0]['matrice']
-
-# get the random data for the buildings
-y = YamlReader('params.yml')
-random_data = y.data
-
-#move your editor to the position you wanna build on
-transform = Transform((75,-60,110),rotation = 0)
-editor.transform.push(transform)
-
-# clear the area you build on
-geometry.placeCuboid(editor, (-5,0,-8), (25,100,25), Block("air"))
-
-# create a building at the relative position 0,0 with 20 blocks length and 20 blocks width, with a normal shape and 10 floors
-building = Building(random_data["buildings"], [(0,0,0), (20,30,20)], baseShape, DIRECTION.EAST)
-# build it with your custom materials
-building.build(editor, ["stone_bricks","glass_pane","glass","cobblestone_wall","stone_brick_stairs","oak_planks","white_concrete","cobblestone","stone_brick_slab","iron_bars"])
-"""

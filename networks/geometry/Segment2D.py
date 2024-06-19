@@ -12,7 +12,10 @@ class Segment2D:
         self.end = end
         self.points: List[Point2D] = []
         self.points_thick: List[Point2D] = []
-        self.points_thick_by_line: List[Union[Point2D, int]] = []
+
+        self.points_thick_by_line: List[List[Point2D]] = []
+        self.gaps: List[List[Point2D]] = []
+
         self.thickness = None
 
     def __repr__(self):
@@ -58,7 +61,7 @@ class Segment2D:
         delta_2x = 2*delta_x
         delta_2y = 2*delta_y
 
-        self._add_points(start, _is_computing_thickness)
+        self._add_points(start, _is_computing_thickness, LINE_OVERLAP.NONE)
 
         if (delta_x > delta_y):
             error = delta_2y - delta_x
@@ -66,30 +69,34 @@ class Segment2D:
                 start.x += step_x
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self._add_points(start, _is_computing_thickness)
+                        self._add_points(
+                            start, _is_computing_thickness, overlap)
 
                     start.y += step_y
                     if (overlap == LINE_OVERLAP.MINOR):
                         self._add_points(
-                            Point2D(start.copy().x - step_x, start.copy().y), _is_computing_thickness)
+                            Point2D(start.copy().x - step_x, start.copy().y), _is_computing_thickness, overlap)
                     error -= delta_2x
                 error += delta_2y
-                self._add_points(start, _is_computing_thickness)
+                self._add_points(
+                    start, _is_computing_thickness, LINE_OVERLAP.NONE)
         else:
             error = delta_2x - delta_y
             while (start.y != end.y):
                 start.y += step_y
                 if (error >= 0):
                     if (overlap == LINE_OVERLAP.MAJOR):
-                        self._add_points(start, _is_computing_thickness)
+                        self._add_points(
+                            start, _is_computing_thickness, overlap)
 
                     start.x += step_x
                     if (overlap == LINE_OVERLAP.MINOR):
                         self._add_points(
-                            Point2D(start.copy().x, start.copy().y - step_y), _is_computing_thickness)
+                            Point2D(start.copy().x, start.copy().y - step_y), _is_computing_thickness, overlap)
                     error -= delta_2y
                 error += delta_2x
-                self._add_points(start, _is_computing_thickness)
+                self._add_points(
+                    start, _is_computing_thickness, LINE_OVERLAP.NONE)
 
         if not _is_computing_thickness:
             return self.points
@@ -110,6 +117,7 @@ class Segment2D:
         >>> self.compute_thick_segment(self.start, self.end, self.thickness, self.thickness_mode)
         """
         self.points_thick_by_line = [[] for _ in range(thickness+1)]
+        self.gaps = [[] for _ in range(thickness+1)]
 
         start = self.start.copy()
         end = self.end.copy()
@@ -243,10 +251,14 @@ class Segment2D:
                 np.round((self.start.y + self.end.y) / 2.0).astype(int),
                 )
 
-    def _add_points(self, points, is_computing_thickness):
+    def _add_points(self, points, is_computing_thickness, overlap):
         if is_computing_thickness > 0:
             self.points_thick.append(points.copy())
-            self.points_thick_by_line[is_computing_thickness].append(
-                (points.copy()))
+            if overlap == LINE_OVERLAP.NONE:
+                self.points_thick_by_line[is_computing_thickness].append(
+                    (points.copy()))
+            else:
+                self.gaps[is_computing_thickness].append(
+                    (points.copy()))
         else:
             self.points.append(points.copy())

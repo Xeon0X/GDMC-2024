@@ -65,9 +65,10 @@ class Road:
                     # self.output_block.append(
                     #     (Point3D.insert_3d([self.polyline.segments[i].points_thick[j]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("stone")))
                 for k in range(len(self.polyline.segments[i].points_thick_by_line)):
-                    match k:
+                    kk = k % 7
+                    match kk:
                         case 0:
-                            blob = 'black_concrete'
+                            blob = 'pink_concrete'
                         case 1:
                             blob = 'red_concrete'
                         case 2:
@@ -87,12 +88,17 @@ class Road:
                         self.output_block.append(
                             (Point3D.insert_3d([self.polyline.segments[i].points_thick_by_line[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
 
+                    for m in range(len(self.polyline.segments[i].gaps[k])):
+                        nearest = self.polyline.segments[i].gaps[k][m].nearest(
+                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        self.output_block.append(
+                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
+
         for i in range(1, len(self.polyline.centers)-1):
             # Circle
 
-            circle = Circle(self.polyline.centers[i])
-            circle.circle_thick(int(
-                (self.polyline.radii[i]-self.width/2)), int((self.polyline.radii[i]+self.width/2)-1))
+            circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
+                (self.polyline.radii[i]-self.width/2)), int((self.polyline.radii[i]+self.width/2)+1))
 
             # Better to do here than drawing circle arc inside big triangle!
             double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
@@ -100,13 +106,39 @@ class Road:
             double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
                 self.polyline.acrs_intersections[i][2]) - Point2D.to_arrays(self.polyline.centers[i])))
 
-            for j in range(len(circle.points_thick)):
-                if circle.points_thick[j].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                    nearest = circle.points_thick[j].nearest(
-                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
-                    self.output_block.append(
-                        (Point3D.insert_3d([circle.points_thick[j]], 'y', [
-                            self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
+            for j in range(len(circle)):
+                for k in range(len(circle[j])):
+                    jj = j % 7
+                    match jj:
+                        case 0:
+                            blob = 'pink_concrete'
+                        case 1:
+                            blob = 'red_concrete'
+                        case 2:
+                            blob = 'orange_concrete'
+                        case 3:
+                            blob = 'yellow_concrete'
+                        case 4:
+                            blob = 'green_concrete'
+                        case 5:
+                            blob = 'blue_concrete'
+                        case 6:
+                            blob = 'purple_concrete'
+                    if circle[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                        nearest = circle[j][k].nearest(
+                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        self.output_block.append(
+                            (Point3D.insert_3d([circle[j][k]], 'y', [
+                                self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
+
+            for j in range(len(gaps)):
+                for k in range(len(gaps[j])):
+                    if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                        nearest = gaps[j][k].nearest(
+                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        self.output_block.append(
+                            (Point3D.insert_3d([gaps[j][k]], 'y', [
+                                self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
 
     def _projection_polyline(self):
         nearest_points_to_reference = []
