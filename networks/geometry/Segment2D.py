@@ -247,7 +247,6 @@ class Segment2D:
                     index = -1
                 else:
                     index = 0
-                print(i)
                 del self.points_thick_by_line[index]
                 del self.gaps[index]
 
@@ -276,9 +275,9 @@ class Segment2D:
         return Point2D(x3, y3).round(), Point2D(x4, y4).round()
 
     def middle_point(self):
-        return (np.round((self.start.x + self.end.x) / 2.0).astype(int),
-                np.round((self.start.y + self.end.y) / 2.0).astype(int),
-                )
+        return Point2D(np.round((self.start.x + self.end.x) / 2.0).astype(int),
+                       np.round((self.start.y + self.end.y) / 2.0).astype(int),
+                       )
 
     def _add_points(self, points, is_computing_thickness, overlap):
         if is_computing_thickness >= 0:

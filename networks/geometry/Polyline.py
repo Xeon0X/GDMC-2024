@@ -102,12 +102,25 @@ class Polyline:
             list[tuple(Point2D)]: List of tuples composed - in order - of the first arc points, the corner points, the last arc points. The corresponding arc circle is inside this triangle.
         """
         for i in range(1, self.length_polyline-1):
+
             point_1 = Point2D.from_arrays(self.points_array[i] -
                                           self.alpha_radii[i] * self.unit_vectors[i-1])
             point_2 = Point2D.from_arrays(self.points_array[i] +
                                           self.alpha_radii[i] * self.unit_vectors[i])
-            self.acrs_intersections[i] = point_1.round(), Point2D.from_arrays(
-                self.points_array[i]), point_2.round()
+
+            # If Arc intersection are near, meaning no segment between, we need to remove error due to discrete appoximation.
+            # Instead of two independant arc intersection, we make sure to combine both.
+            if i > 1:
+                if point_1.distance(self.acrs_intersections[i-1][2]) <= 2:
+                    print(point_1, self.acrs_intersections[i-1][2])
+                    middle = Segment2D(
+                        point_1, self.acrs_intersections[i-1][2]).middle_point()
+                    print(middle)
+                    point_1 = middle
+                    self.acrs_intersections[i-1][2] = middle
+
+            self.acrs_intersections[i] = [point_1.round(), Point2D.from_arrays(
+                self.points_array[i]), point_2.round()]
         return self.acrs_intersections
 
     def get_arcs(self) -> List[Point2D]:
@@ -142,7 +155,6 @@ class Polyline:
         for i in range(2, self.length_polyline - 1):
             self.segments[i] = Segment2D(Point2D(
                 self.acrs_intersections[i-1][2].x, self.acrs_intersections[i-1][2].y), Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y))
-            print(self.segments[i], i)
 
         # Why -3?
         # For n points, there are n-1 segments.
