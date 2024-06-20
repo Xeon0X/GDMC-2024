@@ -116,8 +116,8 @@ class Segment2D:
 
         >>> self.compute_thick_segment(self.start, self.end, self.thickness, self.thickness_mode)
         """
-        self.points_thick_by_line = [[] for _ in range(thickness+1)]
-        self.gaps = [[] for _ in range(thickness+1)]
+        self.points_thick_by_line = [[] for _ in range(thickness)]
+        self.gaps = [[] for _ in range(thickness)]
 
         start = self.start.copy()
         end = self.end.copy()
@@ -168,8 +168,12 @@ class Segment2D:
                     error -= delta_2x
                 error += delta_2x
 
-            self.segment(
-                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=1)
+            if not swap:
+                self.segment(
+                    start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=0)
+            else:
+                self.segment(
+                    start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=thickness-1)
 
             error = delta_2x - delta_x
             for i in range(thickness, 1, -1):
@@ -183,8 +187,12 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2y
 
-                self.segment(
-                    start, end, overlap=overlap, _is_computing_thickness=i)
+                if not swap:
+                    self.segment(
+                        start, end, overlap=overlap, _is_computing_thickness=(thickness-i+1))
+                else:
+                    self.segment(
+                        start, end, overlap=overlap, _is_computing_thickness=(i-2))
 
         else:
             if swap:
@@ -204,8 +212,12 @@ class Segment2D:
                     error -= delta_2y
                 error += delta_2x
 
-            self.segment(
-                start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=1)
+            if swap:
+                self.segment(
+                    start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=0)
+            else:
+                self.segment(
+                    start, end, overlap=LINE_OVERLAP.NONE, _is_computing_thickness=thickness-1)
 
             error = delta_2x - delta_y
             for i in range(thickness, 1, -1):
@@ -219,8 +231,15 @@ class Segment2D:
                     overlap = LINE_OVERLAP.MAJOR
                 error += delta_2x
 
-                self.segment(
-                    start, end, overlap=overlap, _is_computing_thickness=i)
+                if swap:
+                    self.segment(
+                        start, end, overlap=overlap, _is_computing_thickness=(thickness-i+1))
+                else:
+                    self.segment(
+                        start, end, overlap=overlap, _is_computing_thickness=(i-2))
+
+        reel_distance = self.points_thick_by_line[0][0].distance(
+            self.points_thick_by_line[-1][0])
 
         return self.points_thick
 
@@ -252,7 +271,7 @@ class Segment2D:
                 )
 
     def _add_points(self, points, is_computing_thickness, overlap):
-        if is_computing_thickness > 0:
+        if is_computing_thickness >= 0:
             self.points_thick.append(points.copy())
             if overlap == LINE_OVERLAP.NONE:
                 self.points_thick_by_line[is_computing_thickness].append(

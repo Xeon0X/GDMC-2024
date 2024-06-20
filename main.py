@@ -8,16 +8,18 @@ from world_maker.Skeleton import Skeleton, simplify_coordinates
 from world_maker.terraforming import remove_trees, smooth_terrain
 from networks.geometry.Point3D import Point3D
 from networks.geometry.Point2D import Point2D
+from networks.geometry.Segment2D import Segment2D
 from networks.roads_2.Road import Road
 from networks.legacy_roads import roads
 from world_maker.District import Road as Road_grid
 from networks.geometry.Circle import Circle
 from House import *
 from gdpc import Editor, Block
+from utils.Enums import LINE_THICKNESS_MODE
 
 
 def main():
-    editor = Editor(buffering=True)
+    editor = Editor(buffering=False)
     # c = Circle(Point2D(400, -75)).circle_thick_by_line(5, 32)
     # for i in range(len(c[0])):
     #     for j in range(len(c[0][i])):
@@ -33,10 +35,82 @@ def main():
     #         editor.placeBlock(
     #             (c[1][i][j].x, 110, c[1][i][j].y), Block("red_concrete"))
 
+    def place_segment(segment):
+        segment.segment_thick(4, LINE_THICKNESS_MODE.MIDDLE)
+        for i in range(len(segment.points_thick_by_line)):
+            kk = i % 7
+            match kk:
+                case 0:
+                    blob = 'pink_concrete'
+                case 1:
+                    blob = 'red_concrete'
+                case 2:
+                    blob = 'orange_concrete'
+                case 3:
+                    blob = 'yellow_concrete'
+                case 4:
+                    blob = 'green_concrete'
+                case 5:
+                    blob = 'blue_concrete'
+                case 6:
+                    blob = 'purple_concrete'
+            for j in range(len(segment.points_thick_by_line[i])):
+                editor.placeBlock(Point3D.insert_3d(
+                    [segment.points_thick_by_line[i][j]], 'y', [134])[0].coordinates, Block(blob))
+        for i in range(len(segment.gaps)):
+            kk = i % 7
+            match kk:
+                case 0:
+                    blob = 'pink_concrete'
+                case 1:
+                    blob = 'red_concrete'
+                case 2:
+                    blob = 'orange_concrete'
+                case 3:
+                    blob = 'yellow_concrete'
+                case 4:
+                    blob = 'green_concrete'
+                case 5:
+                    blob = 'blue_concrete'
+                case 6:
+                    blob = 'purple_concrete'
+            for j in range(len(segment.gaps[i])):
+                editor.placeBlock(Point3D.insert_3d(
+                    [segment.gaps[i][j]], 'y', [135])[0].coordinates, Block(blob))
+
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(132, -554)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(117, -563)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(97, -576)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(71, -625)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(115, -655)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(162, -682)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(195, -665)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(204, -622)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(178, -575)))
+
+    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 0)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 25)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(25, 50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(0, 50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-25, 50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 25)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 0)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, -25)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, -50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(-25, -50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(0, -50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(25, -50)))
+    place_segment(Segment2D(Point2D(0, 0), Point2D(50, -50)))
+
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(201, -595)))
+    # place_segment(Segment2D(Point2D(147, -616), Point2D(233, -605)))
+
     # Road([Point3D(464, 85+10, -225), Point3D(408, 105+10, -224),
     #      Point3D(368, 104+10, -249), Point3D(368, 85+10, -296), Point3D(457, 79+10, -292)], 15)
-    Road([Point3D(526, 70, -415), Point3D(497, 76, -420), Point3D(483, 70, -381), Point3D(460, 71, -360), Point3D(430, 78, -383), Point3D(410, 71, -364), Point3D(381,
-         71, -383), Point3D(350, 76, -375), Point3D(332, 79, -409), Point3D(432, 71, -460), Point3D(450, 70, -508), Point3D(502, 81, -493), Point3D(575, 85, -427)], 15)
+    # Road([Point3D(526, 70, -415), Point3D(497, 76, -420), Point3D(483, 70, -381), Point3D(460, 71, -360), Point3D(430, 78, -383), Point3D(410, 71, -364), Point3D(381,
+    #      71, -383), Point3D(350, 76, -375), Point3D(332, 79, -409), Point3D(432, 71, -460), Point3D(450, 70, -508), Point3D(502, 81, -493), Point3D(575, 85, -427)], 15)
     # rectangle_house_mountain, rectangle_building, ske,leton_highway, skeleton_mountain, road_grid = world_maker()
 
     # editor = Editor(buffering=True)
