@@ -36,7 +36,7 @@ def main():
     #             (c[1][i][j].x, 110, c[1][i][j].y), Block("red_concrete"))
 
     def place_segment(segment):
-        segment.segment_thick(4, LINE_THICKNESS_MODE.MIDDLE)
+        segment.segment_thick(30, LINE_THICKNESS_MODE.MIDDLE)
         for i in range(len(segment.points_thick_by_line)):
             kk = i % 7
             match kk:
@@ -79,33 +79,40 @@ def main():
                     [segment.gaps[i][j]], 'y', [135])[0].coordinates, Block(blob))
 
     # place_segment(Segment2D(Point2D(147, -616), Point2D(132, -554)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(117, -563)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(97, -576)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(71, -625)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(115, -655)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(162, -682)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(195, -665)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(204, -622)))
-    # place_segment(Segment2D(Point2D(147, -616), Point2D(178, -575)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(117, -563)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(97, -576)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(71, -625)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(115, -655)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(162, -682)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(195, -665)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(204, -622)))
+    # # place_segment(Segment2D(Point2D(147, -616), Point2D(178, -575)))
 
-    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 0)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 25)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(50, 50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(25, 50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(0, 50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-25, 50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 25)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, 0)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, -25)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-50, -50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(-25, -50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(0, -50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(25, -50)))
-    place_segment(Segment2D(Point2D(0, 0), Point2D(50, -50)))
+    x = 200
+
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(50+x, 0)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(50+x, 25)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(50+x, 50)))
+    place_segment(Segment2D(Point2D(0+x, 0), Point2D(25+x, 50)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(0+x, 50)))
+    place_segment(Segment2D(Point2D(0+x, 0), Point2D(-25+x, 50)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(-50+x, 50)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(-50+x, 25)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(-50+x, 0)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(-50+x, -25)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(-50+x, -50)))
+    place_segment(Segment2D(Point2D(0+x, 0), Point2D(-25+x, -50)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(0+x, -50)))
+    place_segment(Segment2D(Point2D(0+x, 0), Point2D(25+x, -50)))
+    # place_segment(Segment2D(Point2D(0+x, 0), Point2D(50+x, -50)))
 
     # place_segment(Segment2D(Point2D(147, -616), Point2D(201, -595)))
     # place_segment(Segment2D(Point2D(147, -616), Point2D(233, -605)))
+
+    y = 105
+
+    # Road([Point3D(121, 108+y, -68), Point3D(163, 108+y, -95), Point3D(173, 108+y, -169), Point3D(188, 108+y, -174), Point3D(229,
+    #      108+y, -217), Point3D(190, 95+y, -270), Point3D(198, 95+y, -297), Point3D(237, 95+y, -287), Point3D(283, 95+y, -328)], 15)
 
     # Road([Point3D(464, 85+10, -225), Point3D(408, 105+10, -224),
     #      Point3D(368, 104+10, -249), Point3D(368, 85+10, -296), Point3D(457, 79+10, -292)], 15)

@@ -8,7 +8,7 @@ from networks.geometry.Segment2D import Segment2D
 from networks.geometry.Segment3D import Segment3D
 from networks.geometry.Circle import Circle
 from utils.Enums import LINE_THICKNESS_MODE
-from gdpc import Block, Editor
+from gdpc import Block, Editor, geometry
 
 
 class Road:
@@ -92,19 +92,30 @@ class Road:
                         nearest = self.polyline.segments[i].gaps[k][m].nearest(
                             Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
                         self.output_block.append(
-                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
+                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("black_concrete")))
 
         for i in range(1, len(self.polyline.centers)-1):
             # Circle
 
             circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
-                (self.polyline.radii[i]-self.width/2)), int((self.polyline.radii[i]+self.width/2)))
+                (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
 
             # Better to do here than drawing circle arc inside big triangle!
             double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
                 self.polyline.acrs_intersections[i][0]) - Point2D.to_arrays(self.polyline.centers[i])))
             double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
                 self.polyline.acrs_intersections[i][2]) - Point2D.to_arrays(self.polyline.centers[i])))
+
+            editor = Editor(buffering=True)
+            editor.placeBlock(Point3D.insert_3d(
+                [self.polyline.acrs_intersections[i][0]], 'y', [230])[0].coordinates, Block("purple_concrete"))
+            editor.placeBlock(Point3D.insert_3d(
+                [self.polyline.acrs_intersections[i][2]], 'y', [230])[0].coordinates, Block("pink_concrete"))
+
+            geometry.placeLine(editor, Point3D.insert_3d([double_point_a], 'y', [250])[
+                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [250])[0].coordinates, Block("blue_concrete"))
+            geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [250])[
+                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [250])[0].coordinates, Block("red_concrete"))
 
             for j in range(len(circle)):
                 for k in range(len(circle[j])):
@@ -176,7 +187,7 @@ class Road:
                 self.segment_total_line_output[i].x, reference[self.segment_total_line_output[i].nearest(Point3D.to_2d(reference, 'y'), True)[0]].y, self.segment_total_line_output[i].y), Block("black_concrete")))
 
     def place(self):
-        editor = Editor(buffering=False)
+        editor = Editor(buffering=True)
         for i in range(len(self.output_block)):
             editor.placeBlock(self.output_block[i][0],
                               self.output_block[i][1])

@@ -140,8 +140,9 @@ class Polyline:
 
         # Get segments between arcs
         for i in range(2, self.length_polyline - 1):
-            self.segments[i] = Segment2D(Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y), Point2D(
-                self.acrs_intersections[i-1][-1].x, self.acrs_intersections[i-1][-1].y))
+            self.segments[i] = Segment2D(Point2D(
+                self.acrs_intersections[i-1][2].x, self.acrs_intersections[i-1][2].y), Point2D(self.acrs_intersections[i][0].x, self.acrs_intersections[i][0].y))
+            print(self.segments[i], i)
 
         # Why -3?
         # For n points, there are n-1 segments.
@@ -162,7 +163,8 @@ class Polyline:
         alpha_b = min(
             self.lengths[start_index] - self.alpha_radii[start_index], self.lengths[start_index + 1])
         current_radius = max(self.tangente[start_index] * self.alpha_radii[start_index],
-                             self.tangente[start_index + 1] * alpha_b)  # Radius at initial segment
+                             # Radius at initial segment
+                             self.tangente[start_index + 1] * alpha_b)
 
         if current_radius < minimum_radius:
             minimum_radius, minimum_index = current_radius, start_index
@@ -180,7 +182,8 @@ class Polyline:
             self.lengths[end_index-2], self.lengths[end_index-1]-self.alpha_radii[end_index])
 
         current_radius = max(self.tangente[end_index-1]*alpha_a, self.tangente[end_index]
-                             * self.alpha_radii[end_index])  # Radius at final segment
+                             # Radius at final segment
+                             * self.alpha_radii[end_index])
 
         if current_radius < minimum_radius:
             minimum_radius, minimum_index = current_radius, end_index - 1

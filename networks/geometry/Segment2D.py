@@ -21,7 +21,7 @@ class Segment2D:
     def __repr__(self):
         return str(f"Segment2D(start: {self.start}, end: {self.end}, points: {self.points})")
 
-    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: int = 0) -> Union[List[Point2D], None]:
+    def segment(self, start: Point2D = None, end: Point2D = None, overlap: LINE_OVERLAP = LINE_OVERLAP.NONE, _is_computing_thickness: int = -1) -> Union[List[Point2D], None]:
         """Modified Bresenham draw (line) with optional overlap.
 
         From: https://github.com/ArminJo/Arduino-BlueDisplay/blob/master/src/LocalGUI/ThickLine.hpp
@@ -98,7 +98,7 @@ class Segment2D:
                 self._add_points(
                     start, _is_computing_thickness, LINE_OVERLAP.NONE)
 
-        if not _is_computing_thickness:
+        if _is_computing_thickness < 0:
             return self.points
         return None
 
@@ -166,7 +166,7 @@ class Segment2D:
                     start.y -= step_y
                     end.y -= step_y
                     error -= delta_2x
-                error += delta_2x
+                error += delta_2y
 
             if not swap:
                 self.segment(
@@ -240,6 +240,16 @@ class Segment2D:
 
         reel_distance = self.points_thick_by_line[0][0].distance(
             self.points_thick_by_line[-1][0])
+        delta_correction = round(reel_distance - thickness)
+        if delta_correction > 0:
+            for i in range(delta_correction):
+                if (-1) ** i == 1:
+                    index = -1
+                else:
+                    index = 0
+                print(i)
+                del self.points_thick_by_line[index]
+                del self.gaps[index]
 
         return self.points_thick
 
