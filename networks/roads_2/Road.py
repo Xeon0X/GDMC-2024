@@ -112,10 +112,10 @@ class Road:
             editor.placeBlock(Point3D.insert_3d(
                 [self.polyline.acrs_intersections[i][2]], 'y', [230])[0].coordinates, Block("pink_concrete"))
 
-            geometry.placeLine(editor, Point3D.insert_3d([double_point_a], 'y', [250])[
-                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [250])[0].coordinates, Block("blue_concrete"))
-            geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [250])[
-                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [250])[0].coordinates, Block("red_concrete"))
+            geometry.placeLine(editor, Point3D.insert_3d([double_point_a], 'y', [229])[
+                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("blue_concrete"))
+            geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [229])[
+                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("red_concrete"))
 
             for j in range(len(circle)):
                 for k in range(len(circle[j])):

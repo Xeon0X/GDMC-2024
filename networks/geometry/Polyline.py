@@ -112,12 +112,18 @@ class Polyline:
             # Instead of two independant arc intersection, we make sure to combine both.
             if i > 1:
                 if point_1.distance(self.acrs_intersections[i-1][2]) <= 2:
-                    print(point_1, self.acrs_intersections[i-1][2])
                     middle = Segment2D(
+                        self.centers[i], self.centers[i-1]).middle_point()
+                    combined = Segment2D(
                         point_1, self.acrs_intersections[i-1][2]).middle_point()
-                    print(middle)
-                    point_1 = middle
-                    self.acrs_intersections[i-1][2] = middle
+
+                    # To correct mis-alignement bewteen center 1 - arc intersection 1 and 2 combined - center 2
+                    if middle.distance(combined) <= 2:
+                        point_1 = middle
+                        self.acrs_intersections[i-1][2] = middle
+                    else:
+                        point_1 = combined
+                        self.acrs_intersections[i-1][2] = combined
 
             self.acrs_intersections[i] = [point_1.round(), Point2D.from_arrays(
                 self.points_array[i]), point_2.round()]
