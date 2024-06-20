@@ -33,9 +33,11 @@ def main():
     #         editor.placeBlock(
     #             (c[1][i][j].x, 110, c[1][i][j].y), Block("red_concrete"))
 
-    Road([Point3D(464, 85, -225), Point3D(408, 105, -224),
-         Point3D(368, 104, -249), Point3D(368, 85, -296), Point3D(457, 79, -292)], 15)
-    # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
+    # Road([Point3D(464, 85+10, -225), Point3D(408, 105+10, -224),
+    #      Point3D(368, 104+10, -249), Point3D(368, 85+10, -296), Point3D(457, 79+10, -292)], 15)
+    Road([Point3D(526, 70, -415), Point3D(497, 76, -420), Point3D(483, 70, -381), Point3D(460, 71, -360), Point3D(430, 78, -383), Point3D(410, 71, -364), Point3D(381,
+         71, -383), Point3D(350, 76, -375), Point3D(332, 79, -409), Point3D(432, 71, -460), Point3D(450, 70, -508), Point3D(502, 81, -493), Point3D(575, 85, -427)], 15)
+    # rectangle_house_mountain, rectangle_building, ske,leton_highway, skeleton_mountain, road_grid = world_maker()
 
     # editor = Editor(buffering=True)
     # buildArea = editor.getBuildArea()

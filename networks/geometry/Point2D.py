@@ -3,7 +3,7 @@ from typing import List, Union
 
 import numpy as np
 
-from Enums import ROTATION
+from utils.Enums import ROTATION
 
 
 class Point2D:

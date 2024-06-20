@@ -2,7 +2,7 @@ from typing import List, Union
 
 import numpy as np
 
-from Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
+from utils.Enums import LINE_OVERLAP, LINE_THICKNESS_MODE
 from networks.geometry.Point2D import Point2D
 
 

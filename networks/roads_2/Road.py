@@ -7,7 +7,7 @@ from networks.geometry.Point2D import Point2D
 from networks.geometry.Segment2D import Segment2D
 from networks.geometry.Segment3D import Segment3D
 from networks.geometry.Circle import Circle
-from Enums import LINE_THICKNESS_MODE
+from utils.Enums import LINE_THICKNESS_MODE
 from gdpc import Block, Editor
 
 
@@ -98,7 +98,7 @@ class Road:
             # Circle
 
             circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
-                (self.polyline.radii[i]-self.width/2)), int((self.polyline.radii[i]+self.width/2)+1))
+                (self.polyline.radii[i]-self.width/2)), int((self.polyline.radii[i]+self.width/2)))
 
             # Better to do here than drawing circle arc inside big triangle!
             double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
@@ -176,7 +176,7 @@ class Road:
                 self.segment_total_line_output[i].x, reference[self.segment_total_line_output[i].nearest(Point3D.to_2d(reference, 'y'), True)[0]].y, self.segment_total_line_output[i].y), Block("black_concrete")))
 
     def place(self):
-        editor = Editor(buffering=True)
+        editor = Editor(buffering=False)
         for i in range(len(self.output_block)):
             editor.placeBlock(self.output_block[i][0],
                               self.output_block[i][1])
