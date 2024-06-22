@@ -20,7 +20,7 @@ def main():
     origin = ((buildArea.begin).x, (buildArea.begin).z)
 
     remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-                 './world_maker/data/smooth_sobel_watermap.png')
+                './world_maker/data/smooth_sobel_watermap.png')
     smooth_terrain('./world_maker/data/heightmap.png',
                    './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
