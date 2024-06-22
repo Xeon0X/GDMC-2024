@@ -9,6 +9,8 @@ from networks.geometry.Segment3D import Segment3D
 from networks.geometry.Circle import Circle
 from utils.Enums import LINE_THICKNESS_MODE
 from gdpc import Block, Editor, geometry
+from scipy.ndimage import gaussian_filter1d
+import numpy as np
 
 
 class Road:
@@ -29,7 +31,7 @@ class Road:
             self.polyline_total_line_output = [
                 [] for _ in range(len(self.polyline.total_line_output))]
 
-            self._projection_polyline()
+            self._projection_gaussian()
 
         if len(self.coordinates) == 2:
             self.segment_total_line_output = Segment2D(
@@ -101,21 +103,22 @@ class Road:
                 (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
 
             # Better to do here than drawing circle arc inside big triangle!
-            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
+            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 50 * (Point2D.to_arrays(
                 self.polyline.acrs_intersections[i][0]) - Point2D.to_arrays(self.polyline.centers[i])))
-            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
+            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 50 * (Point2D.to_arrays(
                 self.polyline.acrs_intersections[i][2]) - Point2D.to_arrays(self.polyline.centers[i])))
 
-            editor = Editor(buffering=True)
-            editor.placeBlock(Point3D.insert_3d(
-                [self.polyline.acrs_intersections[i][0]], 'y', [230])[0].coordinates, Block("purple_concrete"))
-            editor.placeBlock(Point3D.insert_3d(
-                [self.polyline.acrs_intersections[i][2]], 'y', [230])[0].coordinates, Block("pink_concrete"))
+            # Debug
+            # editor = Editor(buffering=True)
+            # editor.placeBlock(Point3D.insert_3d(
+            #     [self.polyline.acrs_intersections[i][0]], 'y', [230])[0].coordinates, Block("purple_concrete"))
+            # editor.placeBlock(Point3D.insert_3d(
+            #     [self.polyline.acrs_intersections[i][2]], 'y', [230])[0].coordinates, Block("pink_concrete"))
 
-            geometry.placeLine(editor, Point3D.insert_3d([double_point_a], 'y', [229])[
-                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("blue_concrete"))
-            geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [229])[
-                               0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("red_concrete"))
+            # geometry.placeLine(editor, Point3D.insert_3d([double_point_a], 'y', [229])[
+            #                    0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("blue_concrete"))
+            # geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [229])[
+            #                    0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("red_concrete"))
 
             for j in range(len(circle)):
                 for k in range(len(circle[j])):
@@ -151,6 +154,38 @@ class Road:
                             (Point3D.insert_3d([gaps[j][k]], 'y', [
                                 self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
 
+    def _projection_gaussian(self):
+        nearest_points_to_reference = []
+        for i in range(len(self.coordinates)):
+            # Index is used to space accordingly
+            index, point = Point3D.to_2d([self.coordinates[i]], 'y')[0].nearest(
+                self.polyline.total_line_output, return_index=True)
+            nearest_points_to_reference.append(
+                Point2D(index, self.coordinates[i].y))
+
+        linear_y_interpolation = []
+        for i in range(len(nearest_points_to_reference)-1):
+            linear_y_interpolation.extend(Segment2D(
+                nearest_points_to_reference[i], nearest_points_to_reference[i+1]).segment())
+
+        linear_y_interpolation = np.array(
+            Point2D.to_arrays(linear_y_interpolation))
+
+        # Extract x and y coordinates
+        x = linear_y_interpolation[:, 0]
+        y = linear_y_interpolation[:, 1]
+
+        y_smooth = gaussian_filter1d(y, sigma=5)
+
+        self.index_factor = len(y_smooth)/len(self.polyline.total_line_output)
+
+        for i in range(len(self.polyline.total_line_output)):
+            self.polyline_total_line_output[i] = Point3D(
+                self.polyline.total_line_output[i].x, y[round(i*self.index_factor)]+100, self.polyline.total_line_output[i].y)
+
+        self._surface()
+        self.place()
+
     def _projection_polyline(self):
         nearest_points_to_reference = []
         for i in range(len(self.coordinates)):
@@ -169,7 +204,7 @@ class Road:
 
             for i in range(len(self.polyline.total_line_output)):
                 self.polyline_total_line_output[i] = Point3D(
-                    self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y, self.polyline.total_line_output[i].y)
+                    self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y+70, self.polyline.total_line_output[i].y)
 
             self._surface()
             self.place()

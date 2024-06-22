@@ -106,10 +106,13 @@ def main():
     # place_segment(Segment2D(Point2D(147, -616), Point2D(201, -595)))
     # place_segment(Segment2D(Point2D(147, -616), Point2D(233, -605)))
 
-    y = 120
+    # y = 120
 
-    Road([Point3D(121, 108+y, -68), Point3D(163, 108+y, -95), Point3D(173, 108+y, -169), Point3D(188, 108+y, -174), Point3D(229,
-         108+y, -217), Point3D(190, 95+y, -270), Point3D(198, 95+y, -297), Point3D(237, 95+y, -287), Point3D(283, 95+y, -328)], 15)
+    # Road([Point3D(-46, 64, -12), Point3D(-86, 65, 13), Point3D(-47, 66, 82),
+    #      Point3D(-117, 69, 150), Point3D(-149, 68, 148), Point3D(-185, 70, 78)], 9)
+
+    Road([Point3D(-130, 70, 7), Point3D(-170, 67, -9), Point3D(-189, 79, 3), Point3D(-194,
+         82, 25), Point3D(-217, 88, 30), Point3D(-248, 89, 20), Point3D(-212, 98, 12)], 9)
 
     # Road([Point3D(464, 85+10, -225), Point3D(408, 105+10, -224),
     #      Point3D(368, 104+10, -249), Point3D(368, 85+10, -296), Point3D(457, 79+10, -292)], 15)

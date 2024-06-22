@@ -134,9 +134,9 @@ class Polyline:
             points = Circle(self.centers[i]).circle(self.radii[i])
 
             # Better to do here than drawing circle arc inside big triangle!
-            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][0]) + 5 * (Point2D.to_arrays(
+            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][0]) + 50 * (Point2D.to_arrays(
                 self.acrs_intersections[i][0]) - Point2D.to_arrays(self.centers[i])))
-            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][2]) + 5 * (Point2D.to_arrays(
+            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.acrs_intersections[i][2]) + 50 * (Point2D.to_arrays(
                 self.acrs_intersections[i][2]) - Point2D.to_arrays(self.centers[i])))
 
             for j in range(len(points)):
