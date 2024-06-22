@@ -10,6 +10,7 @@ from world_maker.District import Road as Road_grid
 from world_maker.Skeleton import Skeleton, simplify_coordinates
 from world_maker.terraforming import remove_trees, smooth_terrain
 from world_maker.world_maker import world_maker
+from networks.geometry.Point3D import Point3D
 
 
 def main():
@@ -20,7 +21,7 @@ def main():
     origin = ((buildArea.begin).x, (buildArea.begin).z)
 
     remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-                './world_maker/data/smooth_sobel_watermap.png')
+                 './world_maker/data/smooth_sobel_watermap.png')
     smooth_terrain('./world_maker/data/heightmap.png',
                    './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
@@ -95,7 +96,7 @@ def set_roads(skeleton: Skeleton, origin):
     # Simplification
     for i in range(len(skeleton.lines)):
         print(f"[Roads] Simplify skelton {i+1}/{len(skeleton.lines)}")
-        skeleton.lines[i] = simplify_coordinates(skeleton.lines[i], 10)
+        skeleton.lines[i] = simplify_coordinates(skeleton.lines[i], 40)
 
     print("[Roads] Start generation...")
     for i in range(len(skeleton.lines)):

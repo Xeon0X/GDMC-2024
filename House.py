@@ -53,7 +53,7 @@ class House:
         z_max -= 1
         if x_min + 1 > x_max - 1:
             x = np.random.randint(x_max - 1, x_min + 1)
-        else :
+        else:
             x = np.random.randint(x_min + 1, x_max - 1)
 
         if z_min + 1 > z_max - 1:
@@ -105,14 +105,18 @@ class House:
                     new_width = np.random.randint(width - 2, 5)
 
                 if max(x_min+1, x-new_width) > min(x_max-new_width-1, x+width):
-                    new_x = np.random.randint(min(x_max - new_width - 1, x + width), max(x_min + 1, x - new_width))
+                    new_x = np.random.randint(
+                        min(x_max - new_width - 1, x + width), max(x_min + 1, x - new_width))
                 else:
-                    new_x = np.random.randint(max(x_min + 1, x - new_width), min(x_max - new_width - 1, x + width))
+                    new_x = np.random.randint(
+                        max(x_min + 1, x - new_width), min(x_max - new_width - 1, x + width))
 
                 if max(z_min+1, z-new_depth) > min(z_max-new_depth-1, z+depth):
-                    new_z = np.random.randint(min(z_max - new_depth - 1, z + depth), max(z_min + 1, z - new_depth))
+                    new_z = np.random.randint(
+                        min(z_max - new_depth - 1, z + depth), max(z_min + 1, z - new_depth))
                 else:
-                    new_z = np.random.randint(max(z_min + 1, z - new_depth), min(z_max - new_depth - 1, z + depth))
+                    new_z = np.random.randint(
+                        max(z_min + 1, z - new_depth), min(z_max - new_depth - 1, z + depth))
 
                 new_x_plan3d = new_x - x_min - 1
                 new_z_plan3d = new_z - z_min + 1
@@ -136,23 +140,24 @@ class House:
                     new_z_plan3d = new_z - z_min
                     for i in range(0, new_width):
                         for j in range(0, new_depth):
-                            self.grid3d[new_x_plan3d + i, 0, new_z_plan3d + j] = True, 2
+                            self.grid3d[new_x_plan3d + i, 0,
+                                        new_z_plan3d + j] = True, 2
 
                             if i == 0 or i == new_width - 1 or j == 0 or j == new_depth - 1:
                                 continue
                             else:
-                                self.editor.placeBlock((new_x + i, y_min, new_z + j), self.floor)
+                                self.editor.placeBlock(
+                                    (new_x + i, y_min, new_z + j), self.floor)
 
-                    self.skeleton.append((new_x, new_z, new_width, new_depth, height))
+                    self.skeleton.append(
+                        (new_x, new_z, new_width, new_depth, height))
                     break
             else:
                 print("Failed to place rectangle after 100000 attempts.")
 
     def delete(self):
-        for x in range(self.coordinates_min[0], self.coordinates_max[0]):
-            for y in range(self.coordinates_min[1], self.coordinates_max[1] + 10):
-                for z in range(self.coordinates_min[2], self.coordinates_max[2]):
-                    self.editor.placeBlock((x, y, z), Block("air"))
+        geometry.placeCuboid(self.editor, self.coordinates_min,
+                             self.coordinates_max, Block("air"))
 
     def putWallOnSkeleton(self):
         for k in range(len(self.skeleton)):
@@ -173,8 +178,10 @@ class House:
                                     self.grid3d[x_plan3d + i, y, z_plan3d + j]['int'] == 1) or (
                                     self.grid3d[x_plan3d + i, y, z_plan3d + j]['bool'] and
                                     self.grid3d[x_plan3d + i, y, z_plan3d + j]['int'] == 2) or y == 0:
-                                self.editor.placeBlock((x + i, self.coordinates_min[1] + y, z + j), self.wall)
-                                self.grid3d[x_plan3d + i, y, z_plan3d + j] = True
+                                self.editor.placeBlock(
+                                    (x + i, self.coordinates_min[1] + y, z + j), self.wall)
+                                self.grid3d[x_plan3d + i,
+                                            y, z_plan3d + j] = True
 
     def getAdjacentWalls(self):
 
@@ -216,24 +223,30 @@ class House:
                     if width % 2 != 0:
                         door_pos = width // 2
                         for y in range(self.coordinates_min[1] + 1 + i * 4, self.coordinates_min[1] + 3 + i * 4):
-                            self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
-                            self.editor.placeBlock((x_min, y, z_min + door_pos + 1), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min, y, z_min + door_pos), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min, y, z_min + door_pos + 1), Block("air"))
                     else:
                         door_pos = width // 2
                         for y in range(self.coordinates_min[1] + 1 + i * 4, self.coordinates_min[1] + 3 + i * 4):
-                            self.editor.placeBlock((x_min, y, z_min + door_pos), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min, y, z_min + door_pos), Block("air"))
                 else:
                     width = x_max - x_min
                     if width % 2 != 0:
                         door_pos = width // 2
                         for y in range(self.coordinates_min[1] + 1 + i * 4, self.coordinates_min[1] + 3 + i * 4):
-                            self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
-                            self.editor.placeBlock((x_min + door_pos + 1, y, z_min), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min + door_pos, y, z_min), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min + door_pos + 1, y, z_min), Block("air"))
 
                     else:
                         door_pos = width // 2
                         for y in range(self.coordinates_min[1] + 1 + i * 4, self.coordinates_min[1] + 3 + i * 4):
-                            self.editor.placeBlock((x_min + door_pos, y, z_min), Block("air"))
+                            self.editor.placeBlock(
+                                (x_min + door_pos, y, z_min), Block("air"))
 
     def placeRoof(self):
         for k in range(len(self.skeleton) - 1, -1, -1):
@@ -269,39 +282,47 @@ class House:
             z_plan3d = z - self.coordinates_min[2]
 
             print(width, depth, n)
-            
+
             if width < depth:
 
-                if n > 1 :
+                if n > 1:
                     for k in range(n):
                         for i in range(-1, depth + 1):
                             for y in range(-1, width // 2 + 1 - k):
-                                self.editor.placeBlock((x + y + k + 2, self.coordinates_max[1] + k , z + i), self.roof)
-                                self.editor.placeBlock((x + width - y - 1 - k -  2, self.coordinates_max[1] + k, z + i), self.roof)
-                else:           
+                                self.editor.placeBlock(
+                                    (x + y + k + 2, self.coordinates_max[1] + k, z + i), self.roof)
+                                self.editor.placeBlock(
+                                    (x + width - y - 1 - k - 2, self.coordinates_max[1] + k, z + i), self.roof)
+                else:
                     if width % 2 == 0:
                         for i in range(-1, depth + 1):
                             for y in range(2):
-                                self.editor.placeBlock((x+ width//2 -1 + y, self.coordinates_max[1] + n -1, z + i), self.roof)
+                                self.editor.placeBlock(
+                                    (x + width//2 - 1 + y, self.coordinates_max[1] + n - 1, z + i), self.roof)
                     else:
                         for i in range(-1, depth + 1):
-                            self.editor.placeBlock((x + width // 2, self.coordinates_max[1] + n - 1, z + i), self.roof)
+                            self.editor.placeBlock(
+                                (x + width // 2, self.coordinates_max[1] + n - 1, z + i), self.roof)
             else:
                 if n > 1:
-                    for k in range(n ):
+                    for k in range(n):
                         for i in range(-1, width + 1):
                             for y in range(-1, depth // 2 + 1 - k):
-                                self.editor.placeBlock((x + i, self.coordinates_max[1] + k, z + y + k + 2 ), self.roof)
-                                self.editor.placeBlock((x + i, self.coordinates_max[1] + k, z + depth - y  -1- k - 2),self.roof)
+                                self.editor.placeBlock(
+                                    (x + i, self.coordinates_max[1] + k, z + y + k + 2), self.roof)
+                                self.editor.placeBlock(
+                                    (x + i, self.coordinates_max[1] + k, z + depth - y - 1 - k - 2), self.roof)
                 else:
                     if depth % 2 == 0:
                         for i in range(-1, width + 1):
                             for y in range(2):
-                                self.editor.placeBlock((x + i, self.coordinates_max[1] + n - 1, z + depth // 2 -1 +y ), self.roof)
+                                self.editor.placeBlock(
+                                    (x + i, self.coordinates_max[1] + n - 1, z + depth // 2 - 1 + y), self.roof)
                     else:
                         for i in range(-1, width + 1):
-                            self.editor.placeBlock((x + i, self.coordinates_max[1] + n - 1, z + depth // 2), self.roof)
-            
+                            self.editor.placeBlock(
+                                (x + i, self.coordinates_max[1] + n - 1, z + depth // 2), self.roof)
+
             print('-----------------------------------')
 
             for i in range(-1, width + 1):
@@ -311,52 +332,62 @@ class House:
                             if (i == width // 2):
                                 self.editor.placeBlock((x + i, self.coordinates_max[1] + n, z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
-                                self.grid3d[x_plan3d + i, height + n, z_plan3d + j] = True
+                                self.grid3d[x_plan3d + i,
+                                            height + n, z_plan3d + j] = True
                                 if j == -1:
                                     if not self.grid3d[x_plan3d + i, height + n, z_plan3d + j - 1]:
                                         self.editor.placeBlock((x + i, self.coordinates_max[1] + n, z + j - 1),
                                                                Block(self.blocks["celling_slab"], {"type": "bottom"}))
-                                        self.grid3d[x_plan3d + i, height + n, z_plan3d + j - 1] = True
+                                        self.grid3d[x_plan3d + i, height +
+                                                    n, z_plan3d + j - 1] = True
                                     if not self.grid3d[x_plan3d + i, height + n - 1, z_plan3d + j - 1]:
                                         self.editor.placeBlock((x + i, self.coordinates_max[1] + n - 1, z + j - 1),
                                                                Block(self.blocks["celling_slab"], {"type": "top"}))
-                                        self.grid3d[x_plan3d + i, height + n - 1, z_plan3d + j - 1] = True
+                                        self.grid3d[x_plan3d + i, height +
+                                                    n - 1, z_plan3d + j - 1] = True
 
                                 elif j == depth:
                                     if not self.grid3d[x_plan3d + i, height + n, z_plan3d + j + 1]:
                                         self.editor.placeBlock((x + i, self.coordinates_max[1] + n, z + j + 1),
                                                                Block(self.blocks["celling_slab"], {"type": "bottom"}))
-                                        self.grid3d[x_plan3d + i, height + n, z_plan3d + j + 1] = True
+                                        self.grid3d[x_plan3d + i, height +
+                                                    n, z_plan3d + j + 1] = True
                                     if not self.grid3d[x_plan3d + i, height + n - 1, z_plan3d + j + 1]:
                                         self.editor.placeBlock((x + i, self.coordinates_max[1] + n - 1, z + j + 1),
                                                                Block(self.blocks["celling_slab"], {"type": "top"}))
-                                        self.grid3d[x_plan3d + i, height + n - 1, z_plan3d + j + 1] = True
+                                        self.grid3d[x_plan3d + i, height +
+                                                    n - 1, z_plan3d + j + 1] = True
 
                     else:
                         if depth % 2 != 0:
                             if (j == depth // 2):
                                 self.editor.placeBlock((x + i, self.coordinates_max[1] + n, z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
-                                self.grid3d[x_plan3d + i, height + n, z_plan3d + j] = True
+                                self.grid3d[x_plan3d + i,
+                                            height + n, z_plan3d + j] = True
                                 if i == -1:
                                     if not self.grid3d[x_plan3d + i - 1, height + n, z_plan3d + j]:
                                         self.editor.placeBlock((x + i - 1, self.coordinates_max[1] + n, z + j),
                                                                Block(self.blocks["celling_slab"], {"type": "bottom"}))
-                                        self.grid3d[x_plan3d + i - 1, height + n, z_plan3d + j] = True
+                                        self.grid3d[x_plan3d + i - 1,
+                                                    height + n, z_plan3d + j] = True
                                     if not self.grid3d[x_plan3d + i - 1, height + n - 1, z_plan3d + j]:
                                         self.editor.placeBlock((x + i - 1, self.coordinates_max[1] + n - 1, z + j),
                                                                Block(self.blocks["celling_slab"], {"type": "top"}))
-                                        self.grid3d[x_plan3d + i - 1, height + n - 1, z_plan3d + j] = True
+                                        self.grid3d[x_plan3d + i - 1,
+                                                    height + n - 1, z_plan3d + j] = True
 
                                 elif i == width:
                                     if not self.grid3d[x_plan3d + i + 1, height + n, z_plan3d + j]:
                                         self.editor.placeBlock((x + i + 1, self.coordinates_max[1] + n, z + j),
                                                                Block(self.blocks["celling_slab"], {"type": "bottom"}))
-                                        self.grid3d[x_plan3d + i + 1, height + n, z_plan3d + j] = True
+                                        self.grid3d[x_plan3d + i + 1,
+                                                    height + n, z_plan3d + j] = True
                                     if not self.grid3d[x_plan3d + i + 1, height + n - 1, z_plan3d + j]:
                                         self.editor.placeBlock((x + i + 1, self.coordinates_max[1] + n - 1, z + j),
                                                                Block(self.blocks["celling_slab"], {"type": "top"}))
-                                        self.grid3d[x_plan3d + i + 1, height + n - 1, z_plan3d + j] = True
+                                        self.grid3d[x_plan3d + i + 1,
+                                                    height + n - 1, z_plan3d + j] = True
 
             if width < depth:
 
@@ -367,39 +398,50 @@ class House:
                             if h % 1 == 0:
                                 self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "top"}))
-                                self.editor.placeBlock((x + width - 1 - i,math.ceil(self.coordinates_max[1] + h), z + j),
+                                self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "top"}))
-                                self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j] = True
-                                self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + i,
+                                            round(height + h), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + width - 1 - i,
+                                            round(height + h), z_plan3d + j] = True
 
                                 if j == -1:
 
-                                    self.editor.placeBlock((x + i,math.ceil(self.coordinates_max[1] + h), z + j - 1),
+                                    self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j - 1),
                                                            self.celling)
                                     self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h), z + j - 1),
                                                            self.celling)
-                                    self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j - 1] = True
-                                    self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h), z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                round(height + h), z_plan3d + j - 1] = True
                                 elif j == depth:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j + 1),
                                                            self.celling)
                                     self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h), z + j + 1),
                                                            self.celling)
-                                    self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j + 1] = True
-                                    self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h), z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                round(height + h), z_plan3d + j + 1] = True
                             else:
                                 self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
                                 self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
-                                self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h-0.5), z + j), self.roof)
+                                self.editor.placeBlock(
+                                    (x + i, math.ceil(self.coordinates_max[1] + h-0.5), z + j), self.roof)
                                 self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h-0.5), z + j),
                                                        self.roof)
 
-                                self.grid3d[x_plan3d + i, round(height + h + 0.5), z_plan3d + j] = True
-                                self.grid3d[x_plan3d + width - 1 - i, round(height + h + 0.5), z_plan3d + j] = True
-                                self.grid3d[x_plan3d + i, round(height + h - 0.5), z_plan3d + j] = True
-                                self.grid3d[x_plan3d + width - 1 - i, round(height + h - 0.5), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + i,
+                                            round(height + h + 0.5), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + width - 1 - i,
+                                            round(height + h + 0.5), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + i,
+                                            round(height + h - 0.5), z_plan3d + j] = True
+                                self.grid3d[x_plan3d + width - 1 - i,
+                                            round(height + h - 0.5), z_plan3d + j] = True
 
                                 if j == -1:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j - 1),
@@ -409,14 +451,18 @@ class House:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
                                     self.editor.placeBlock(
-                                        (x + width - 1 - i, math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
+                                        (x + width - 1 - i,
+                                         math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
 
-                                    self.grid3d[x_plan3d + i, round(height + h - 1), z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h - 1), z_plan3d + j - 1] = True
                                     self.grid3d[
                                         x_plan3d + width - 1 - i, round(height + h - 1), z_plan3d + j - 1] = True
-                                    self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j - 1] = True
-                                    self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h), z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                round(height + h), z_plan3d + j - 1] = True
                                 elif j == depth:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j + 1),
                                                            Block(self.blocks["celling_slab"], {"type": "bottom"}))
@@ -425,22 +471,28 @@ class House:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
                                     self.editor.placeBlock(
-                                        (x + width - 1 - i, math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
+                                        (x + width - 1 - i,
+                                         math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
 
-                                    self.grid3d[x_plan3d + i, round(height + h - 1), z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h - 1), z_plan3d + j + 1] = True
                                     self.grid3d[
                                         x_plan3d + width - 1 - i, round(height + h - 1), z_plan3d + j + 1] = True
-                                    self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j + 1] = True
-                                    self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + i,
+                                                round(height + h), z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                round(height + h), z_plan3d + j + 1] = True
                         else:
                             self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                    Block(self.blocks["roof_slab"], {"type": "bottom"}))
                             self.editor.placeBlock((x + width - 1 - i, math.ceil(self.coordinates_max[1] + h), z + j),
                                                    Block(self.blocks["roof_slab"], {"type": "bottom"}))
 
-                            self.grid3d[x_plan3d + i, round(height + h), z_plan3d + j] = True
-                            self.grid3d[x_plan3d + width - 1 - i, round(height + h), z_plan3d + j] = True
+                            self.grid3d[x_plan3d + i,
+                                        round(height + h), z_plan3d + j] = True
+                            self.grid3d[x_plan3d + width - 1 - i,
+                                        round(height + h), z_plan3d + j] = True
 
                             if j == -1:
                                 self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j - 1),
@@ -450,15 +502,20 @@ class House:
                                 if not self.grid3d[x_plan3d + i, height + h - 1, z_plan3d + j - 1]:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d + i, height + h - 1, z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + i, height +
+                                                h - 1, z_plan3d + j - 1] = True
                                 if not self.grid3d[x_plan3d + width - 1 - i, height + h - 1, z_plan3d + j - 1]:
                                     self.editor.placeBlock(
-                                        (x + width - 1 - i, math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
+                                        (x + width - 1 - i,
+                                         math.ceil(self.coordinates_max[1] + h-1), z + j - 1),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d + width - 1 - i, height + h - 1, z_plan3d + j - 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                height + h - 1, z_plan3d + j - 1] = True
 
-                                self.grid3d[x_plan3d + i, round(height + h - 1), z_plan3d + j - 1] = True
-                                self.grid3d[x_plan3d + width - 1 - i, round(height + h - 1), z_plan3d + j - 1] = True
+                                self.grid3d[x_plan3d + i,
+                                            round(height + h - 1), z_plan3d + j - 1] = True
+                                self.grid3d[x_plan3d + width - 1 - i,
+                                            round(height + h - 1), z_plan3d + j - 1] = True
                             elif j == depth:
                                 self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h), z + j + 1),
                                                        Block(self.blocks["celling_slab"], {"type": "bottom"}))
@@ -467,15 +524,20 @@ class House:
                                 if not self.grid3d[x_plan3d + i, height + h - 1, z_plan3d + j + 1]:
                                     self.editor.placeBlock((x + i, math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d + i, height + h - 1, z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + i, height +
+                                                h - 1, z_plan3d + j + 1] = True
                                 if not self.grid3d[x_plan3d + width - 1 - i, height + h - 1, z_plan3d + j + 1]:
                                     self.editor.placeBlock(
-                                        (x + width - 1 - i, math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
+                                        (x + width - 1 - i,
+                                         math.ceil(self.coordinates_max[1] + h-1), z + j + 1),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d + width - 1 - i, height + h - 1, z_plan3d + j + 1] = True
+                                    self.grid3d[x_plan3d + width - 1 - i,
+                                                height + h - 1, z_plan3d + j + 1] = True
 
-                                self.grid3d[x_plan3d + i, round(height + h - 1), z_plan3d + j + 1] = True
-                                self.grid3d[x_plan3d + width - 1 - i, round(height + h - 1), z_plan3d + j + 1] = True
+                                self.grid3d[x_plan3d + i,
+                                            round(height + h - 1), z_plan3d + j + 1] = True
+                                self.grid3d[x_plan3d + width - 1 - i,
+                                            round(height + h - 1), z_plan3d + j + 1] = True
                     if i != -1:
                         h += 0.5
             else:
@@ -490,8 +552,10 @@ class House:
                                 self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                        Block(self.blocks["roof_slab"], {"type": "top"}))
 
-                                self.grid3d[x_plan3d + j, round(height + h), z_plan3d + i] = True
-                                self.grid3d[x_plan3d + j, round(height + h), z_plan3d + depth - 1 - i] = True
+                                self.grid3d[x_plan3d + j,
+                                            round(height + h), z_plan3d + i] = True
+                                self.grid3d[x_plan3d + j,
+                                            round(height + h), z_plan3d + depth - 1 - i] = True
 
                                 if j == -1:
                                     self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h), z + i),
@@ -499,30 +563,39 @@ class House:
                                     self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                            self.celling)
 
-                                    self.grid3d[x_plan3d + j - 1, round(height + h), z_plan3d + i] = True
-                                    self.grid3d[x_plan3d + j - 1, round(height + h), z_plan3d + depth - 1 - i] = True
+                                    self.grid3d[x_plan3d + j - 1,
+                                                round(height + h), z_plan3d + i] = True
+                                    self.grid3d[x_plan3d + j - 1,
+                                                round(height + h), z_plan3d + depth - 1 - i] = True
                                 elif j == width:
                                     self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h), z + i),
                                                            self.celling)
                                     self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                            self.celling)
 
-                                    self.grid3d[x_plan3d + j + 1, round(height + h), z_plan3d + i] = True
-                                    self.grid3d[x_plan3d + j + 1, round(height + h), z_plan3d + depth - 1 - i] = True
+                                    self.grid3d[x_plan3d + j + 1,
+                                                round(height + h), z_plan3d + i] = True
+                                    self.grid3d[x_plan3d + j + 1,
+                                                round(height + h), z_plan3d + depth - 1 - i] = True
 
                             else:
                                 self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h), z + i),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
                                 self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                        Block(self.blocks["roof_slab"], {"type": "bottom"}))
-                                self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h - 0.5), z + i), self.roof)
+                                self.editor.placeBlock(
+                                    (x + j, math.ceil(self.coordinates_max[1] + h - 0.5), z + i), self.roof)
                                 self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h - 0.5), z + depth - 1 - i),
                                                        self.roof)
 
-                                self.grid3d[x_plan3d+j, round(height + h + 0.5),z_plan3d+ i] = True
-                                self.grid3d[x_plan3d+j, round(height + h + 0.5),z_plan3d+ depth - 1 - i] = True
-                                self.grid3d[x_plan3d+j, round(height + h - 0.5),z_plan3d+ i] = True
-                                self.grid3d[x_plan3d+j, round(height + h - 0.5), z_plan3d+depth - 1 - i] = True
+                                self.grid3d[x_plan3d+j,
+                                            round(height + h + 0.5), z_plan3d + i] = True
+                                self.grid3d[x_plan3d+j, round(
+                                    height + h + 0.5), z_plan3d + depth - 1 - i] = True
+                                self.grid3d[x_plan3d+j,
+                                            round(height + h - 0.5), z_plan3d + i] = True
+                                self.grid3d[x_plan3d+j,
+                                            round(height + h - 0.5), z_plan3d+depth - 1 - i] = True
 
                                 if j == -1:
                                     self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h), z + i),
@@ -532,13 +605,18 @@ class House:
                                     self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h - 1), z + i),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
                                     self.editor.placeBlock(
-                                        (x + j - 1, math.ceil(self.coordinates_max[1] + h-1), z + depth - 1 - i),
+                                        (x + j - 1, math.ceil(
+                                            self.coordinates_max[1] + h-1), z + depth - 1 - i),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
 
-                                    self.grid3d[x_plan3d+j-1, round(height + h),z_plan3d+ i] = True
-                                    self.grid3d[x_plan3d+j-1, round(height + h), z_plan3d+depth - 1 - i] = True
-                                    self.grid3d[x_plan3d+j-1, round(height + h - 1),z_plan3d+ i] = True
-                                    self.grid3d[x_plan3d+j-1, round(height + h - 1), z_plan3d+depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j-1,
+                                                round(height + h), z_plan3d + i] = True
+                                    self.grid3d[x_plan3d+j-1,
+                                                round(height + h), z_plan3d+depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j-1,
+                                                round(height + h - 1), z_plan3d + i] = True
+                                    self.grid3d[x_plan3d+j-1, round(
+                                        height + h - 1), z_plan3d+depth - 1 - i] = True
                                 elif j == width:
                                     self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h), z + i),
                                                            Block(self.blocks["celling_slab"], {"type": "bottom"}))
@@ -547,21 +625,28 @@ class House:
                                     self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h-1), z + i),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
                                     self.editor.placeBlock(
-                                        (x + j + 1, math.ceil(self.coordinates_max[1] + h-1), z + depth - 1 - i),
+                                        (x + j + 1, math.ceil(
+                                            self.coordinates_max[1] + h-1), z + depth - 1 - i),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
 
-                                    self.grid3d[x_plan3d+j+1, round(height + h),z_plan3d+ i] = True
-                                    self.grid3d[x_plan3d+j+1, round(height + h),z_plan3d+ depth - 1 - i] = True
-                                    self.grid3d[x_plan3d+j+1, round(height + h - 1), z_plan3d+i] = True
-                                    self.grid3d[x_plan3d+j+1, round(height + h - 1),z_plan3d+ depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j+1,
+                                                round(height + h), z_plan3d + i] = True
+                                    self.grid3d[x_plan3d+j+1,
+                                                round(height + h), z_plan3d + depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j+1,
+                                                round(height + h - 1), z_plan3d+i] = True
+                                    self.grid3d[x_plan3d+j+1, round(
+                                        height + h - 1), z_plan3d + depth - 1 - i] = True
                         else:
                             self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h), z + i),
                                                    Block(self.blocks["roof_slab"], {"type": "bottom"}))
                             self.editor.placeBlock((x + j, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                    Block(self.blocks["roof_slab"], {"type": "bottom"}))
 
-                            self.grid3d[x_plan3d+j, round(height + h), z_plan3d+i] = True
-                            self.grid3d[x_plan3d+j, round(height + h), z_plan3d+depth - 1 - i] = True
+                            self.grid3d[x_plan3d+j,
+                                        round(height + h), z_plan3d+i] = True
+                            self.grid3d[x_plan3d+j,
+                                        round(height + h), z_plan3d+depth - 1 - i] = True
 
                             if j == -1:
                                 self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h), z + i),
@@ -569,41 +654,53 @@ class House:
                                 self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                        Block(self.blocks["celling_slab"], {"type": "bottom"}))
                                 if not self.grid3d[x_plan3d+j-1, height + h - 1, z_plan3d+i]:
-                                    self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h-1) , z + i),
+                                    self.editor.placeBlock((x + j - 1, math.ceil(self.coordinates_max[1] + h-1), z + i),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d+j-1, height + h - 1, z_plan3d+i] = True
+                                    self.grid3d[x_plan3d+j-1,
+                                                height + h - 1, z_plan3d+i] = True
                                 if not self.grid3d[x_plan3d+j-1, height + h - 1, z_plan3d+depth - 1 - i]:
                                     self.editor.placeBlock(
-                                        (x + j - 1, math.ceil(self.coordinates_max[1] + h-1) , z + depth - 1 - i),
+                                        (x + j - 1, math.ceil(
+                                            self.coordinates_max[1] + h-1), z + depth - 1 - i),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d+j-1, height + h - 1, z_plan3d+depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j-1, height +
+                                                h - 1, z_plan3d+depth - 1 - i] = True
 
-                                self.grid3d[x_plan3d+j-1, round(height + h), z_plan3d+i] = True
-                                self.grid3d[x_plan3d+j-1, round(height + h),z_plan3d+ depth - 1 - i] = True
+                                self.grid3d[x_plan3d+j-1,
+                                            round(height + h), z_plan3d+i] = True
+                                self.grid3d[x_plan3d+j-1,
+                                            round(height + h), z_plan3d + depth - 1 - i] = True
                             elif j == width:
                                 self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h), z + i),
                                                        Block(self.blocks["celling_slab"], {"type": "bottom"}))
                                 self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h), z + depth - 1 - i),
                                                        Block(self.blocks["celling_slab"], {"type": "bottom"}))
-                                if not self.grid3d[x_plan3d+j+1, height + h - 1,z_plan3d+ i]:
+                                if not self.grid3d[x_plan3d+j+1, height + h - 1, z_plan3d + i]:
                                     self.editor.placeBlock((x + j + 1, math.ceil(self.coordinates_max[1] + h-1), z + i),
                                                            Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d+j+1, height + h - 1, z_plan3d+i] = True
-                                if not self.grid3d[x_plan3d+j+1, height + h - 1,z_plan3d+ depth - 1 - i]:
+                                    self.grid3d[x_plan3d+j+1,
+                                                height + h - 1, z_plan3d+i] = True
+                                if not self.grid3d[x_plan3d+j+1, height + h - 1, z_plan3d + depth - 1 - i]:
                                     self.editor.placeBlock(
-                                        (x + j + 1, math.ceil(self.coordinates_max[1] + h-1), z + depth - 1 - i),
+                                        (x + j + 1, math.ceil(
+                                            self.coordinates_max[1] + h-1), z + depth - 1 - i),
                                         Block(self.blocks["celling_slab"], {"type": "top"}))
-                                    self.grid3d[x_plan3d+j+1, height + h - 1,z_plan3d+ depth - 1 - i] = True
+                                    self.grid3d[x_plan3d+j+1, height + h -
+                                                1, z_plan3d + depth - 1 - i] = True
 
-                                self.grid3d[x_plan3d+j+1, round(height + h), z_plan3d+i] = True
-                                self.grid3d[x_plan3d+j+1, round(height + h), z_plan3d+depth - 1 - i] = True
+                                self.grid3d[x_plan3d+j+1,
+                                            round(height + h), z_plan3d+i] = True
+                                self.grid3d[x_plan3d+j+1,
+                                            round(height + h), z_plan3d+depth - 1 - i] = True
 
-                            self.grid3d[x_plan3d+j, round(height + h), z_plan3d+i] = True
-                            self.grid3d[x_plan3d+j, round(height + h),z_plan3d+ depth - 1 - i] = True
+                            self.grid3d[x_plan3d+j,
+                                        round(height + h), z_plan3d+i] = True
+                            self.grid3d[x_plan3d+j,
+                                        round(height + h), z_plan3d + depth - 1 - i] = True
 
                     if i != -1:
                         h += 0.5
-            
+
             QUARTZ_SLAB = Block(self.blocks["celling_slab"], {"type": "top"})
 
             for i in range(-2, width + 2):
@@ -612,12 +709,14 @@ class House:
                         if not self.grid3d[x_plan3d + i, height - 1, z_plan3d + j]['bool']:
                             if width < depth:
                                 if i == -2 or i == width + 1:
-                                    self.editor.placeBlock((x + i, self.coordinates_max[1] - 1, z + j), QUARTZ_SLAB)
+                                    self.editor.placeBlock(
+                                        (x + i, self.coordinates_max[1] - 1, z + j), QUARTZ_SLAB)
 
                             else:
                                 if j == -2 or j == depth + 1:
-                                    self.editor.placeBlock((x + i, self.coordinates_max[1] - 1, z + j), QUARTZ_SLAB)
-                        
+                                    self.editor.placeBlock(
+                                        (x + i, self.coordinates_max[1] - 1, z + j), QUARTZ_SLAB)
+
     def putCelling(self):
         for k in range(0, len(self.skeleton)):
             x, z, width, depth, height = self.skeleton[k]
@@ -632,7 +731,8 @@ class House:
             for y in range(1, self.nbEtage + 1):
                 for i in range(0, width):
                     for j in range(0, depth):
-                        self.editor.placeBlock((x + i, self.coordinates_min[1] + 4 * y, z + j), self.celling)
+                        self.editor.placeBlock(
+                            (x + i, self.coordinates_min[1] + 4 * y, z + j), self.celling)
                         self.grid3d[x_plan3d + i, 4 * y, z_plan3d + j] = True
 
     def getAllExterneWalls(self):
@@ -676,11 +776,15 @@ class House:
             if axis % 2 == 0:
                 if axis == 4:
                     if is_x:
-                        self.editor.placeBlock((wall[0] + 2, self.coordinates_min[1] + 2 + l * 4, wall[1]), self.window)
-                        self.editor.placeBlock((wall[0] + 3, self.coordinates_min[1] + 2 + l * 4, wall[1]), self.window)
+                        self.editor.placeBlock(
+                            (wall[0] + 2, self.coordinates_min[1] + 2 + l * 4, wall[1]), self.window)
+                        self.editor.placeBlock(
+                            (wall[0] + 3, self.coordinates_min[1] + 2 + l * 4, wall[1]), self.window)
                     else:
-                        self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2 + l * 4, wall[1] + 3), self.window)
-                        self.editor.placeBlock((wall[0], self.coordinates_min[1] + 2 + l * 4, wall[1] + 2), self.window)
+                        self.editor.placeBlock(
+                            (wall[0], self.coordinates_min[1] + 2 + l * 4, wall[1] + 3), self.window)
+                        self.editor.placeBlock(
+                            (wall[0], self.coordinates_min[1] + 2 + l * 4, wall[1] + 2), self.window)
                 else:
                     for i in range(0, math.ceil(axis / 4)):
                         if is_x:
@@ -736,34 +840,47 @@ class House:
                                            Block("air"))
 
             for j in range(1, 5):
-                self.editor.placeBlock((x_moy, self.coordinates_min[1] + 4 * i + j, z_moy), self.floor)
+                self.editor.placeBlock(
+                    (x_moy, self.coordinates_min[1] + 4 * i + j, z_moy), self.floor)
 
-            self.editor.placeBlock((x_moy - 1, self.coordinates_min[1] + 1 + 4 * i, z_moy - 1), slab_down)
-            self.editor.placeBlock((x_moy, self.coordinates_min[1] + 1 + 4 * i, z_moy - 1), slab_up)
-            self.editor.placeBlock((x_moy + 1, self.coordinates_min[1] + 2 + 4 * i, z_moy - 1), slab_down)
-            self.editor.placeBlock((x_moy + 1, self.coordinates_min[1] + 2 + 4 * i, z_moy), slab_up)
-            self.editor.placeBlock((x_moy + 1, self.coordinates_min[1] + 3 + 4 * i, z_moy + 1), slab_down)
+            self.editor.placeBlock(
+                (x_moy - 1, self.coordinates_min[1] + 1 + 4 * i, z_moy - 1), slab_down)
+            self.editor.placeBlock(
+                (x_moy, self.coordinates_min[1] + 1 + 4 * i, z_moy - 1), slab_up)
+            self.editor.placeBlock(
+                (x_moy + 1, self.coordinates_min[1] + 2 + 4 * i, z_moy - 1), slab_down)
+            self.editor.placeBlock(
+                (x_moy + 1, self.coordinates_min[1] + 2 + 4 * i, z_moy), slab_up)
+            self.editor.placeBlock(
+                (x_moy + 1, self.coordinates_min[1] + 3 + 4 * i, z_moy + 1), slab_down)
 
-            self.editor.placeBlock((x_moy, self.coordinates_min[1] + 3 + 4 * i, z_moy + 1), slab_up)
-            self.editor.placeBlock((x_moy - 1, self.coordinates_min[1] + 4 + 4 * i, z_moy + 1), slab_down)
-            self.editor.placeBlock((x_moy - 1, self.coordinates_min[1] + 4 + 4 * i, z_moy), slab_up)
+            self.editor.placeBlock(
+                (x_moy, self.coordinates_min[1] + 3 + 4 * i, z_moy + 1), slab_up)
+            self.editor.placeBlock(
+                (x_moy - 1, self.coordinates_min[1] + 4 + 4 * i, z_moy + 1), slab_down)
+            self.editor.placeBlock(
+                (x_moy - 1, self.coordinates_min[1] + 4 + 4 * i, z_moy), slab_up)
 
     def WallFacingDirection(self):
 
         if self.direction == "N":
             closest_wall = min(self.skeleton, key=lambda wall: wall[1])
-            wall = (closest_wall[0], closest_wall[1], closest_wall[0] + closest_wall[2], closest_wall[1])
+            wall = (closest_wall[0], closest_wall[1],
+                    closest_wall[0] + closest_wall[2], closest_wall[1])
         elif self.direction == "S":
-            closest_wall = max(self.skeleton, key=lambda wall: wall[1] + wall[3])
+            closest_wall = max(
+                self.skeleton, key=lambda wall: wall[1] + wall[3])
             wall = (closest_wall[0], closest_wall[1] + closest_wall[3], closest_wall[0] + closest_wall[2],
                     closest_wall[1] + closest_wall[3])
         elif self.direction == "E":
-            closest_wall = max(self.skeleton, key=lambda wall: wall[0] + wall[2])
+            closest_wall = max(
+                self.skeleton, key=lambda wall: wall[0] + wall[2])
             wall = (closest_wall[0] + closest_wall[2], closest_wall[1], closest_wall[0] + closest_wall[2],
                     closest_wall[1] + closest_wall[3])
         elif self.direction == "W":
             closest_wall = min(self.skeleton, key=lambda wall: wall[0])
-            wall = (closest_wall[0], closest_wall[1], closest_wall[0], closest_wall[1] + closest_wall[3])
+            wall = (closest_wall[0], closest_wall[1],
+                    closest_wall[0], closest_wall[1] + closest_wall[3])
         else:
             return []
 
@@ -825,8 +942,9 @@ class House:
                                            Block(self.blocks["stairs"], {"facing": "north", "half": "top"}))
 
                     self.entranceCo = (
-                    (wall[1] + wall[3]) // 2, (wall[1] + wall[3]) // 2 + 2, (wall[1] + wall[3]) // 2 + 1,
-                    (wall[1] + wall[3]) // 2 - 1)
+                        (wall[1] + wall[3]) // 2, (wall[1] + wall[3]
+                                                   ) // 2 + 2, (wall[1] + wall[3]) // 2 + 1,
+                        (wall[1] + wall[3]) // 2 - 1)
 
                 else:
                     self.editor.placeBlock((wall[0] + 1, self.coordinates_min[1] + 1, (wall[1] + wall[3]) // 2),
@@ -849,16 +967,19 @@ class House:
                                            Block(self.blocks["stairs"], {"facing": "south", "half": "top"}))
 
                     self.entranceCo = (
-                    (wall[1] + wall[3]) // 2, (wall[1] + wall[3]) // 2 + 1, (wall[1] + wall[3]) // 2 + 1,
-                    (wall[1] + wall[3]) // 2 - 1)
+                        (wall[1] + wall[3]) // 2, (wall[1] + wall[3]
+                                                   ) // 2 + 1, (wall[1] + wall[3]) // 2 + 1,
+                        (wall[1] + wall[3]) // 2 - 1)
 
             case "N":
                 if (wall[2] - wall[0]) % 2 != 0:
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 1, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 1, wall[1] + 1),
                         Block("air"))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 2, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 2, wall[1] + 1),
                         Block("air"))
                     self.editor.placeBlock(
                         (wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1] + 1, wall[1] + 1), Block("air"))
@@ -877,13 +998,16 @@ class House:
                     self.editor.placeBlock((wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1] + 3, wall[1]),
                                            Block(self.blocks["stairs"], {"facing": "south", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 3, wall[1]),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 3, wall[1]),
                         Block(self.blocks["stairs"], {"facing": "south", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1] + 3, wall[1]),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1] + 3, wall[1]),
                         Block(self.blocks["stairs"], {"facing": "east", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 2, self.coordinates_min[1] + 3, wall[1]),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 2,
+                         self.coordinates_min[1] + 3, wall[1]),
                         Block(self.blocks["stairs"], {"facing": "west", "half": "top"}))
 
                     self.entranceCo = (wall[0] + (wall[2] - wall[0]) // 2, wall[0] + (wall[2] - wall[0]) // 2 + 2,
@@ -905,10 +1029,12 @@ class House:
                     self.editor.placeBlock((wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1] + 3, wall[1]),
                                            Block(self.blocks["stairs"], {"facing": "south", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 3, wall[1]),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 3, wall[1]),
                         Block(self.blocks["stairs"], {"facing": "west", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1] + 3, wall[1]),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1] + 3, wall[1]),
                         Block(self.blocks["stairs"], {"facing": "east", "half": "top"}))
 
                     self.entranceCo = (wall[0] + (wall[2] - wall[0]) // 2, wall[0] + (wall[2] - wall[0]) // 2 + 1,
@@ -944,8 +1070,9 @@ class House:
                                            Block(self.blocks["stairs"], {"facing": "north", "half": "top"}))
 
                     self.entranceCo = (
-                    (wall[1] + wall[3]) // 2, (wall[1] + wall[3]) // 2 + 2, (wall[1] + wall[3]) // 2 + 1,
-                    (wall[1] + wall[3]) // 2 - 1)
+                        (wall[1] + wall[3]) // 2, (wall[1] + wall[3]
+                                                   ) // 2 + 2, (wall[1] + wall[3]) // 2 + 1,
+                        (wall[1] + wall[3]) // 2 - 1)
                 else:
                     self.editor.placeBlock((wall[0], self.coordinates_min[1] + 1, (wall[1] + wall[3]) // 2),
                                            Block("air"))
@@ -967,8 +1094,9 @@ class House:
                                            Block(self.blocks["stairs"], {"facing": "south", "half": "top"}))
 
                     self.entranceCo = (
-                    (wall[1] + wall[3]) // 2, (wall[1] + wall[3]) // 2 + 1, (wall[1] + wall[3]) // 2 + 1,
-                    (wall[1] + wall[3]) // 2 - 1)
+                        (wall[1] + wall[3]) // 2, (wall[1] + wall[3]
+                                                   ) // 2 + 1, (wall[1] + wall[3]) // 2 + 1,
+                        (wall[1] + wall[3]) // 2 - 1)
 
             case "S":
                 print(wall)
@@ -985,26 +1113,33 @@ class House:
                     self.editor.placeBlock((wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1], wall[1] + 1),
                                            Block(self.blocks["stairs"], {"facing": "north"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1], wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1], wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "north"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1], wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1], wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "east"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 2, self.coordinates_min[1], wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 2,
+                         self.coordinates_min[1], wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "west"}))
 
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "north", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "north", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "east", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 2, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 2,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "west", "half": "top"}))
 
                     self.entranceCo = (wall[0] + (wall[2] - wall[0]) // 2, wall[0] + (wall[2] - wall[0]) // 2 + 2,
@@ -1018,20 +1153,25 @@ class House:
                     self.editor.placeBlock((wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1], wall[1] + 1),
                                            Block(self.blocks["stairs"], {"facing": "north"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1], wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1], wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "west"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1], wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1], wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "east"}))
 
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "north", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 + 1, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 + 1,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "west", "half": "top"}))
                     self.editor.placeBlock(
-                        (wall[0] + (wall[2] - wall[0]) // 2 - 1, self.coordinates_min[1] + 3, wall[1] + 1),
+                        (wall[0] + (wall[2] - wall[0]) // 2 - 1,
+                         self.coordinates_min[1] + 3, wall[1] + 1),
                         Block(self.blocks["stairs"], {"facing": "east", "half": "top"}))
 
                     self.entranceCo = (wall[0] + (wall[2] - wall[0]) // 2, wall[0] + (wall[2] - wall[0]) // 2 + 1,
@@ -1048,36 +1188,53 @@ class House:
                     match self.direction:
                         case "N":
                             if not (i in self.entranceCo and y == z_min):
-                                self.editor.placeBlock((i, y_min - 1, y), Block("oak_log"))
-                                self.editor.placeBlock((i, y_min, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 1, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 2, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min - 1, y), Block("oak_log"))
+                                self.editor.placeBlock(
+                                    (i, y_min, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 1, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 2, y), self.gardenOutline)
                         case "S":
                             if not (i in self.entranceCo and y == z_max - 1):
-                                self.editor.placeBlock((i, y_min - 1, y), Block("oak_log"))
-                                self.editor.placeBlock((i, y_min, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 1, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 2, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min - 1, y), Block("oak_log"))
+                                self.editor.placeBlock(
+                                    (i, y_min, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 1, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 2, y), self.gardenOutline)
                         case "E":
                             if not (i == x_max - 1 and y in self.entranceCo):
-                                self.editor.placeBlock((i, y_min - 1, y), Block("oak_log"))
-                                self.editor.placeBlock((i, y_min, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 1, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 2, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min - 1, y), Block("oak_log"))
+                                self.editor.placeBlock(
+                                    (i, y_min, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 1, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 2, y), self.gardenOutline)
 
                         case "W":
                             if not (i == x_min and y in self.entranceCo):
-                                self.editor.placeBlock((i, y_min - 1, y), Block("oak_log"))
-                                self.editor.placeBlock((i, y_min, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 1, y), self.gardenOutline)
-                                self.editor.placeBlock((i, y_min + 2, y), self.gardenOutline)
-                            
-                        case _:
-                            self.editor.placeBlock((i, y_min - 1, y), self.garden_floor)
+                                self.editor.placeBlock(
+                                    (i, y_min - 1, y), Block("oak_log"))
+                                self.editor.placeBlock(
+                                    (i, y_min, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 1, y), self.gardenOutline)
+                                self.editor.placeBlock(
+                                    (i, y_min + 2, y), self.gardenOutline)
 
+                        case _:
+                            self.editor.placeBlock(
+                                (i, y_min - 1, y), self.garden_floor)
 
                 else:
-                    self.editor.placeBlock((i, y_min - 1, y), self.garden_floor)
+                    self.editor.placeBlock(
+                        (i, y_min - 1, y), self.garden_floor)
 
     def build(self):
         self.createHouseSkeleton()
@@ -1095,8 +1252,10 @@ class House:
 if __name__ == "__main__":
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
-    coordinates_min = [min(buildArea.begin[i], buildArea.last[i]) for i in range(3)]
-    coordinates_max = [max(buildArea.begin[i], buildArea.last[i]) for i in range(3)]
+    coordinates_min = [min(buildArea.begin[i], buildArea.last[i])
+                       for i in range(3)]
+    coordinates_max = [max(buildArea.begin[i], buildArea.last[i])
+                       for i in range(3)]
 
     blocks = {
         "wall": "blackstone",
@@ -1119,8 +1278,10 @@ if __name__ == "__main__":
 
         house.build()
 
-        new_coordinates_min = (coordinates_max[0] + 20, coordinates_min[1], coordinates_min[2])
-        new_coordinates_max = (coordinates_max[0] + 10 + 40, coordinates_max[1], coordinates_max[2])
+        new_coordinates_min = (
+            coordinates_max[0] + 20, coordinates_min[1], coordinates_min[2])
+        new_coordinates_max = (
+            coordinates_max[0] + 10 + 40, coordinates_max[1], coordinates_max[2])
         coordinates_min = new_coordinates_min
         coordinates_max = new_coordinates_max
 

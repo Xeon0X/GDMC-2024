@@ -235,7 +235,7 @@ def highway_map() -> Image:
 
 
 def create_volume(surface: np.ndarray, heightmap: np.ndarray, make_it_flat: bool = False) -> np.ndarray:
-    volume = np.full((len(surface), 255, len(surface[0])), False)
+    volume = np.full((len(surface[0]), 255, len(surface)), False)
     for z in range(len(surface)):
         for x in range(len(surface[0])):
             if not make_it_flat:

@@ -181,7 +181,7 @@ class Road:
 
         for i in range(len(self.polyline.total_line_output)):
             self.polyline_total_line_output[i] = Point3D(
-                self.polyline.total_line_output[i].x, y[round(i*self.index_factor)]+100, self.polyline.total_line_output[i].y)
+                self.polyline.total_line_output[i].x, y[round(i*self.index_factor)], self.polyline.total_line_output[i].y)
 
         self._surface()
         self.place()
