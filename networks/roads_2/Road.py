@@ -31,7 +31,7 @@ class Road:
             self.polyline_total_line_output = [
                 [] for _ in range(len(self.polyline.total_line_output))]
 
-            self._projection_gaussian()
+            self._projection_polyline()
 
         if len(self.coordinates) == 2:
             self.segment_total_line_output = Segment2D(
@@ -56,9 +56,10 @@ class Road:
         return output_points
 
     def _surface(self):
-        # Segments
         for i in range(1, len(self.polyline.segments)):
+            # Segments
             if len(self.polyline.segments[i].segment()) > 2:
+                last_valid_index = i
                 self.polyline.segments[i].segment_thick(
                     self.width, LINE_THICKNESS_MODE.MIDDLE)
                 for k in range(len(self.polyline.segments[i].points_thick_by_line)):
@@ -91,48 +92,75 @@ class Road:
                         self.output_block.append(
                             (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("black_concrete")))
 
-        # Circle
-        for i in range(1, len(self.polyline.centers)-1):
-            circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
-                (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
+            # Circle
+            if i != 0 and i != len(self.polyline.segments)-1:
+                circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
+                    (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
 
-            # Better to do here than drawing circle arc inside big triangle!
-            double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 50 * (Point2D.to_arrays(
-                self.polyline.acrs_intersections[i][0]) - Point2D.to_arrays(self.polyline.centers[i])))
-            double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 50 * (Point2D.to_arrays(
-                self.polyline.acrs_intersections[i][2]) - Point2D.to_arrays(self.polyline.centers[i])))
+                # Better to do here than drawing circle arc inside big triangle!
+                double_point_a = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][0]) + 50 * (Point2D.to_arrays(
+                    self.polyline.acrs_intersections[i][0]) - Point2D.to_arrays(self.polyline.centers[i])))
+                double_point_b = Point2D.from_arrays(Point2D.to_arrays(self.polyline.acrs_intersections[i][2]) + 50 * (Point2D.to_arrays(
+                    self.polyline.acrs_intersections[i][2]) - Point2D.to_arrays(self.polyline.centers[i])))
 
-            circle_list = [[] for _ in range(len(circle))]
-            for j in range(len(circle)):
-                for k in range(len(circle[j])):
-                    if circle[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                        circle_list[j].append(circle[j][k])
+                circle_list = [[] for _ in range(len(circle))]
+                for j in range(len(circle)):
+                    for k in range(len(circle[j])):
+                        if circle[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                            circle_list[j].append(circle[j][k])
 
-            for j in range(len(gaps)):
-                for k in range(len(gaps[j])):
-                    if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                        circle_list[j].append(gaps[j][k])
+                # for j in range(len(gaps)):
+                #     for k in range(len(gaps[j])):
+                #         if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                #             circle_list[j].append(gaps[j][k])
 
-            middle_lane_index = round(len(circle_list)/2)
-            middle_line_length = len(circle_list[middle_lane_index])
-            circle_list[middle_lane_index] = circle_list[middle_lane_index][0].optimized_path(
-                circle_list[middle_lane_index])
-            for k in range(len(circle_list[middle_lane_index])):
-                nearest = circle_list[middle_lane_index][k].nearest(
-                    Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
-                circle_list[middle_lane_index][k] = Point3D.insert_3d([circle_list[middle_lane_index][k]], 'y', [
-                    self.polyline_total_line_output[nearest[0]].y])[0]
+                middle_lane_index = round(len(circle_list)/2)
+                middle_line_length = len(circle_list[middle_lane_index])
+                circle_list[middle_lane_index] = circle_list[middle_lane_index][-1].optimized_path(
+                    circle_list[middle_lane_index])
+                for k in range(len(circle_list[middle_lane_index])):
+                    nearest = circle_list[middle_lane_index][k].nearest(
+                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                    circle_list[middle_lane_index][k] = Point3D.insert_3d([circle_list[middle_lane_index][k]], 'y', [
+                        self.polyline_total_line_output[nearest[0]].y])[0]
 
-            for j in range(len(circle_list)):
-                circle_list[j] = circle_list[j][0].optimized_path(
-                    circle_list[j])
-                factor = (middle_line_length)/(len(circle_list[j]))
-                for k in range(len(circle_list[j])):
-                    print(round(factor * k), factor, k,
-                          len(circle_list[middle_lane_index]))
-                    self.output_block.append(
-                        (Point3D.insert_3d([circle_list[j][k]], 'y', [
-                            circle_list[middle_lane_index][int(factor * k)].y])[0].coordinates, Block("stone")))
+                for j in range(len(circle_list)):
+                    circle_list[j] = circle_list[j][0].optimized_path(
+                        circle_list[j])
+                    factor = (middle_line_length-1)/(len(circle_list[j])-1)
+
+                    for k in range(len(circle_list[j])):
+                        circle_list[j][k] = Point3D.insert_3d([circle_list[j][k]], 'y', [
+                            circle_list[middle_lane_index][round(factor * k)].y])[0]
+
+                    if j < len(gaps):
+                        for k in range(len(gaps[j])):
+                            if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
+                                print("yes")
+                                circle_list[j].append(
+                                    Point3D.insert_3d([gaps[j][k]], 'y', [
+                                        circle_list[j][gaps[j][k].nearest(Point3D.to_2d(circle_list[j], 'y'), True)[0]].y])[0])
+                                print(circle_list[j][-1])
+
+                    kk = j % 7
+                    match kk:
+                        case 0:
+                            blob = 'pink_concrete'
+                        case 1:
+                            blob = 'red_concrete'
+                        case 2:
+                            blob = 'orange_concrete'
+                        case 3:
+                            blob = 'yellow_concrete'
+                        case 4:
+                            blob = 'green_concrete'
+                        case 5:
+                            blob = 'blue_concrete'
+                        case 6:
+                            blob = 'purple_concrete'
+                    for k in range(len(circle_list[j])):
+                        self.output_block.append(
+                            (circle_list[j][k].coordinates, Block(blob)))
 
     def _projection_gaussian(self):
         nearest_points_to_reference = []
@@ -159,9 +187,12 @@ class Road:
 
         self.index_factor = len(y_smooth)/len(self.polyline.total_line_output)
 
+        editor = Editor(buffering=True)
         for i in range(len(self.polyline.total_line_output)):
             self.polyline_total_line_output[i] = Point3D(
                 self.polyline.total_line_output[i].x, y[round(i*self.index_factor)], self.polyline.total_line_output[i].y)
+            editor.placeBlock(
+                self.polyline_total_line_output[i].coordinates, Block("white_concrete"))
 
         self._surface()
         self.place()
@@ -182,9 +213,12 @@ class Road:
             self.index_factor = len(
                 self.polyline_height.total_line_output)/len(self.polyline.total_line_output)
 
+            editor = Editor(buffering=True)
             for i in range(len(self.polyline.total_line_output)):
                 self.polyline_total_line_output[i] = Point3D(
                     self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y+70, self.polyline.total_line_output[i].y)
+                editor.placeBlock(
+                    self.polyline_total_line_output[i].coordinates, Block("white_concrete"))
 
             self._surface()
             self.place()
