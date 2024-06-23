@@ -17,10 +17,12 @@ def world_maker():
 
     smooth_sobel_water_map = smooth_sobel_water()
     skeleton_highway = skeleton_highway_map(highway_map())
+
     city = City()
     city.generate_district()
     city.loop_expend_district()
     city.district_draw_map()
+
     road_grid = city.district_generate_road()
     image_mountain_map = city.get_district_mountain_map()
     road = city.draw_roads(4)

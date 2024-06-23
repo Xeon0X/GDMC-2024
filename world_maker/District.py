@@ -135,7 +135,6 @@ class District:
         self.roads = [self.roads_expend[0]]
         while len(self.roads_expend) > 0:
             road = self.roads_expend.pop(0)
-            print(road.position)
             for id_width in [-1, 1]:
                 if road.id_width + id_width not in width:
                     width[road.id_width + id_width] = width[road.id_width] + randint(random_range[0],
