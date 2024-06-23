@@ -59,6 +59,8 @@ class Road:
         # Segments
         for i in range(1, len(self.polyline.segments)):
             if len(self.polyline.segments[i].segment()) > 2:
+                self.polyline.segments[i].segment_thick(
+                    self.width, LINE_THICKNESS_MODE.MIDDLE)
                 for k in range(len(self.polyline.segments[i].points_thick_by_line)):
                     kk = k % 7
                     match kk:
@@ -89,8 +91,8 @@ class Road:
                         self.output_block.append(
                             (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("black_concrete")))
 
+        # Circle
         for i in range(1, len(self.polyline.centers)-1):
-            # Circle
             circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
                 (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
 
@@ -111,31 +113,26 @@ class Road:
                     if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
                         circle_list[j].append(gaps[j][k])
 
+            middle_lane_index = round(len(circle_list)/2)
+            middle_line_length = len(circle_list[middle_lane_index])
+            circle_list[middle_lane_index] = circle_list[middle_lane_index][0].optimized_path(
+                circle_list[middle_lane_index])
+            for k in range(len(circle_list[middle_lane_index])):
+                nearest = circle_list[middle_lane_index][k].nearest(
+                    Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                circle_list[middle_lane_index][k] = Point3D.insert_3d([circle_list[middle_lane_index][k]], 'y', [
+                    self.polyline_total_line_output[nearest[0]].y])[0]
+
             for j in range(len(circle_list)):
                 circle_list[j] = circle_list[j][0].optimized_path(
                     circle_list[j])
-                jj = j % 7
-                match jj:
-                    case 0:
-                        blob = 'pink_concrete'
-                    case 1:
-                        blob = 'red_concrete'
-                    case 2:
-                        blob = 'orange_concrete'
-                    case 3:
-                        blob = 'yellow_concrete'
-                    case 4:
-                        blob = 'green_concrete'
-                    case 5:
-                        blob = 'blue_concrete'
-                    case 6:
-                        blob = 'purple_concrete'
+                factor = (middle_line_length)/(len(circle_list[j]))
                 for k in range(len(circle_list[j])):
-                    nearest = circle_list[j][k].nearest(
-                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                    print(round(factor * k), factor, k,
+                          len(circle_list[middle_lane_index]))
                     self.output_block.append(
                         (Point3D.insert_3d([circle_list[j][k]], 'y', [
-                            self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
+                            circle_list[middle_lane_index][int(factor * k)].y])[0].coordinates, Block("stone")))
 
     def _projection_gaussian(self):
         nearest_points_to_reference = []

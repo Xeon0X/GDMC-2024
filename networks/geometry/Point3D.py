@@ -22,7 +22,7 @@ class Point3D:
         if isinstance(other, Point3D):
             return self.x == other.x and self.y == other.y and self.z == other.z
 
-    def nearest(self, points: List["Point3D"]) -> "Point3D":
+    def nearest(self, points: List["Point3D"], return_index=False) -> "Point3D":
         """Return the nearest point. If multiple nearest point, returns the first in the list.
 
         Args:
@@ -34,6 +34,9 @@ class Point3D:
         >>> Point3D(0, 0, 0).nearest((Point3D(-10, 10, 5), Point3D(10, 10, 1)))
         Point3D(x: 10, y: 10, z: 1)
         """
+        if return_index:
+            return min(
+                enumerate(points), key=lambda pair: self.distance(pair[1]))
         return min(points, key=lambda point: self.distance(point))
 
     def optimized_path(self, points: List["Point3D"]) -> List["Point3D"]:
