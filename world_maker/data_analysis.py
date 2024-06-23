@@ -4,7 +4,7 @@ import numpy as np
 from scipy import ndimage
 from world_maker.Skeleton import Skeleton
 from world_maker.Position import Position
-from random import randint
+from random import randint, choice
 import cv2
 
 
@@ -318,6 +318,15 @@ def get_index_of_biggest_area_mountain(area_mountain: list[int], exception: list
             index = i
     return index
 
+def get_random_point_in_area_mountain(mountain_map: list[list[int]], index: int) -> Position | None:
+    points = []
+    for y in range(len(mountain_map)):
+        for x in range(len(mountain_map[0])):
+            if mountain_map[y][x] == index + 1:
+                points.append(Position(x, y))
+    if not points:
+        return None
+    return choice(points)
 
 def get_center_of_area_mountain(mountain_map: list[list[int]], index: int) -> Position:
     sum_x = 0
@@ -329,7 +338,10 @@ def get_center_of_area_mountain(mountain_map: list[list[int]], index: int) -> Po
                 sum_x += x
                 sum_y += y
                 count += 1
-    return Position(sum_x // count, sum_y // count)
+    center = Position(sum_x // count, sum_y // count)
+    if mountain_map[center.y][center.x] != index + 1:
+        return get_random_point_in_area_mountain(mountain_map, index)
+    return center
 
 
 def detect_mountain(number_of_mountain: int = 2, height_threshold: int = 10,
@@ -350,11 +362,9 @@ def detect_mountain(number_of_mountain: int = 2, height_threshold: int = 10,
 
     area_mountain = []
     for y in range(image_heightmap.size[1]):
-        print(y)
         for x in range(image_heightmap.size[0]):
             if mountain_map[y][x] == 0:
                 area_mountain.append(0)
-                print("Enter the mountain")
                 mountain_map_expend(mountain_map, (x, y), len(area_mountain))
 
     if not area_mountain:
