@@ -120,6 +120,7 @@ class Road:
             # geometry.placeLine(editor, Point3D.insert_3d([double_point_b], 'y', [229])[
             #                    0].coordinates, Point3D.insert_3d([self.polyline.centers[i]], 'y', [229])[0].coordinates, Block("red_concrete"))
 
+            circle_list = [[] for _ in range(len(circle))]
             for j in range(len(circle)):
                 for k in range(len(circle[j])):
                     jj = j % 7
@@ -139,20 +140,48 @@ class Road:
                         case 6:
                             blob = 'purple_concrete'
                     if circle[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                        nearest = circle[j][k].nearest(
-                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
-                        self.output_block.append(
-                            (Point3D.insert_3d([circle[j][k]], 'y', [
-                                self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
+                        # nearest = circle[j][k].nearest(
+                        #     Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        # circle_list[j].append(
+                        #     (Point3D.insert_3d([circle[j][k]], 'y', [
+                        #         self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
+                        circle_list[j].append(circle[j][k])
 
             for j in range(len(gaps)):
                 for k in range(len(gaps[j])):
                     if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                        nearest = gaps[j][k].nearest(
-                            Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
-                        self.output_block.append(
-                            (Point3D.insert_3d([gaps[j][k]], 'y', [
-                                self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
+                        # nearest = gaps[j][k].nearest(
+                        #     Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                        # circle_list[j].append(
+                        #     (Point3D.insert_3d([gaps[j][k]], 'y', [
+                        #         self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("white_concrete")))
+                        circle_list[j].append(gaps[j][k])
+
+            for j in range(len(circle_list)):
+                circle_list[j] = circle_list[j][0].optimized_path(
+                    circle_list[j])
+                jj = j % 7
+                match jj:
+                    case 0:
+                        blob = 'pink_concrete'
+                    case 1:
+                        blob = 'red_concrete'
+                    case 2:
+                        blob = 'orange_concrete'
+                    case 3:
+                        blob = 'yellow_concrete'
+                    case 4:
+                        blob = 'green_concrete'
+                    case 5:
+                        blob = 'blue_concrete'
+                    case 6:
+                        blob = 'purple_concrete'
+                for k in range(len(circle_list[j])):
+                    nearest = circle_list[j][k].nearest(
+                        Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
+                    self.output_block.append(
+                        (Point3D.insert_3d([circle_list[j][k]], 'y', [
+                            self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
 
     def _projection_gaussian(self):
         nearest_points_to_reference = []
