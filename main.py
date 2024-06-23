@@ -1,4 +1,5 @@
 import random
+from math import exp, sqrt
 
 import gdpc.exceptions
 
@@ -14,12 +15,13 @@ from House import *
 
 
 def main():
-
     rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
 
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
     origin = ((buildArea.begin).x, (buildArea.begin).z)
+    center = (abs(buildArea.begin.x - buildArea.end.x) / 2, abs(buildArea.begin.z - buildArea.end.z) / 2)
+    length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
 
     remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
                 './world_maker/data/smooth_sobel_watermap.png')
@@ -51,22 +53,25 @@ def main():
     entranceDirection = ["N", "S", "E", "W"]
 
     for houses in rectangle_building:
-        start = (houses[0][0]+buildArea.begin[0], houses[0]
-                 [1], houses[0][2]+buildArea.begin[2])
-        end = (houses[1][0]+buildArea.begin[0], houses[1]
-               [1], houses[1][2]+buildArea.begin[2])
+        height = get_height_building_from_center(center, (houses[0][0], houses[0][2]), length_world)
+        start = (houses[0][0] + origin[0], houses[0][1], houses[0][2] + origin[1])
+        end = (houses[1][0] + origin[0], houses[1][1] + height, houses[1][2] + origin[1])
         house = House(editor, start, end,
                       entranceDirection[random.randint(0, 3)], blocks)
         house.build()
 
     for houses in rectangle_house_mountain:
-        start = (houses[0][0]+buildArea.begin[0], houses[0]
-                 [1], houses[0][2]+buildArea.begin[2])
-        end = (houses[1][0]+buildArea.begin[0], houses[1]
-               [1], houses[1][2]+buildArea.begin[2])
+        start = (houses[0][0] + origin[0], houses[0][1], houses[0][2] + origin[1])
+        end = (houses[1][0] + origin[0], houses[1][1], houses[1][2] + origin[1])
         house = House(editor, start, end,
                       entranceDirection[random.randint(0, 3)], blocks)
         house.build()
+
+
+def get_height_building_from_center(center, position, length_world):
+    length = abs(sqrt(((center[0] - position[0]) ** 2 + (center[1] - position[1]) ** 2)))
+    print(length, length_world)
+    return int(exp(-(length / (length_world / 4)) ** 2) * 75 + 30)
 
 
 def set_roads_grids(road_grid: Road_grid, origin):
@@ -74,7 +79,10 @@ def set_roads_grids(road_grid: Road_grid, origin):
         if road_grid[i].border:
             for j in range(len(road_grid)):
                 # Same line
-                if (road_grid[i].position.x == road_grid[j].position.x and road_grid[i].position.y != road_grid[j].position.y) or (road_grid[i].position.x != road_grid[j].position.x and road_grid[i].position.y == road_grid[j].position.y):
+                if (road_grid[i].position.x == road_grid[j].position.x and road_grid[i].position.y != road_grid[
+                    j].position.y) or (
+                        road_grid[i].position.x != road_grid[j].position.x and road_grid[i].position.y == road_grid[
+                    j].position.y):
                     point_1 = transpose_form_heightmap(
                         './world_maker/data/heightmap.png', (road_grid[i].position.x, road_grid[i].position.y), origin)
                     point_2 = transpose_form_heightmap(
@@ -87,7 +95,7 @@ def set_roads(skeleton: Skeleton, origin):
     # Parsing
     print("[Roads] Start parsing...")
     for i in range(len(skeleton.lines)):
-        print(f"[Roads] Parsing skeleton {i+1}/{len(skeleton.lines)}.")
+        print(f"[Roads] Parsing skeleton {i + 1}/{len(skeleton.lines)}.")
         for j in range(len(skeleton.lines[i])):
             xyz = transpose_form_heightmap('./world_maker/data/heightmap.png',
                                            skeleton.coordinates[skeleton.lines[i][j]], origin)
@@ -96,17 +104,17 @@ def set_roads(skeleton: Skeleton, origin):
     print("[Roads] Start simplification...")
     # Simplification
     for i in range(len(skeleton.lines)):
-        print(f"[Roads] Simplify skelton {i+1}/{len(skeleton.lines)}")
+        print(f"[Roads] Simplify skelton {i + 1}/{len(skeleton.lines)}")
         skeleton.lines[i] = simplify_coordinates(skeleton.lines[i], 10)
 
     print("[Roads] Start generation...")
     for i in range(len(skeleton.lines)):
-        print(f"[Roads] Generating roads {i+1}/{len(skeleton.lines)}.")
+        print(f"[Roads] Generating roads {i + 1}/{len(skeleton.lines)}.")
         if len(skeleton.lines[i]) >= 4:
             Road(Point3D.from_arrays(skeleton.lines[i]), 25)
         else:
             print(
-                f"[Roads] Ignore roads {i+1} with {len(skeleton.lines[i])} coordinates between {skeleton.lines[i][1]} and {skeleton.lines[i][-1]}.")
+                f"[Roads] Ignore roads {i + 1} with {len(skeleton.lines[i])} coordinates between {skeleton.lines[i][1]} and {skeleton.lines[i][-1]}.")
 
 
 if __name__ == '__main__':
