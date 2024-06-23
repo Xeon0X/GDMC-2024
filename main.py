@@ -15,7 +15,7 @@ from networks.geometry.Point3D import Point3D
 
 
 def main():
-    y = 100
+    y = 105
     Road([Point3D(3903, 137+y, -142), Point3D(3948, 111+y, -148),
          Point3D(3967, 112+y, -116), Point3D(4011, 112+y, -99)], 25)
     # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()

@@ -93,7 +93,7 @@ class Road:
                             (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("black_concrete")))
 
             # Circle
-            if i != 0 and i != len(self.polyline.segments)-1:
+            if i != len(self.polyline.segments)-1:
                 circle, gaps = Circle(self.polyline.centers[i]).circle_thick_by_line(int(
                     (self.polyline.radii[i]-self.width/2))+1, int((self.polyline.radii[i]+self.width/2))+1)
 
@@ -125,22 +125,22 @@ class Road:
                         self.polyline_total_line_output[nearest[0]].y])[0]
 
                 for j in range(len(circle_list)):
-                    circle_list[j] = circle_list[j][0].optimized_path(
-                        circle_list[j])
-                    factor = (middle_line_length-1)/(len(circle_list[j])-1)
+                    if j != middle_lane_index:
+                        circle_list[j] = circle_list[j][0].optimized_path(
+                            circle_list[j])
+                        factor = (middle_line_length-1)/(len(circle_list[j])-1)
 
-                    for k in range(len(circle_list[j])):
-                        circle_list[j][k] = Point3D.insert_3d([circle_list[j][k]], 'y', [
-                            circle_list[middle_lane_index][round(factor * k)].y])[0]
+                        for k in range(len(circle_list[j])):
+                            circle_list[j][k] = Point3D.insert_3d([circle_list[j][k]], 'y', [
+                                circle_list[middle_lane_index][round(factor * k)].y])[0]
 
+                    # Complete with gaps
                     if j < len(gaps):
                         for k in range(len(gaps[j])):
                             if gaps[j][k].is_in_triangle(double_point_a, self.polyline.centers[i], double_point_b):
-                                print("yes")
                                 circle_list[j].append(
                                     Point3D.insert_3d([gaps[j][k]], 'y', [
                                         circle_list[j][gaps[j][k].nearest(Point3D.to_2d(circle_list[j], 'y'), True)[0]].y])[0])
-                                print(circle_list[j][-1])
 
                     kk = j % 7
                     match kk:
@@ -187,12 +187,9 @@ class Road:
 
         self.index_factor = len(y_smooth)/len(self.polyline.total_line_output)
 
-        editor = Editor(buffering=True)
         for i in range(len(self.polyline.total_line_output)):
             self.polyline_total_line_output[i] = Point3D(
                 self.polyline.total_line_output[i].x, y[round(i*self.index_factor)], self.polyline.total_line_output[i].y)
-            editor.placeBlock(
-                self.polyline_total_line_output[i].coordinates, Block("white_concrete"))
 
         self._surface()
         self.place()
@@ -213,12 +210,9 @@ class Road:
             self.index_factor = len(
                 self.polyline_height.total_line_output)/len(self.polyline.total_line_output)
 
-            editor = Editor(buffering=True)
             for i in range(len(self.polyline.total_line_output)):
                 self.polyline_total_line_output[i] = Point3D(
                     self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y+70, self.polyline.total_line_output[i].y)
-                editor.placeBlock(
-                    self.polyline_total_line_output[i].coordinates, Block("white_concrete"))
 
             self._surface()
             self.place()
