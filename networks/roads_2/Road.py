@@ -13,6 +13,8 @@ from scipy.ndimage import gaussian_filter1d
 import numpy as np
 import random
 
+from PIL import Image
+
 
 class Road:
     def __init__(self, coordinates: List[Point3D], width: int):

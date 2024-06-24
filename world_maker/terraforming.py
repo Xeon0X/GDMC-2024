@@ -56,7 +56,7 @@ def remove_trees(heightmap: Union[str, Image], treesmap: Union[str, Image], mask
 def smooth_terrain(heightmap: Union[str, Image], heightmap_smooth: Union[str, Image], mask: Union[str, Image]):
 
     print("[Smooth terrain] Starting...")
-    editor = Editor()
+    editor = Editor(buffering=True)
     build_area = editor.getBuildArea()
     build_rectangle = build_area.toRect()
 

@@ -11,9 +11,9 @@ import numpy as np
 
 
 def world_maker():
-    # world = World()
-    # heightmap, watermap, treemap = get_data(world)
-    heightmap, watermap, treemap = get_data_no_update()
+    world = World()
+    heightmap, watermap, treemap = get_data(world)
+    # heightmap, watermap, treemap = get_data_no_update()
 
     heightmap_smooth = filter_smooth(heightmap, 4)
     heightmap_smooth.save('./world_maker/data/heightmap_smooth.png')
