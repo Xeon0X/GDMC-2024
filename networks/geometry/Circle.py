@@ -66,20 +66,26 @@ class Circle:
     def _remove_gaps(outter_line: List[Point2D], inner_line: List[Point2D]) -> List[Point2D]:
         gaps = []
         for i in range(len(outter_line)):
-            if Circle._count_neighbors(outter_line[i], inner_line) == 0:
-                if Circle._count_neighbors(Point2D(outter_line[i].x-1, outter_line[i].y), inner_line) > 1:
+            nearest_index = outter_line[i].nearest(
+                inner_line, True)[0]
+            potential_neighbors = [inner_line[(nearest_index+j) % len(inner_line)]
+                                   for j in range(-10, 10, 1)]
+            print("\n\n", nearest_index,
+                  inner_line[nearest_index], potential_neighbors)
+            if Circle._count_neighbors(outter_line[i], potential_neighbors) == 0:
+                if Circle._count_neighbors(Point2D(outter_line[i].x-1, outter_line[i].y), potential_neighbors) > 1:
                     if Point2D(outter_line[i].x-1, outter_line[i].y) not in outter_line:
                         gaps.append(
                             Point2D(outter_line[i].x-1, outter_line[i].y))
-                if Circle._count_neighbors(Point2D(outter_line[i].x+1, outter_line[i].y), inner_line) > 1:
+                if Circle._count_neighbors(Point2D(outter_line[i].x+1, outter_line[i].y), potential_neighbors) > 1:
                     if Point2D(outter_line[i].x+1, outter_line[i].y) not in outter_line:
                         gaps.append(
                             Point2D(outter_line[i].x+1, outter_line[i].y))
-                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y-1), inner_line) > 1:
+                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y-1), potential_neighbors) > 1:
                     if Point2D(outter_line[i].x, outter_line[i].y-1) not in outter_line:
                         gaps.append(
                             Point2D(outter_line[i].x, outter_line[i].y-1))
-                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y+1), inner_line) > 1:
+                if Circle._count_neighbors(Point2D(outter_line[i].x, outter_line[i].y+1), potential_neighbors) > 1:
                     if Point2D(outter_line[i].x, outter_line[i].y+1) not in outter_line:
                         gaps.append(
                             Point2D(outter_line[i].x, outter_line[i].y+1))

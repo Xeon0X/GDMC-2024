@@ -116,7 +116,7 @@ class Road:
 
                 middle_lane_index = round(len(circle_list)/2)
                 middle_line_length = len(circle_list[middle_lane_index])
-                circle_list[middle_lane_index] = circle_list[middle_lane_index][-1].optimized_path(
+                circle_list[middle_lane_index] = circle_list[middle_lane_index][0].optimized_path(
                     circle_list[middle_lane_index])
                 for k in range(len(circle_list[middle_lane_index])):
                     nearest = circle_list[middle_lane_index][k].nearest(
@@ -128,7 +128,11 @@ class Road:
                     if j != middle_lane_index:
                         circle_list[j] = circle_list[j][0].optimized_path(
                             circle_list[j])
-                        factor = (middle_line_length-1)/(len(circle_list[j])-1)
+                        if len(circle_list[j]) != 1:
+                            factor = (middle_line_length-1) / \
+                                (len(circle_list[j])-1)
+                        else:
+                            factor = 1
 
                         for k in range(len(circle_list[j])):
                             circle_list[j][k] = Point3D.insert_3d([circle_list[j][k]], 'y', [
@@ -212,7 +216,7 @@ class Road:
 
             for i in range(len(self.polyline.total_line_output)):
                 self.polyline_total_line_output[i] = Point3D(
-                    self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y+70, self.polyline.total_line_output[i].y)
+                    self.polyline.total_line_output[i].x, self.polyline_height.total_line_output[round(i*self.index_factor)].y, self.polyline.total_line_output[i].y)
 
             self._surface()
             self.place()
