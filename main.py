@@ -26,13 +26,13 @@ def main():
               abs(buildArea.begin.z - buildArea.end.z) / 2)
     length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
 
-    remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-                 './world_maker/data/smooth_sobel_watermap.png')
-    smooth_terrain('./world_maker/data/heightmap.png',
-                   './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    # remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
+    #              './world_maker/data/smooth_sobel_watermap.png')
+    # smooth_terrain('./world_maker/data/heightmap.png',
+    #                './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
-    set_roads(skeleton_mountain, origin)
-    set_roads(skeleton_highway, origin)
+    # set_roads(skeleton_highway, origin)
+    # set_roads(skeleton_mountain, origin)
     # set_roads_grids(road_grid, origin)
     # roads.setRoads(skeleton_mountain)
     # roads.setRoads(skeleton_highway)
@@ -114,16 +114,22 @@ def set_roads(skeleton: Skeleton, origin):
     # Simplification
     for i in range(len(skeleton.lines)):
         print(f"[Roads] Simplify skelton {i + 1}/{len(skeleton.lines)}")
-        skeleton.lines[i] = simplify_coordinates(skeleton.lines[i], 10)
+        print(f"[Roads] Number of points: {len(skeleton.lines[i])}")
+        skeleton.lines[i] = simplify_coordinates(skeleton.lines[i], 20)
+        j = 0
+        while j < len(skeleton.lines[i])-1:
+            if Point3D(skeleton.lines[i][j][0], skeleton.lines[i][j][1], skeleton.lines[i][j][2]).distance(Point3D(skeleton.lines[i][j+1][0], skeleton.lines[i][j+1][1], skeleton.lines[i][j+1][2])) <= 10:
+                del skeleton.lines[i][j+1]
+                print("[Roads] Delete point to close")
+            j += 1
+        print(
+            f"[Roads] Number of points after simplification: {len(skeleton.lines[i])}")
 
     print("[Roads] Start generation...")
     for i in range(len(skeleton.lines)):
         print(f"[Roads] Generating roads {i + 1}/{len(skeleton.lines)}.")
         if len(skeleton.lines[i]) >= 4:
             Road(Point3D.from_arrays(skeleton.lines[i]), 9)
-        else:
-            print(
-                f"[Roads] Ignore roads {i + 1} with {len(skeleton.lines[i])} coordinates between {skeleton.lines[i][1]} and {skeleton.lines[i][-1]}.")
 
 
 if __name__ == '__main__':

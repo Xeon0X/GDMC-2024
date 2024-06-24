@@ -87,13 +87,13 @@ def draw_rectangles(rectangles, grid, heightmap):
                 image.putpixel((x, y), round(height_average))
     return image
 
+
 def area_of_rectangles(rectangles):
     area = 0
     for rectangle in rectangles:
         start, end = rectangle
         area += abs((end[0] - start[0]) * (end[1] - start[1]))
     return area
-
 
 
 def generate_building(image: str | Image.Image, heightmap: str | Image.Image, output: str = './world_maker/data/building.png',
@@ -111,5 +111,3 @@ def generate_building(image: str | Image.Image, heightmap: str | Image.Image, ou
             rectangles_output = rectangles
     draw_rectangles(rectangles_output, grid, heightmap).save(output)
     return rectangles_output
-
-

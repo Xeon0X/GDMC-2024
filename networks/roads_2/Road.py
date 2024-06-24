@@ -125,7 +125,8 @@ class Road:
                         self.polyline_total_line_output[nearest[0]].y])[0]
 
                 for j in range(len(circle_list)):
-                    if j != middle_lane_index:
+                    if j != middle_lane_index and len(circle_list[j]) > 0:
+                        print(len(circle_list[j]), circle_list[j])
                         circle_list[j] = circle_list[j][0].optimized_path(
                             circle_list[j])
                         if len(circle_list[j]) != 1:
