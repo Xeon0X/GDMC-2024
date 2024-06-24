@@ -26,13 +26,13 @@ def main():
               abs(buildArea.begin.z - buildArea.end.z) / 2)
     length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
 
-    # remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-    #              './world_maker/data/smooth_sobel_watermap.png')
-    # smooth_terrain('./world_maker/data/heightmap.png',
-    #                './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
+                 './world_maker/data/smooth_sobel_watermap.png')
+    smooth_terrain('./world_maker/data/heightmap.png',
+                   './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
-    # set_roads(skeleton_highway, origin)
-    # set_roads(skeleton_mountain, origin)
+    set_roads(skeleton_highway, origin)
+    set_roads(skeleton_mountain, origin)
     # set_roads_grids(road_grid, origin)
     # roads.setRoads(skeleton_mountain)
     # roads.setRoads(skeleton_highway)

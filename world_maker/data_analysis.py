@@ -229,19 +229,50 @@ def highway_map() -> Image.Image:
     negative_smooth_sobel_water = subtract_map(
         negative_smooth_sobel, './world_maker/data/watermap.png')
     array_sobel_water = np.array(negative_smooth_sobel_water)
+
+    # Remove details
     array_sobel_water = ndimage.binary_erosion(
-        array_sobel_water, iterations=12)
+        array_sobel_water, iterations=5)
+
+    # Smooth non buildable area
+    array_sobel_water = filter_negative(
+        filter_smooth_array(np.array(filter_negative(array_sobel_water)), 2))
+    array_sobel_water = np.array(array_sobel_water)
+
+    # Propagate buildable area
     array_sobel_water = ndimage.binary_dilation(
         array_sobel_water, iterations=5)
-    array_sobel_water = filter_smooth_array(array_sobel_water, 5)
+
+    # Smooth buildable area
+    array_sobel_water = filter_smooth_array(array_sobel_water, 2)
+    array_sobel_water = np.array(array_sobel_water)
+
+    # Smooth non buildable area
+    array_sobel_water = filter_negative(
+        filter_smooth_array(np.array(filter_negative(array_sobel_water)), 1))
+    array_sobel_water = np.array(array_sobel_water)
+
+    # Erode buildable area
     array_sobel_water = ndimage.binary_erosion(
-        array_sobel_water, iterations=20)
-    array_sobel_water = filter_smooth_array(array_sobel_water, 6)
+        array_sobel_water, iterations=12)
+
+    # Dilate buildable area
+    array_sobel_water = ndimage.binary_dilation(
+        array_sobel_water, iterations=7)
+
+    # Smooth buildable area
+    array_sobel_water = filter_smooth_array(array_sobel_water, 20)
+    array_sobel_water = np.array(array_sobel_water)
+
     image = Image.fromarray(array_sobel_water)
-    image_no_details = filter_remove_details(image, 15)
-    image_no_details.save('./world_maker/data/highwaymap.png')
+    image.save('./world_maker/data/smooth_for_highway.png')
+
+    # Remove details
+    # image_no_details = filter_remove_details(image, 10)
+    # image_no_details.save('./world_maker/data/highwaymap.png')
+
     print("[Data Analysis] Highway map generated.")
-    return image_no_details
+    return image
 
 
 def create_volume(surface: np.ndarray, heightmap: np.ndarray, make_it_flat: bool = False) -> np.ndarray:

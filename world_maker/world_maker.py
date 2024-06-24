@@ -9,10 +9,10 @@ from world_maker.pack_rectangle import generate_building
 
 
 def world_maker():
-    # world = World()
-    # heightmap, watermap, treemap = get_data(world)
+    world = World()
+    heightmap, watermap, treemap = get_data(world)
 
-    heightmap, watermap, treemap = get_data_no_update()
+    # heightmap, watermap, treemap = get_data_no_update()
 
     filter_sobel(
         "./world_maker/data/heightmap.png").save('./world_maker/data/sobelmap.png')
