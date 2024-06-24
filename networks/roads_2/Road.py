@@ -11,6 +11,7 @@ from utils.Enums import LINE_THICKNESS_MODE
 from gdpc import Block, Editor, geometry
 from scipy.ndimage import gaussian_filter1d
 import numpy as np
+import random
 
 
 class Road:
@@ -61,36 +62,62 @@ class Road:
             if len(self.polyline.segments[i].segment()) > 2:
                 last_valid_index = i
                 self.polyline.segments[i].segment_thick(
-                    self.width, LINE_THICKNESS_MODE.MIDDLE)
+                    self.width-1, LINE_THICKNESS_MODE.MIDDLE)
                 for k in range(len(self.polyline.segments[i].points_thick_by_line)):
-                    kk = k % 7
-                    match kk:
-                        case 0:
-                            blob = 'pink_concrete'
-                        case 1:
-                            blob = 'red_concrete'
-                        case 2:
-                            blob = 'orange_concrete'
-                        case 3:
-                            blob = 'yellow_concrete'
-                        case 4:
-                            blob = 'green_concrete'
-                        case 5:
-                            blob = 'blue_concrete'
-                        case 6:
-                            blob = 'purple_concrete'
-
                     for m in range(len(self.polyline.segments[i].points_thick_by_line[k])):
+                        kk = k % self.width
+                        if kk in [round((self.width-1)/2)]:
+                            if m % 4 == 0:
+                                block = random.choices(
+                                    ["stone", "andesite"],
+                                    weights=[3, 1],
+                                    k=1,
+                                )[0]
+                            else:
+                                block = random.choices(
+                                    ["yellow_concrete", "yellow_concrete_powder"],
+                                    weights=[3, 1],
+                                    k=1,
+                                )[0]
+                        elif kk in [self.width-2, 0]:
+                            block = random.choices(
+                                ["white_concrete", "white_concrete_powder"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0]
+                        else:
+                            block = random.choices(
+                                ["stone", "andesite"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0]
                         nearest = self.polyline.segments[i].points_thick_by_line[k][m].nearest(
                             Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
                         self.output_block.append(
-                            (Point3D.insert_3d([self.polyline.segments[i].points_thick_by_line[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(blob)))
+                            (Point3D.insert_3d([self.polyline.segments[i].points_thick_by_line[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(block)))
+                        self.output_block.append(
+                            (Point3D.insert_3d([self.polyline.segments[i].points_thick_by_line[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y-1])[0].coordinates, Block(random.choices(
+                                ["stone", "andesite"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0])))
 
                     for m in range(len(self.polyline.segments[i].gaps[k])):
+                        block = random.choices(
+                            ["stone", "andesite"],
+                            weights=[3, 1],
+                            k=1,
+                        )[0]
                         nearest = self.polyline.segments[i].gaps[k][m].nearest(
                             Point3D.to_2d(self.polyline_total_line_output, removed_axis='y'), True)
                         self.output_block.append(
-                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block("black_concrete")))
+                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y])[0].coordinates, Block(block)))
+                        self.output_block.append(
+                            (Point3D.insert_3d([self.polyline.segments[i].gaps[k][m]], 'y', [self.polyline_total_line_output[nearest[0]].y-1])[0].coordinates, Block(random.choices(
+                                ["stone", "andesite"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0])))
 
             # Circle
             if i != len(self.polyline.segments)-1:
@@ -147,25 +174,41 @@ class Road:
                                     Point3D.insert_3d([gaps[j][k]], 'y', [
                                         circle_list[j][gaps[j][k].nearest(Point3D.to_2d(circle_list[j], 'y'), True)[0]].y])[0])
 
-                    kk = j % 7
-                    match kk:
-                        case 0:
-                            blob = 'pink_concrete'
-                        case 1:
-                            blob = 'red_concrete'
-                        case 2:
-                            blob = 'orange_concrete'
-                        case 3:
-                            blob = 'yellow_concrete'
-                        case 4:
-                            blob = 'green_concrete'
-                        case 5:
-                            blob = 'blue_concrete'
-                        case 6:
-                            blob = 'purple_concrete'
                     for k in range(len(circle_list[j])):
+                        kk = j % self.width
+                        if kk in [round(self.width/2)]:
+                            if k % 4 == 0:
+                                block = random.choices(
+                                    ["stone", "andesite"],
+                                    weights=[3, 1],
+                                    k=1,
+                                )[0]
+                            else:
+                                block = random.choices(
+                                    ["yellow_concrete", "yellow_concrete_powder"],
+                                    weights=[3, 1],
+                                    k=1,
+                                )[0]
+                        elif kk in [self.width-1, 0]:
+                            block = random.choices(
+                                ["white_concrete", "white_concrete_powder"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0]
+                        else:
+                            block = random.choices(
+                                ["stone", "andesite"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0]
                         self.output_block.append(
-                            (circle_list[j][k].coordinates, Block(blob)))
+                            (circle_list[j][k].coordinates, Block(block)))
+                        self.output_block.append(
+                            ((circle_list[j][k].coordinates[0], circle_list[j][k].coordinates[1]-1, circle_list[j][k].coordinates[2]), Block(random.choices(
+                                ["stone", "andesite"],
+                                weights=[3, 1],
+                                k=1,
+                            )[0])))
 
     def _projection_gaussian(self):
         nearest_points_to_reference = []

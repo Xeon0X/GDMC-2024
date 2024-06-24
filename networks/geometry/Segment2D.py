@@ -240,7 +240,7 @@ class Segment2D:
 
         reel_distance = self.points_thick_by_line[0][0].distance(
             self.points_thick_by_line[-1][0])
-        delta_correction = round(reel_distance - thickness)
+        delta_correction = round(reel_distance - thickness)-1
         if delta_correction > 0:
             for i in range(delta_correction):
                 if (-1) ** i == 1:

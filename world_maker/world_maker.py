@@ -7,10 +7,13 @@ from world_maker.Position import Position
 from random import randint
 from world_maker.pack_rectangle import generate_building
 
+import numpy as np
+
 
 def world_maker():
-    world = World()
-    heightmap, watermap, treemap = get_data(world)
+    # world = World()
+    # heightmap, watermap, treemap = get_data(world)
+    heightmap, watermap, treemap = get_data_no_update()
 
     heightmap_smooth = filter_smooth(heightmap, 4)
     heightmap_smooth.save('./world_maker/data/heightmap_smooth.png')
@@ -34,6 +37,7 @@ def world_maker():
     road = city.draw_roads(4)
     road.save('./world_maker/data/roadmap.png')
 
+    # Buildings
     subtract_map(smooth_sobel_water_map, road).save(
         './world_maker/data/city_map.png')
     subtract_map('./world_maker/data/city_map.png',
@@ -45,6 +49,7 @@ def world_maker():
         './world_maker/data/city_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building.png')
     rectangle_building = rectangle_2D_to_3D(rectangle_building)
 
+    # Houses
     skeleton_mountain = skeleton_mountain_map(image_mountain_map)
     subtract_map('./world_maker/data/mountain_map.png',
                  './world_maker/data/skeleton_mountain_area.png').save('./world_maker/data/mountain_map.png')
@@ -52,9 +57,23 @@ def world_maker():
                  './world_maker/data/skeleton_highway_area.png').save('./world_maker/data/mountain_map.png')
     subtract_map(smooth_sobel_water_map, filter_negative(
         './world_maker/data/mountain_map.png')).save('./world_maker/data/mountain_map.png')
+
     rectangle_mountain = generate_building(
         './world_maker/data/mountain_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building_moutain.png')
     rectangle_mountain = rectangle_2D_to_3D(rectangle_mountain)
+
+    # Road
+    heightmap_smooth_2 = filter_smooth(heightmap, 4)
+    heightmap_smooth_2.save('./world_maker/data/heightmap_smooth_2.png')
+    overide_map('./world_maker/data/skeleton_highway_area.png',
+                './world_maker/data/skeleton_mountain_area.png').save('./world_maker/data/full_road.png')
+    overide_map('./world_maker/data/full_road.png',
+                './world_maker/data/roadmap.png').save('./world_maker/data/full_road.png')
+
+    road_heightmap = subtract_map(
+        heightmap_smooth_2, filter_negative('./world_maker/data/full_road.png'))
+
+    road_heightmap.save('./world_maker/data/road_heightmap.png')
 
     # Terraforming
     # Smooth initialization
@@ -63,14 +82,24 @@ def world_maker():
     overide_map('./world_maker/data/heightmap_with_building.png',
                 './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
     filter_smooth(
-        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_with_building.png')
 
+    overide_map('./world_maker/data/heightmap_with_building.png',
+                road_heightmap).save('./world_maker/data/heightmap_with_building.png')
+
+    filter_smooth('./world_maker/data/heightmap_with_building.png',
+                  2).save('./world_maker/data/heightmap_with_building.png')
+
+    # Smooth repetition
     for i in range(10):
         overide_map('./world_maker/data/heightmap_with_building.png',
                     './world_maker/data/building_moutain.png').save('./world_maker/data/heightmap_with_building.png')
         overide_map('./world_maker/data/heightmap_with_building.png',
                     './world_maker/data/building.png').save('./world_maker/data/heightmap_with_building.png')
         filter_smooth(
-            './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
+            './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_with_building.png')
+
+    filter_smooth(
+        './world_maker/data/heightmap_with_building.png', 2).save('./world_maker/data/heightmap_smooth.png')
 
     return rectangle_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid

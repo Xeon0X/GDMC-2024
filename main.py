@@ -17,43 +17,45 @@ from networks.geometry.Circle import Circle
 
 
 def main():
-    rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
+    Road([Point3D(4089, 138, 21), Point3D(4122, 128, 46),
+         Point3D(4120, 128, 75), Point3D(4154, 128, 90), Point3D(4182, 122, 53)], 9)
+    # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
 
-    editor = Editor(buffering=True)
-    buildArea = editor.getBuildArea()
-    origin = ((buildArea.begin).x, (buildArea.begin).z)
-    center = (abs(buildArea.begin.x - buildArea.end.x) / 2,
-              abs(buildArea.begin.z - buildArea.end.z) / 2)
-    length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
+    # editor = Editor(buffering=True)
+    # buildArea = editor.getBuildArea()
+    # origin = ((buildArea.begin).x, (buildArea.begin).z)
+    # center = (abs(buildArea.begin.x - buildArea.end.x) / 2,
+    #           abs(buildArea.begin.z - buildArea.end.z) / 2)
+    # length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
 
-    remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-                 './world_maker/data/smooth_sobel_watermap.png')
-    smooth_terrain('./world_maker/data/heightmap.png',
-                   './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    # remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
+    #              './world_maker/data/smooth_sobel_watermap.png')
+    # smooth_terrain('./world_maker/data/heightmap.png',
+    #                './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
-    set_roads(skeleton_highway, origin)
-    set_roads(skeleton_mountain, origin)
+    # set_roads(skeleton_highway, origin)
+    # set_roads(skeleton_mountain, origin)
     # set_roads_grids(road_grid, origin)
     # roads.setRoads(skeleton_mountain)
     # roads.setRoads(skeleton_highway)
 
-    blocks = {
-        "wall": "blackstone",
-        "roof": "blackstone",
-        "roof_slab": "blackstone_slab",
-        "door": "oak_door",
-        "window": "glass_pane",
-        "entrance": "oak_door",
-        "stairs": "quartz_stairs",
-        "stairs_slab": "quartz_slab",
-        "celling": "quartz_block",
-        "floor": "quartz_block",
-        "celling_slab": "quartz_slab",
-        "garden_outline": "oak_leaves",
-        "garden_floor": "grass_block"
-    }
+    # blocks = {
+    #     "wall": "blackstone",
+    #     "roof": "blackstone",
+    #     "roof_slab": "blackstone_slab",
+    #     "door": "oak_door",
+    #     "window": "glass_pane",
+    #     "entrance": "oak_door",
+    #     "stairs": "quartz_stairs",
+    #     "stairs_slab": "quartz_slab",
+    #     "celling": "quartz_block",
+    #     "floor": "quartz_block",
+    #     "celling_slab": "quartz_slab",
+    #     "garden_outline": "oak_leaves",
+    #     "garden_floor": "grass_block"
+    # }
 
-    entranceDirection = ["N", "S", "E", "W"]
+    # entranceDirection = ["N", "S", "E", "W"]
 
     # for houses in rectangle_building:
     #     height = get_height_building_from_center(
