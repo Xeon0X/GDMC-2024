@@ -1,7 +1,7 @@
 from world_maker.World import World
 from PIL import Image
 from world_maker.data_analysis import (get_data, filter_negative, rectangle_2D_to_3D, skeleton_mountain_map, highway_map, filter_sobel, skeleton_highway_map,
-                                       smooth_sobel_water, subtract_map, detect_mountain, filter_smooth, overide_map)
+                                       smooth_sobel_water, subtract_map, detect_mountain, filter_smooth, overide_map, filter_remove_details)
 from world_maker.City import City
 from world_maker.Position import Position
 from random import randint
@@ -12,10 +12,14 @@ def world_maker():
     world = World()
     heightmap, watermap, treemap = get_data(world)
 
+    heightmap_smooth = filter_smooth(heightmap, 4)
+    heightmap_smooth.save('./world_maker/data/heightmap_smooth.png')
+
     filter_sobel(
         "./world_maker/data/heightmap.png").save('./world_maker/data/sobelmap.png')
+    filter_sobel(heightmap_smooth).save('./world_maker/data/sobelmap_from_smooth.png')
 
-    smooth_sobel_water_map = smooth_sobel_water()
+    smooth_sobel_water_map = smooth_sobel_water('./world_maker/data/sobelmap_from_smooth.png')
     skeleton_highway = skeleton_highway_map(highway_map())
 
     city = City()
@@ -27,6 +31,7 @@ def world_maker():
     image_mountain_map = city.get_district_mountain_map()
     road = city.draw_roads(4)
     road.save('./world_maker/data/roadmap.png')
+
     subtract_map(smooth_sobel_water_map, road).save(
         './world_maker/data/city_map.png')
     subtract_map('./world_maker/data/city_map.png',
