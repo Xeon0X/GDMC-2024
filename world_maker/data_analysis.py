@@ -316,12 +316,15 @@ def skeleton_mountain_map(image: str | Image.Image = './world_maker/data/mountai
     return skeleton
 
 
-def smooth_sobel_water() -> Image.Image:
+def smooth_sobel_water(image: str | Image.Image = "./world_maker/data/sobelmap.png") -> Image.Image:
     watermap = handle_import_image("./world_maker/data/watermap.png")
     watermap = filter_negative(
         filter_remove_details(filter_negative(watermap), 5))
-    sobel = handle_import_image("./world_maker/data/sobelmap.png")
-    sobel = filter_remove_details(filter_smooth_theshold(sobel, 1), 2)
+    sobel = handle_import_image(image)
+    sobel = filter_remove_details(filter_smooth_theshold(sobel, 1), 5)
+    sobel_array = np.array(filter_negative(sobel))
+    sobel_array = ndimage.binary_dilation(sobel_array, iterations=3)
+    sobel = filter_negative(Image.fromarray(sobel_array))
     group = group_map(watermap, sobel)
     group = filter_negative(group)
     group.save('./world_maker/data/smooth_sobel_watermap.png')

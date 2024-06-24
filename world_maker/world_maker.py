@@ -12,12 +12,16 @@ def world_maker():
     world = World()
     heightmap, watermap, treemap = get_data(world)
 
-    # heightmap, watermap, treemap = get_data_no_update()
+    heightmap_smooth = filter_smooth(heightmap, 4)
+    heightmap_smooth.save('./world_maker/data/heightmap_smooth.png')
 
     filter_sobel(
         "./world_maker/data/heightmap.png").save('./world_maker/data/sobelmap.png')
+    filter_sobel(heightmap_smooth).save(
+        './world_maker/data/sobelmap_from_smooth.png')
 
-    smooth_sobel_water_map = smooth_sobel_water()
+    smooth_sobel_water_map = smooth_sobel_water(
+        './world_maker/data/sobelmap_from_smooth.png')
     skeleton_highway = skeleton_highway_map(highway_map())
 
     city = City()
@@ -29,6 +33,7 @@ def world_maker():
     image_mountain_map = city.get_district_mountain_map()
     road = city.draw_roads(4)
     road.save('./world_maker/data/roadmap.png')
+
     subtract_map(smooth_sobel_water_map, road).save(
         './world_maker/data/city_map.png')
     subtract_map('./world_maker/data/city_map.png',

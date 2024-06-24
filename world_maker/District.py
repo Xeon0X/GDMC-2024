@@ -128,7 +128,7 @@ class District:
                 return road
         return None
 
-    def generate_roads(self, map_data, random_range=(20, 40)):
+    def generate_roads(self, map_data, random_range=(40, 50)):
         width = {0: self.center_expend.x}
         height = {0: self.center_expend.y}
         self.roads_expend = [Road(self.center_expend, 0, 0)]
