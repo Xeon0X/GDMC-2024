@@ -1,6 +1,6 @@
 from world_maker.World import World
 from PIL import Image
-from world_maker.data_analysis import (get_data, filter_negative, rectangle_2D_to_3D, skeleton_mountain_map, highway_map, filter_sobel, skeleton_highway_map,
+from world_maker.data_analysis import (get_data, get_data_no_update, filter_negative, rectangle_2D_to_3D, skeleton_mountain_map, highway_map, filter_sobel, skeleton_highway_map,
                                        smooth_sobel_water, subtract_map, detect_mountain, filter_smooth, overide_map)
 from world_maker.City import City
 from world_maker.Position import Position
@@ -9,8 +9,10 @@ from world_maker.pack_rectangle import generate_building
 
 
 def world_maker():
-    world = World()
-    heightmap, watermap, treemap = get_data(world)
+    # world = World()
+    # heightmap, watermap, treemap = get_data(world)
+
+    heightmap, watermap, treemap = get_data_no_update()
 
     filter_sobel(
         "./world_maker/data/heightmap.png").save('./world_maker/data/sobelmap.png')

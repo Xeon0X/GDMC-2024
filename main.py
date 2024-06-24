@@ -55,25 +55,25 @@ def main():
 
     entranceDirection = ["N", "S", "E", "W"]
 
-    for houses in rectangle_building:
-        height = get_height_building_from_center(
-            center, (houses[0][0], houses[0][2]), length_world)
-        start = (houses[0][0] + origin[0], houses[0]
-                 [1], houses[0][2] + origin[1])
-        end = (houses[1][0] + origin[0], houses[1]
-               [1] + height, houses[1][2] + origin[1])
-        house = House(editor, start, end,
-                      entranceDirection[random.randint(0, 3)], blocks)
-        house.build()
+    # for houses in rectangle_building:
+    #     height = get_height_building_from_center(
+    #         center, (houses[0][0], houses[0][2]), length_world)
+    #     start = (houses[0][0] + origin[0], houses[0]
+    #              [1], houses[0][2] + origin[1])
+    #     end = (houses[1][0] + origin[0], houses[1]
+    #            [1] + height, houses[1][2] + origin[1])
+    #     house = House(editor, start, end,
+    #                   entranceDirection[random.randint(0, 3)], blocks)
+    #     house.build()
 
-    for houses in rectangle_house_mountain:
-        start = (houses[0][0] + origin[0], houses[0]
-                 [1], houses[0][2] + origin[1])
-        end = (houses[1][0] + origin[0], houses[1]
-               [1], houses[1][2] + origin[1])
-        house = House(editor, start, end,
-                      entranceDirection[random.randint(0, 3)], blocks)
-        house.build()
+    # for houses in rectangle_house_mountain:
+    #     start = (houses[0][0] + origin[0], houses[0]
+    #              [1], houses[0][2] + origin[1])
+    #     end = (houses[1][0] + origin[0], houses[1]
+    #            [1], houses[1][2] + origin[1])
+    #     house = House(editor, start, end,
+    #                   entranceDirection[random.randint(0, 3)], blocks)
+    #     house.build()
 
 
 def get_height_building_from_center(center, position, length_world):

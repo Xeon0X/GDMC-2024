@@ -18,6 +18,17 @@ def get_data(world: World):
     return heightmap, watermap, treemap
 
 
+def get_data_no_update():
+    print("[Data Analysis] Generating data...")
+    # heightmap, watermap, treemap = world.getData()
+    heightmap, watermap, treemap = handle_import_image(
+        './world_maker/data/heightmap.png'), handle_import_image(
+        './world_maker/data/watermap.png'), handle_import_image(
+        './world_maker/data/treemap.png')
+    print("[Data Analysis] Data generated.")
+    return heightmap, watermap, treemap
+
+
 def handle_import_image(image: str | Image.Image) -> Image.Image:
     if isinstance(image, str):
         return Image.open(image)
@@ -68,29 +79,29 @@ def filter_sobel(image: str | Image.Image) -> Image.Image:
     for i in range(1, h - 1):
         for j in range(1, w - 1):
             horizontalGrad = (
-                    (horizontal[0, 0] * gray_img[i - 1, j - 1])
-                    + (horizontal[0, 1] * gray_img[i - 1, j])
-                    + (horizontal[0, 2] * gray_img[i - 1, j + 1])
-                    + (horizontal[1, 0] * gray_img[i, j - 1])
-                    + (horizontal[1, 1] * gray_img[i, j])
-                    + (horizontal[1, 2] * gray_img[i, j + 1])
-                    + (horizontal[2, 0] * gray_img[i + 1, j - 1])
-                    + (horizontal[2, 1] * gray_img[i + 1, j])
-                    + (horizontal[2, 2] * gray_img[i + 1, j + 1])
+                (horizontal[0, 0] * gray_img[i - 1, j - 1])
+                + (horizontal[0, 1] * gray_img[i - 1, j])
+                + (horizontal[0, 2] * gray_img[i - 1, j + 1])
+                + (horizontal[1, 0] * gray_img[i, j - 1])
+                + (horizontal[1, 1] * gray_img[i, j])
+                + (horizontal[1, 2] * gray_img[i, j + 1])
+                + (horizontal[2, 0] * gray_img[i + 1, j - 1])
+                + (horizontal[2, 1] * gray_img[i + 1, j])
+                + (horizontal[2, 2] * gray_img[i + 1, j + 1])
             )
 
             newhorizontalImage[i - 1, j - 1] = abs(horizontalGrad)
 
             verticalGrad = (
-                    (vertical[0, 0] * gray_img[i - 1, j - 1])
-                    + (vertical[0, 1] * gray_img[i - 1, j])
-                    + (vertical[0, 2] * gray_img[i - 1, j + 1])
-                    + (vertical[1, 0] * gray_img[i, j - 1])
-                    + (vertical[1, 1] * gray_img[i, j])
-                    + (vertical[1, 2] * gray_img[i, j + 1])
-                    + (vertical[2, 0] * gray_img[i + 1, j - 1])
-                    + (vertical[2, 1] * gray_img[i + 1, j])
-                    + (vertical[2, 2] * gray_img[i + 1, j + 1])
+                (vertical[0, 0] * gray_img[i - 1, j - 1])
+                + (vertical[0, 1] * gray_img[i - 1, j])
+                + (vertical[0, 2] * gray_img[i - 1, j + 1])
+                + (vertical[1, 0] * gray_img[i, j - 1])
+                + (vertical[1, 1] * gray_img[i, j])
+                + (vertical[1, 2] * gray_img[i, j + 1])
+                + (vertical[2, 0] * gray_img[i + 1, j - 1])
+                + (vertical[2, 1] * gray_img[i + 1, j])
+                + (vertical[2, 2] * gray_img[i + 1, j + 1])
             )
 
             newverticalImage[i - 1, j - 1] = abs(verticalGrad)
@@ -318,6 +329,7 @@ def get_index_of_biggest_area_mountain(area_mountain: list[int], exception: list
             index = i
     return index
 
+
 def get_random_point_in_area_mountain(mountain_map: list[list[int]], index: int) -> Position | None:
     points = []
     for y in range(len(mountain_map)):
@@ -327,6 +339,7 @@ def get_random_point_in_area_mountain(mountain_map: list[list[int]], index: int)
     if not points:
         return None
     return choice(points)
+
 
 def get_center_of_area_mountain(mountain_map: list[list[int]], index: int) -> Position:
     sum_x = 0
@@ -353,7 +366,8 @@ def detect_mountain(number_of_mountain: int = 2, height_threshold: int = 10,
     for y in range(image_heightmap.size[1]):
         for x in range(image_heightmap.size[0]):
             avg_height += image_heightmap.getpixel((x, y))
-    avg_height = int(avg_height / (image_heightmap.size[0] * image_heightmap.size[1]))
+    avg_height = int(
+        avg_height / (image_heightmap.size[0] * image_heightmap.size[1]))
     print("[Data Analysis] Average height:", avg_height)
 
     mountain_map = [[-1 if image_heightmap.getpixel((x, y)) < (avg_height + height_threshold) else 0 for x in
@@ -375,13 +389,15 @@ def detect_mountain(number_of_mountain: int = 2, height_threshold: int = 10,
     if number_of_mountain < len(area_mountain):
         index_mountain = []
         for n in range(number_of_mountain):
-            index_mountain.append(get_index_of_biggest_area_mountain(area_mountain, index_mountain))
+            index_mountain.append(get_index_of_biggest_area_mountain(
+                area_mountain, index_mountain))
     else:
         index_mountain = [i for i in range(len(area_mountain))]
 
     position_mountain = []
     for i in range(len(index_mountain)):
-        position_mountain.append(get_center_of_area_mountain(mountain_map, index_mountain[i]))
+        position_mountain.append(get_center_of_area_mountain(
+            mountain_map, index_mountain[i]))
 
     return position_mountain
 
@@ -408,7 +424,7 @@ def rectangle_2D_to_3D(rectangle: list[tuple[tuple[int, int], tuple[int, int]]],
 
 
 def transpose_form_heightmap(heightmap: str | Image.Image, coordinates, origin: tuple[int, int]) -> tuple[
-    int, int, int]:
+        int, int, int]:
     heightmap = handle_import_image(heightmap).convert('L')
 
     xMin, zMin = origin
