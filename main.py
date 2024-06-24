@@ -16,75 +16,58 @@ from networks.geometry.Circle import Circle
 
 
 def main():
-    y = 30
-    # Road([Point3D(4183, 100+y, -66), Point3D(4206, 102+y, -88), Point3D(4260, 112+y, -80),
-    #      Point3D(4267, 104+y, -108), Point3D(4230, 102+y, -129), Point3D(4220, 112+y, -213), Point3D(4121, 167+y, -249), Point3D(4052, 129+y, -179)], 25)
+    rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
 
-    # editor = Editor(buffering=True)
-    # c, g = Circle(Point2D(4422, -213)).circle_thick_by_line(10, 20)
-    # for i in range(len(g)):
-    #     for j in range(len(g[i])):
-    #         editor.placeBlock(Point3D.insert_3d(
-    #             [g[i][j]], 'y', [103])[0].coordinates, Block("stone"))
-    # for i in range(len(c)):
-    #     for j in range(len(c[i])):
-    #         editor.placeBlock(Point3D.insert_3d(
-    #             [c[i][j]], 'y', [103])[0].coordinates, Block("white_concrete"))
+    editor = Editor(buffering=True)
+    buildArea = editor.getBuildArea()
+    origin = ((buildArea.begin).x, (buildArea.begin).z)
 
-    Road([Point3D(4180, 68, -260), Point3D(4154, 73, -278), Point3D(4131, 74, -252),
-         Point3D(4162, 69, -233), Point3D(4166, 70, -214), Point3D(4148, 66, -192)], 9)
-    # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
+    remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
+                 './world_maker/data/smooth_sobel_watermap.png')
+    smooth_terrain('./world_maker/data/heightmap.png',
+                   './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
 
-    # editor = Editor(buffering=True)
-    # buildArea = editor.getBuildArea()
-    # origin = ((buildArea.begin).x, (buildArea.begin).z)
+    set_roads(skeleton_mountain, origin)
+    set_roads(skeleton_highway, origin)
+    # set_roads_grids(road_grid, origin)
+    # roads.setRoads(skeleton_mountain)
+    # roads.setRoads(skeleton_highway)
 
-    # remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-    #              './world_maker/data/smooth_sobel_watermap.png')
-    # smooth_terrain('./world_maker/data/heightmap.png',
-    #                './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    blocks = {
+        "wall": "blackstone",
+        "roof": "blackstone",
+        "roof_slab": "blackstone_slab",
+        "door": "oak_door",
+        "window": "glass_pane",
+        "entrance": "oak_door",
+        "stairs": "quartz_stairs",
+        "stairs_slab": "quartz_slab",
+        "celling": "quartz_block",
+        "floor": "quartz_block",
+        "celling_slab": "quartz_slab",
+        "garden_outline": "oak_leaves",
+        "garden_floor": "grass_block"
+    }
 
-    # set_roads(skeleton_mountain, origin)
-    # set_roads(skeleton_highway, origin)
-    # # set_roads_grids(road_grid, origin)
-    # # roads.setRoads(skeleton_mountain)
-    # # roads.setRoads(skeleton_highway)
+    entranceDirection = ["N", "S", "E", "W"]
 
-    # blocks = {
-    #     "wall": "blackstone",
-    #     "roof": "blackstone",
-    #     "roof_slab": "blackstone_slab",
-    #     "door": "oak_door",
-    #     "window": "glass_pane",
-    #     "entrance": "oak_door",
-    #     "stairs": "quartz_stairs",
-    #     "stairs_slab": "quartz_slab",
-    #     "celling": "quartz_block",
-    #     "floor": "quartz_block",
-    #     "celling_slab": "quartz_slab",
-    #     "garden_outline": "oak_leaves",
-    #     "garden_floor": "grass_block"
-    # }
+    for houses in rectangle_building:
+        start = (houses[0][0]+buildArea.begin[0], houses[0]
+                 [1], houses[0][2]+buildArea.begin[2])
+        end = (houses[1][0]+buildArea.begin[0], houses[1]
+               [1], houses[1][2]+buildArea.begin[2])
+        house = House(editor, start, end,
+                      entranceDirection[random.randint(0, 3)], blocks)
+        house.build()
 
-    # entranceDirection = ["N", "S", "E", "W"]
-
-    # for houses in rectangle_building:
-    #     start = (houses[0][0]+buildArea.begin[0], houses[0]
-    #              [1], houses[0][2]+buildArea.begin[2])
-    #     end = (houses[1][0]+buildArea.begin[0], houses[1]
-    #            [1], houses[1][2]+buildArea.begin[2])
-    #     house = House(editor, start, end,
-    #                   entranceDirection[random.randint(0, 3)], blocks)
-    #     house.build()
-
-    # for houses in rectangle_house_mountain:
-    #     start = (houses[0][0]+buildArea.begin[0], houses[0]
-    #              [1], houses[0][2]+buildArea.begin[2])
-    #     end = (houses[1][0]+buildArea.begin[0], houses[1]
-    #            [1], houses[1][2]+buildArea.begin[2])
-    #     house = House(editor, start, end,
-    #                   entranceDirection[random.randint(0, 3)], blocks)
-    #     house.build()
+    for houses in rectangle_house_mountain:
+        start = (houses[0][0]+buildArea.begin[0], houses[0]
+                 [1], houses[0][2]+buildArea.begin[2])
+        end = (houses[1][0]+buildArea.begin[0], houses[1]
+               [1], houses[1][2]+buildArea.begin[2])
+        house = House(editor, start, end,
+                      entranceDirection[random.randint(0, 3)], blocks)
+        house.build()
 
 
 def set_roads_grids(road_grid: Road_grid, origin):
