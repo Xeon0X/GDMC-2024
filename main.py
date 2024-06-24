@@ -71,14 +71,6 @@ def main():
     # get the random data for the buildings
     y = YamlReader('params.yml')
     random_data = y.data
-
-    # move your editor wto the position you wanna build on
-    transform = Transform((75, -60, 110), rotation=0)
-    editor.transform.push(transform)
-
-    # clear the area you build on
-    geometry.placeCuboid(editor, (-5, 0, -8), (25, 100, 25), Block("air"))
-
     # create a building at the relative position 0,0 with 20 blocks length and 20 blocks width, with a normal shape and 10 floors
 
     # build it with your custom materials
@@ -87,26 +79,25 @@ def main():
         height = get_height_building_from_center(
             center, (buildings[0][0], buildings[0][2]), length_world)
         start = (min(buildings[0][0], buildings[1][0]) + origin[0], buildings[0]
-                 [1], min(buildings[0][2], buildings[1][2]) + origin[1])
-        end = (max(buildings[0][0], buildings[1][0]) + origin[0], buildings[1]
+                 [1]+height, min(buildings[0][2], buildings[1][2]) + origin[1])
+        end = (max(buildings[0][0], buildings[1][0]) + origin[0],
+               buildings[1]
                [1], max(buildings[0][2], buildings[1][2]) + origin[1])
 
-        transform = Transform(start, rotation=0)
-        editor.transform.push(transform)
-
+        print("---", start, end)
         building = Building(random_data["buildings"], [
-            (0, 0, 0), (end[0] - start[0], height, end[2] - start[2])], baseShape, DIRECTION.EAST)
+            start, end], baseShape, DIRECTION.EAST)
         building.build(editor, ["stone_bricks", "glass_pane", "glass", "cobblestone_wall", "stone_brick_stairs",
                                 "oak_planks", "white_concrete", "cobblestone", "stone_brick_slab", "iron_bars"])
 
-    for buildings in rectangle_house_mountain:
-        start = (buildings[0][0] + origin[0], buildings[0]
-                 [1], buildings[0][2] + origin[1])
-        end = (buildings[1][0] + origin[0], buildings[1]
-               [1], buildings[1][2] + origin[1])
-        house = House(editor, start, end,
-                      entranceDirection[random.randint(0, 3)], blocks)
-        house.build()
+    # for buildings in rectangle_house_mountain:
+    #     start = (buildings[0][0] + origin[0], buildings[0]
+    #              [1], buildings[0][2] + origin[1])
+    #     end = (buildings[1][0] + origin[0], buildings[1]
+    #            [1], buildings[1][2] + origin[1])
+    #     house = House(editor, start, end,
+    #                   entranceDirection[random.randint(0, 3)], blocks)
+    #     house.build()
 
 
 def get_height_building_from_center(center, position, length_world):

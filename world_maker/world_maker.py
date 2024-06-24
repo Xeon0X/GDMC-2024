@@ -46,7 +46,7 @@ def world_maker():
                  './world_maker/data/mountain_map.png').save('./world_maker/data/city_map.png')
 
     rectangle_building = generate_building(
-        './world_maker/data/city_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building.png')
+        './world_maker/data/city_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building.png', min_width=16, max_width=30)
     rectangle_building = rectangle_2D_to_3D(rectangle_building)
 
     # Houses
@@ -60,7 +60,8 @@ def world_maker():
 
     rectangle_mountain = generate_building(
         './world_maker/data/mountain_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building_moutain.png')
-    rectangle_mountain = rectangle_2D_to_3D(rectangle_mountain)
+    rectangle_mountain = rectangle_2D_to_3D(
+        rectangle_mountain)
 
     # Road
     heightmap_smooth_2 = filter_smooth(heightmap, 4)
