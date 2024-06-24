@@ -48,6 +48,8 @@ def world_maker():
     skeleton_mountain = skeleton_mountain_map(image_mountain_map)
     subtract_map('./world_maker/data/mountain_map.png',
                  './world_maker/data/skeleton_mountain_area.png').save('./world_maker/data/mountain_map.png')
+    subtract_map('./world_maker/data/mountain_map.png',
+                 './world_maker/data/skeleton_highway_area.png').save('./world_maker/data/mountain_map.png')
     subtract_map(smooth_sobel_water_map, filter_negative(
         './world_maker/data/mountain_map.png')).save('./world_maker/data/mountain_map.png')
     rectangle_mountain = generate_building(
