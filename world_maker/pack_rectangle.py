@@ -69,13 +69,12 @@ def pack_rectangles(grid, min_width: int = 10, max_width: int = 25):
         rectangle = generate_rectangle(min_width, max_width)
         if not bin.place_rectangle(rectangle):
             break
-        print(len(bin.rectangles))
     return bin.rectangles
 
 
 def draw_rectangles(rectangles, grid, heightmap):
     heightmap = handle_import_image(heightmap).convert('L')
-    image = Image.new('L', (len(grid[0]), len(grid)), (0))
+    image = Image.new('L', (len(grid[0]), len(grid)), 0)
     for rectangle in rectangles:
         start, end = rectangle
         height = []
@@ -88,13 +87,29 @@ def draw_rectangles(rectangles, grid, heightmap):
                 image.putpixel((x, y), round(height_average))
     return image
 
+def area_of_rectangles(rectangles):
+    area = 0
+    for rectangle in rectangles:
+        start, end = rectangle
+        area += abs((end[0] - start[0]) * (end[1] - start[1]))
+    return area
 
-def generate_building(image: Union[str, Image], heightmap: Union[str, Image], output: str = './world_maker/data/building.png', min_width: int = 10, max_width: int = 25):
+
+
+def generate_building(image: str | Image.Image, heightmap: str | Image.Image, output: str = './world_maker/data/building.png',
+                      number_of_try: int = 3, min_width: int = 10, max_width: int = 25):
+    print("[Building] Start generating building position...")
     image = handle_import_image(image).convert('L')
-    grid = np.array(image)
-    rectangles = pack_rectangles(grid, min_width, max_width)
-    draw_rectangles(rectangles, grid, heightmap).save(
-        output)
-    return rectangles
+    rectangles_output = []
+    for n in range(number_of_try):
+        print("[Building] Try", n+1)
+        grid = np.array(image)
+        rectangles = pack_rectangles(grid, min_width, max_width)
+        print("[Building] Number of building:", len(rectangles))
+        print("[Building] Area of building:", area_of_rectangles(rectangles))
+        if area_of_rectangles(rectangles) > area_of_rectangles(rectangles_output):
+            rectangles_output = rectangles
+    draw_rectangles(rectangles_output, grid, heightmap).save(output)
+    return rectangles_output
 
 

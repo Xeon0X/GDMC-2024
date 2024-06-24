@@ -170,14 +170,15 @@ class City:
     def generate_district(self):
         image = handle_import_image('./world_maker/data/smooth_sobel_watermap.png').convert('L')
         array = np.array(image)
-        mountain_coo = detect_mountain()
-        self.add_district(Position(mountain_coo[0], mountain_coo[1]), "mountain")
-        print("[City] District added.")
-        remove_circle_data(array, mountain_coo)
+        mountain = detect_mountain()
+        for mountain_coo in mountain:
+            self.add_district(mountain_coo, "mountain")
+            print("[City] Mountain district added.")
+            remove_circle_data(array, (mountain_coo.x, mountain_coo.y))
         area = get_area_array(array)
-        sizeX, sizeY = len(array[0]), len(array)
-        while area > sizeX * sizeY * 0.1:
-            x, y = randint(0, sizeX - 1), randint(0, sizeY - 1)
+        size_x, size_y = len(array[0]), len(array)
+        while area > size_x * size_y * 0.1:
+            x, y = randint(0, size_x - 1), randint(0, size_y - 1)
             if array[y][x]:
                 self.add_district(Position(x, y))
                 remove_circle_data(array, (x, y))
