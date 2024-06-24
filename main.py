@@ -20,19 +20,19 @@ def main():
     # Road([Point3D(4183, 100+y, -66), Point3D(4206, 102+y, -88), Point3D(4260, 112+y, -80),
     #      Point3D(4267, 104+y, -108), Point3D(4230, 102+y, -129), Point3D(4220, 112+y, -213), Point3D(4121, 167+y, -249), Point3D(4052, 129+y, -179)], 25)
 
-    editor = Editor(buffering=True)
-    c, g = Circle(Point2D(4422, -213)).circle_thick_by_line(10, 20)
-    for i in range(len(g)):
-        for j in range(len(g[i])):
-            editor.placeBlock(Point3D.insert_3d(
-                [g[i][j]], 'y', [103])[0].coordinates, Block("stone"))
-    for i in range(len(c)):
-        for j in range(len(c[i])):
-            editor.placeBlock(Point3D.insert_3d(
-                [c[i][j]], 'y', [103])[0].coordinates, Block("white_concrete"))
+    # editor = Editor(buffering=True)
+    # c, g = Circle(Point2D(4422, -213)).circle_thick_by_line(10, 20)
+    # for i in range(len(g)):
+    #     for j in range(len(g[i])):
+    #         editor.placeBlock(Point3D.insert_3d(
+    #             [g[i][j]], 'y', [103])[0].coordinates, Block("stone"))
+    # for i in range(len(c)):
+    #     for j in range(len(c[i])):
+    #         editor.placeBlock(Point3D.insert_3d(
+    #             [c[i][j]], 'y', [103])[0].coordinates, Block("white_concrete"))
 
-    # Road([Point3D(4398, 87, -136), Point3D(4394, 101, -200), Point3D(4385, 112, -282), Point3D(4324,
-    #      119, -302), Point3D(4304, 120, -249)], 9)
+    Road([Point3D(4180, 68, -260), Point3D(4154, 73, -278), Point3D(4131, 74, -252),
+         Point3D(4162, 69, -233), Point3D(4166, 70, -214), Point3D(4148, 66, -192)], 9)
     # rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
 
     # editor = Editor(buffering=True)

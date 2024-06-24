@@ -54,6 +54,7 @@ class Circle:
 
     def circle_thick_by_line(self, inner: int, outter: int) -> List[List[Point2D]]:
         width = outter - inner
+        print(f"[Circle gaps] {inner}/{outter}, {self.center}")
         self.circle_thick_by_line = [[] for _ in range(width)]
         for i in range(width):
             self.circle_thick_by_line[i] = self.circle(inner + i)
@@ -70,8 +71,7 @@ class Circle:
                 inner_line, True)[0]
             potential_neighbors = [inner_line[(nearest_index+j) % len(inner_line)]
                                    for j in range(-10, 10, 1)]
-            print("\n\n", nearest_index,
-                  inner_line[nearest_index], potential_neighbors)
+            # print(f"[Circle gaps] {i}/{len(outter_line)}")
             if Circle._count_neighbors(outter_line[i], potential_neighbors) == 0:
                 if Circle._count_neighbors(Point2D(outter_line[i].x-1, outter_line[i].y), potential_neighbors) > 1:
                     if Point2D(outter_line[i].x-1, outter_line[i].y) not in outter_line:
