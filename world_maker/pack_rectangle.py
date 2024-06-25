@@ -68,7 +68,7 @@ def pack_rectangles(grid, min_width: int = 10, max_width: int = 25):
     while True:
         rectangle = generate_rectangle(min_width, max_width)
         print(f"[Pack rectangles] Number of rectangles: {len(bin.rectangles)}")
-        if not bin.place_rectangle(rectangle):
+        if not bin.place_rectangle(rectangle) or len(bin.rectangles) >= 3000:
             break
     return bin.rectangles
 
