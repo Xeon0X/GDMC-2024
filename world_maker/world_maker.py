@@ -46,7 +46,7 @@ def world_maker():
                  './world_maker/data/mountain_map.png').save('./world_maker/data/city_map.png')
 
     rectangle_building = generate_building(
-        './world_maker/data/city_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building.png', min_width=30, max_width=40)
+        './world_maker/data/city_map.png', './world_maker/data/heightmap.png', output='./world_maker/data/building.png', min_width=20, max_width=40)
     rectangle_building = rectangle_2D_to_3D(rectangle_building)
 
     # Houses
