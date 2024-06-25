@@ -67,6 +67,7 @@ def pack_rectangles(grid, min_width: int = 10, max_width: int = 25):
     bin = Bin(grid)
     while True:
         rectangle = generate_rectangle(min_width, max_width)
+        print(f"[Pack rectangles] Number of rectangles: {len(bin.rectangles)}")
         if not bin.place_rectangle(rectangle):
             break
     return bin.rectangles
@@ -97,7 +98,7 @@ def area_of_rectangles(rectangles):
 
 
 def generate_building(image: str | Image.Image, heightmap: str | Image.Image, output: str = './world_maker/data/building.png',
-                      number_of_try: int = 3, min_width: int = 10, max_width: int = 25):
+                      number_of_try: int = 1, min_width: int = 10, max_width: int = 25):
     print("[Building] Start generating building position...")
     image = handle_import_image(image).convert('L')
     rectangles_output = []

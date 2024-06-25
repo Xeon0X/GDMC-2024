@@ -22,11 +22,15 @@ from buildings.Building import Building
 
 from utils.functions import *
 from utils.Enums import DIRECTION
+import time
 
 
 def main():
+    start_time_all = time.time()
+    start_time = time.time()
     rectangle_house_mountain, rectangle_building, skeleton_highway, skeleton_mountain, road_grid = world_maker()
-
+    time_world_maker = time.time() - start_time
+    print(f"[TIME] World_maker {time_world_maker}")
     editor = Editor(buffering=True)
     buildArea = editor.getBuildArea()
     origin = ((buildArea.begin).x, (buildArea.begin).z)
@@ -34,13 +38,23 @@ def main():
               abs(buildArea.begin.z - buildArea.end.z) / 2)
     length_world = sqrt((center[0]*2) ** 2 + (center[1]*2) ** 2)
 
-    # remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
-    #              './world_maker/data/smooth_sobel_watermap.png')
-    # smooth_terrain('./world_maker/data/heightmap.png',
-    #                './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    start_time = time.time()
+    remove_trees('./world_maker/data/heightmap.png', './world_maker/data/treemap.png',
+                 './world_maker/data/smooth_sobel_watermap.png')
+    time_remove_tree = time.time() - start_time
+    print(f"[TIME] Remove tree {time_remove_tree}")
 
-    # set_roads(skeleton_highway, origin)
-    # set_roads(skeleton_mountain, origin)
+    start_time = time.time()
+    smooth_terrain('./world_maker/data/heightmap.png',
+                   './world_maker/data/heightmap_smooth.png', './world_maker/data/smooth_sobel_watermap.png')
+    time_smooth_terrain = time.time() - start_time
+    print(f"[TIME] Smooth terrain {time_smooth_terrain}")
+
+    start_time = time.time()
+    set_roads(skeleton_highway, origin)
+    set_roads(skeleton_mountain, origin)
+    time_roads = time.time() - start_time
+    print(f"[TIME] Roads {time_roads}")
     # set_roads_grids(road_grid, origin)
     # roads.setRoads(skeleton_mountain)
     # roads.setRoads(skeleton_highway)
@@ -75,29 +89,45 @@ def main():
 
     # build it with your custom materials
 
+    start_time = time.time()
     for buildings in rectangle_building:
         height = get_height_building_from_center(
             center, (buildings[0][0], buildings[0][2]), length_world)
         start = (min(buildings[0][0], buildings[1][0]) + origin[0], buildings[0]
-                 [1]+height, min(buildings[0][2], buildings[1][2]) + origin[1])
+                 [1], min(buildings[0][2], buildings[1][2]) + origin[1])
         end = (max(buildings[0][0], buildings[1][0]) + origin[0],
                buildings[1]
-               [1], max(buildings[0][2], buildings[1][2]) + origin[1])
+               [1]+height, max(buildings[0][2], buildings[1][2]) + origin[1])
 
-        print("---", start, end)
         building = Building(random_data["buildings"], [
             start, end], baseShape, DIRECTION.EAST)
         building.build(editor, ["stone_bricks", "glass_pane", "glass", "cobblestone_wall", "stone_brick_stairs",
                                 "oak_planks", "white_concrete", "cobblestone", "stone_brick_slab", "iron_bars"])
 
-    # for buildings in rectangle_house_mountain:
-    #     start = (buildings[0][0] + origin[0], buildings[0]
-    #              [1], buildings[0][2] + origin[1])
-    #     end = (buildings[1][0] + origin[0], buildings[1]
-    #            [1], buildings[1][2] + origin[1])
-    #     house = House(editor, start, end,
-    #                   entranceDirection[random.randint(0, 3)], blocks)
-    #     house.build()
+    time_buildings = time.time() - start_time
+    print(f"[TIME] Buildings {time_buildings}")
+
+    start_time = time.time()
+    for buildings in rectangle_house_mountain:
+        start = (buildings[0][0] + origin[0], buildings[0]
+                 [1], buildings[0][2] + origin[1])
+        end = (buildings[1][0] + origin[0], buildings[1]
+               [1], buildings[1][2] + origin[1])
+        house = House(editor, start, end,
+                      entranceDirection[random.randint(0, 3)], blocks)
+        house.build()
+    time_houses = time.time() - start_time
+    print(f"[TIME] Houses {time_houses}")
+
+    print("[GDMC] Done!\n\n")
+
+    print(f"[TIME] Total {time.time() - start_time_all}")
+    print(f"[TIME] World_maker {time_world_maker}")
+    print(f"[TIME] Remove tree {time_remove_tree}")
+    print(f"[TIME] Smooth terrain {time_smooth_terrain}")
+    print(f"[TIME] Roads {time_roads}")
+    print(f"[TIME] Buildings {time_buildings}")
+    print(f"[TIME] Houses {time_houses}")
 
 
 def get_height_building_from_center(center, position, length_world):
@@ -133,7 +163,7 @@ def set_roads(skeleton: Skeleton, origin):
             xyz = transpose_form_heightmap('./world_maker/data/heightmap.png',
                                            skeleton.coordinates[skeleton.lines[i][j]], origin)
             heightmap_smooth = Image.open(
-                './world_maker/data/full_road_heightmap_smooth.png')
+                './world_maker/data/road_heightmap.png')
             skeleton.lines[i][j] = [xyz[0], heightmap_smooth.getpixel(
                 (skeleton.coordinates[skeleton.lines[i][j]][0], skeleton.coordinates[skeleton.lines[i][j]][-1])), xyz[2]]
 
